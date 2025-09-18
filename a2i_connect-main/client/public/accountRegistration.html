@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Registration - AI Connect</title>
+  <style>
+    body
+    {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f2f2f2;
+    }
+
+    .form-container 
+    {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #000000;
+      border-radius: 5px;
+      background: #fff;
+    }
+
+    h1, h2 
+    {
+      text-align: center;
+    }
+
+    label 
+    {
+      display: block;
+      margin-top: 10px;
+    }
+
+    input, select, textarea 
+    {
+      padding: 8px;
+      margin-top: 5px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+
+    button 
+    {
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
+      background: #000000;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover 
+    {
+      background: #372e2c;
+    }
+  </style>
+</head>
+<body>
+  <h1>AI Connect: Account Registration</h1>
+  <p style="text-align: center;">Join AI Connect to hear from industry professionals.</p>
+  
+  <div class="form-container">
+    <!-- Registration with Email -->
+    <form method="post" action="processRegistration.php">
+      
+      <label for="first-name">First Name</label>
+      <input type="text" id="first-name" name="first-name" placeholder="James" required>
+      
+      <label for="last-name">Last Name</label>
+      <input type="text" id="last-name" name="last-name" placeholder="Smith" required>
+      
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" placeholder="example@domain.com" required>
+      
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="Enter a password" required>
+      
+      <label for="confirm-password">Confirm Password</label>
+      <input type="password" id="confirm-password" name="confirm-password" placeholder="Re-enter your password" required>
+      
+      <button type="submit">Register Account</button>
+    </form>
+  </div>
+</body>
+</html>
