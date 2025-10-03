@@ -3,7 +3,7 @@ import { Container, Row, Col, Card } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import { NavLink, Link } from "react-router-dom";
 import { UserHeader } from './Dashboard';
-import './Base.css';
+import "./Base.css"; 
 
 const EventDescription = () => {
     // Changes the current user (keeping main's comment but using auth logic)
