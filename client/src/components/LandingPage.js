@@ -53,11 +53,14 @@ const LandingPage = () => {
       try {
         const response = await fetch(`http://localhost:5000/events`);
         const data = await response.json();
-        setEvents(data);
+
+        const eventArray = Array.isArray(data) ? data : data.events || [];
+
+        setEvents(eventArray);
 
             // Fetch requester names for each event
             const rNames = {};
-            for (const event of data) {
+            for (const event of eventArray) {
                 if (event.requesterID) {
                     const profileResponse = await fetch(`http://localhost:5000/profile/${event.requesterID}`);
                     const profileData = await profileResponse.json();
