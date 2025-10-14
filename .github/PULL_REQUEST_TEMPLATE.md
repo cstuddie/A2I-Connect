@@ -39,4 +39,5 @@ images for UI changes._
 ## [optional] Any additional information or concerns?
 
 - [ ] Yes
+        _Explain: _
 - [ ] No
