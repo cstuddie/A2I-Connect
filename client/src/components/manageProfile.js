@@ -50,7 +50,7 @@ function CoursesDisplay({ coursesData, setCoursesData }) {
       ...prevData,
       [key]: {
         ...prevData[key],
-        [fieldName]: prevData[key][fieldName] === 1 ? 0 : 1, // toggle between 0 and 1 test
+        [fieldName]: prevData[key][fieldName] === 1 ? 0 : 1, // toggle between 0 and 1 testing discord
       },
     }));
   };
