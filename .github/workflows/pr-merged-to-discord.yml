@@ -1,0 +1,26 @@
+name: Notify Discord on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/1427749837130039447/xeWuERulhCuvw1_bqBkxZamolVo0lTGNStb1H-SgwszvVeQ5NtdXjQZPza75QJwI2CTy"
+        run: |
+          PR_BODY=$(gh pr view ${{ github.event.pull_request.number }} --json body --jq '.body')
+
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{
+            "embeds": [{
+              "title": "Pull Request Merged: #${{ github.event.pull_request.number }}",
+              "description": "**Title:** ${{ github.event.pull_request.title }}\n**Author:** ${{ github.event.pull_request.user.login }}\n\n**Template Content:**\n\n'"$PR_BODY"'",
+              "url": "${{ github.event.pull_request.html_url }}",
+              "color": 3066993
+            }]
+          }' "${DISCORD_WEBHOOK_URL}"
