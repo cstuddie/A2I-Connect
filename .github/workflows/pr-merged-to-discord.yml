@@ -1,35 +1,23 @@
-name: Notify Discord on PR Merge
+name: Notify Discord
 
 on:
   pull_request:
-    types: [closed]
+    branches:
+      - master
+    types: [closed, opened]
 
 jobs:
-  if_merged:
-    if: github.event.pull_request.merged == true
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Send Discord notification
-        env:
-          DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/1427749837130039447/xeWuERulhCuvw1_bqBkxZamolVo0lTGNStb1H-SgwszvVeQ5NtdXjQZPza75QJwI2CTy"
-        run: |
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
-          PR_URL="${{ github.event.pull_request.html_url }}"
-          PR_BODY="${{ github.event.pull_request.body }}"
-
-          # Escape quotes for JSON safety
-          PR_BODY_ESCAPED=$(echo "$PR_BODY" | jq -Rs .)
-
-          curl -X POST -H "Content-Type: application/json" \
-            -d "{
-              \"embeds\": [{
-                \"title\": \"Pull Request Merged: #$PR_NUMBER\",
-                \"description\": \"**Title:** $PR_TITLE\n**Author:** $PR_AUTHOR\n\n**Description:**\n\n$PR_BODY\",
-                \"url\": \"$PR_URL\",
-                \"color\": 3066993
-              }]
-            }" \
-            "$DISCORD_WEBHOOK_URL"
+      - uses: actions/checkout@master
+      - name: send custom message with args
+        uses: appleboy/discord-action@master
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          color: "#48f442"
+          username: "The Lab Bot"
+          message: "🎉 New update on master !\n\n**${{ github.event.pull_request.title }}**\n\n${{ github.event.pull_request.body }}."
 
