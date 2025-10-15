@@ -13,14 +13,23 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: "https://discord.com/api/webhooks/1427749837130039447/xeWuERulhCuvw1_bqBkxZamolVo0lTGNStb1H-SgwszvVeQ5NtdXjQZPza75QJwI2CTy"
         run: |
-          PR_BODY=$(gh pr view ${{ github.event.pull_request.number }} --json body --jq '.body')
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_AUTHOR="${{ github.event.pull_request.user.login }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          PR_BODY="${{ github.event.pull_request.body }}"
+
+          # Escape quotes for JSON safety
+          PR_BODY_ESCAPED=$(echo "$PR_BODY" | jq -Rs .)
 
           curl -X POST -H "Content-Type: application/json" \
-          -d '{
-            "embeds": [{
-              "title": "Pull Request Merged: #${{ github.event.pull_request.number }}",
-              "description": "**Title:** ${{ github.event.pull_request.title }}\n**Author:** ${{ github.event.pull_request.user.login }}\n\n**Template Content:**\n\n'"$PR_BODY"'",
-              "url": "${{ github.event.pull_request.html_url }}",
-              "color": 3066993
-            }]
-          }' "${DISCORD_WEBHOOK_URL}"
+            -d "{
+              \"embeds\": [{
+                \"title\": \"Pull Request Merged: #$PR_NUMBER\",
+                \"description\": \"**Title:** $PR_TITLE\n**Author:** $PR_AUTHOR\n\n**Description:**\n\n$PR_BODY\",
+                \"url\": \"$PR_URL\",
+                \"color\": 3066993
+              }]
+            }" \
+            "$DISCORD_WEBHOOK_URL"
+
