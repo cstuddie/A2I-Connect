@@ -3,6 +3,17 @@
  * @returns { Promise<void> }
  */
 exports.up = async function (knex) {
+  await knex.raw('SET FOREIGN_KEY_CHECKS = 0;');
+
+  const tables = await knex.raw("SHOW TABLES");
+  const tableKey = `Tables_in_${process.env.DB_NAME}`;
+  for (const row of tables[0]) {
+    const tableName = row[tableKey];
+    await knex.schema.dropTableIfExists(tableName);
+  }
+
+  await knex.raw('SET FOREIGN_KEY_CHECKS = 1;');
+
   await knex.schema.createTable('Expertise', (table) => {
     table.increments('ID');
     table.integer('Field').notNullable();
@@ -117,4 +128,18 @@ exports.up = async function (knex) {
       .onDelete('CASCADE');
   });
 };
+
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.down = async function (knex) {
+  await knex.schema.dropTableIfExists('Reviews');
+  await knex.schema.dropTableIfExists('Message');
+  await knex.schema.dropTableIfExists('Conversation');
+  await knex.schema.dropTableIfExists('Event');
+  await knex.schema.dropTableIfExists('User');
+  await knex.schema.dropTableIfExists('Expertise');
+};
+
 
