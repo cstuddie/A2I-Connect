@@ -517,8 +517,6 @@ app.delete('/admin/users/:userID', adminAuthMiddleware, async (req, res) => {
   const { userID } = req.params;
   
   try {
-    // In a real application, you might want to implement cascade deletion
-    // or handle foreign key constraints properly
     await db('interests').where('userID', userID).delete();
     await db('profile').where('userID', userID).delete();
     await db('users').where('userID', userID).delete();
@@ -527,6 +525,20 @@ app.delete('/admin/users/:userID', adminAuthMiddleware, async (req, res) => {
   } catch (error) {
     console.error('Error deleting user:', error);
     res.status(500).json({ error: 'Error deleting user' });
+  }
+});
+
+// Admin route to delete event
+app.delete('/admin/events/:eventID', adminAuthMiddleware, async (req, res) => {
+  const { eventID } = req.params;
+  
+  try {
+    await db('events').where('eventID', eventID).delete();
+    
+    res.json({ message: 'Event deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting event:', error);
+    res.status(500).json({ error: 'Error deleting event' });
   }
 });
 
