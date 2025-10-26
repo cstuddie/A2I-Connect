@@ -91,14 +91,14 @@ const AdminUsers = () => {
     const fetchUsers = async () => {
       try {
         // Fetch all users
-        const usersResponse = await fetch('http://localhost:5000/users');
+        const usersResponse = await fetch('http://localhost:3001/users');
         const usersData = await usersResponse.json();
         
         // Fetch profiles for each user
         const enhancedUsers = await Promise.all(
           usersData.map(async (user) => {
             try {
-              const profileResponse = await fetch(`http://localhost:5000/profile/${user.userID}`);
+              const profileResponse = await fetch(`http://localhost:3001/profile/${user.userID}`);
               const profileData = await profileResponse.json();
               return { ...user, profile: profileData[0] || {} };
             } catch (error) {
@@ -129,15 +129,18 @@ const AdminUsers = () => {
     });
   };
 
-  const handleUpdateUser = async (e) => {
+const handleUpdateUser = async (e) => {
     e.preventDefault();
     
     try {
+      const adminToken = localStorage.getItem('adminToken');
+      
       // Update user profile
-      const profileResponse = await fetch(`http://localhost:5000/profile/${editingUser.userID}`, {
+      const profileResponse = await fetch(`http://localhost:3001/profile/${editingUser.userID}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminToken}`
         },
         body: JSON.stringify({
           name: userFormData.name,
@@ -175,13 +178,25 @@ const AdminUsers = () => {
     }
   };
 
-  const handleDeleteUser = async (userID) => {
+const handleDeleteUser = async (userID) => {
     if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
       try {
-        // In a real application, you would make an API call to delete the user
-        // For now, we'll just update the UI
-        setUsers(users.filter(user => user.userID !== userID));
-        alert('User deleted successfully');
+        const adminToken = localStorage.getItem('adminToken');
+        
+        const response = await fetch(`http://localhost:3001/admin/users/${userID}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${adminToken}`
+          }
+        });
+
+        if (response.ok) {
+          setUsers(users.filter(user => user.userID !== userID));
+          alert('User deleted successfully');
+        } else {
+          const error = await response.json();
+          alert(error.error || 'Failed to delete user');
+        }
       } catch (error) {
         console.error('Error deleting user:', error);
         alert('Error deleting user');
@@ -198,7 +213,7 @@ const AdminUsers = () => {
     }
     
     try {
-      const response = await fetch('http://localhost:5000/register', {
+      const response = await fetch('http://localhost:3001/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -216,12 +231,12 @@ const AdminUsers = () => {
       
       if (response.ok) {
         // Fetch the newly created user to get full details
-        const userResponse = await fetch('http://localhost:5000/users');
+        const userResponse = await fetch('http://localhost:3001/users');
         const usersData = await userResponse.json();
         const newUser = usersData.find(user => user.email === newUserData.email);
         
         if (newUser) {
-          const profileResponse = await fetch(`http://localhost:5000/profile/${newUser.userID}`);
+          const profileResponse = await fetch(`http://localhost:3001/profile/${newUser.userID}`);
           const profileData = await profileResponse.json();
           
           // Add the new user to the state
