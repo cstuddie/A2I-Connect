@@ -31,4 +31,23 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// POST /api/auth/register
+router.post('/register', async (req, res) => {
+  try {
+    const { email, password /*, name*/ } = req.body;
+    if (!email || !password) return res.status(400).json({ message: 'Email and password required' });
+
+    const existing = await db('users').where({ email }).first();
+    if (existing) return res.status(409).json({ message: 'Email already in use' });
+
+    const hashed = await bcrypt.hash(password, 10);
+    const [userID] = await db('users').insert({ email, password: hashed });
+
+    return res.status(201).json({ userID });
+  } catch (err) {
+    console.error('Register error:', err);
+    return res.status(500).json({ message: 'Server error during registration' });
+  }
+});
+
 module.exports = router;
