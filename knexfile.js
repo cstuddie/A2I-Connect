@@ -8,12 +8,16 @@ require('dotenv').config();
 module.exports = {
 
   development: {
-    client: 'mysql2',
+    client: 'mssql',
     connection: {
-      host: process.env.DB_HOST,
+      server: process.env.DB_HOST,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME
+      database: process.env.DB_NAME,
+      options: {
+        encrypt: false,
+        enableArithAbort: true
+      }
     },
     migrations: {
       directory: './db/migrations',
