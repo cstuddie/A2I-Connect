@@ -1,6 +1,6 @@
 const db = require('../../db/knex');
 
-exports.getAllProfiles = () => db('profile').select('*');
+exports.getAllProfiles = () => db('user').select('*');
 
 exports.getInterestsByUser = (userID) =>
   db('interests').where('userID', userID).first();
@@ -10,6 +10,10 @@ exports.getAllInterests = async () => {
   if (!all || !all.length) return [];
   return Object.keys(all[0]);
 };
+
+exports.getExpertise = () => db('Expertise').select('*');
+
+exports.getProfileByID = (id) => db('user').where('ID', id).first();
 
 exports.getTrueInterests = async (userID) => {
   const userInterests = await db('interests').where('userID', userID).first();
