@@ -63,7 +63,7 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetch('http://localhost:5000/events');
+        const res = await fetch('http://localhost:5000/events/');
         const data = await res.json();
         const eventArray = Array.isArray(data) ? data : data.events || [];
         setEvents(eventArray);

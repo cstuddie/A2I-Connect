@@ -15,7 +15,7 @@ const fieldToTableMap = {
   'Environmental Engineering': 'courses_environmental_engineering',
 };
 
-exports.getAllEvents = () => db('events').select('*');
+exports.getAllEvents = () => db('Event').select('*');
 
 exports.getCourseColumnsForField = async (field) => {
   const tableName = fieldToTableMap[field];

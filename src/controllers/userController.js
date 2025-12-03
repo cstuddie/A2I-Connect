@@ -30,6 +30,7 @@ exports.getExpertise = async (req, res) => {
   }
 };
 
+
 exports.getTrueInterests = async (req, res) => {
   try {
     const list = await userService.getTrueInterests(req.params.userID);
