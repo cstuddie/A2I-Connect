@@ -96,7 +96,7 @@ const LandingPage = () => {
       <Container>
         <Row className="mb-5">
           <div className="d-flex flex-column align-items-center" style={{paddingTop: '40px'}}>
-              <h1 >Find and connect with academic and industry professionals.</h1>
+              <h1 style={{color: 'black'}}>Find and connect with academic and industry professionals.</h1>
             <p style={{textAlign: 'center'}}>
               Whether looking to academic professionals for instruction or for industry professionals to give seminars, A2I Connect will connect you with professionals tailored to your needs.
             </p>
@@ -107,7 +107,7 @@ const LandingPage = () => {
         </Row>
         <Row className="mb-5">
           <Col>
-              <h1 style={{textAlign: 'left'}}>Attend Events.</h1>
+              <h1 style={{textAlign: 'left', color: 'black'}}>Attend Events.</h1>
             <div className="card-container">
               {events.slice(0, 10).map(event => (
                 <EventCard
@@ -126,7 +126,7 @@ const LandingPage = () => {
   
         <Row className="mb-5">
           <Col>
-              <h1 style={{textAlign: 'left'}}>Find Professionals.</h1>
+              <h1 style={{textAlign: 'left', color: 'black'}}>Find Professionals.</h1>
             <div className="card-container">
               {professionals.slice(0, 10).map(pro => (
                 <Card
