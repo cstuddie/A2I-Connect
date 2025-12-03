@@ -17,7 +17,10 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    affiliation: 'Independent Professional'
+    interests: '',
+    affiliation: 'Independent Professional',
+    expertise: '',
+    history: ''
   });
 
   const [error, setError] = useState('');
@@ -67,7 +70,7 @@ const Register = () => {
     if (activeTab === 'first') {
       setActiveTab('second');
     }
-    if (activeTab === 'second') {
+    else if (activeTab === 'second') {
       setActiveTab('third')
     }
   };
@@ -76,7 +79,7 @@ const Register = () => {
     if (activeTab === 'second') {
       setActiveTab('first');
     }
-    if (activeTab === 'third') {
+    else if (activeTab === 'third') {
       setActiveTab('second')
     }
   };
@@ -147,7 +150,7 @@ const Register = () => {
                   <Form.Group className="mb-3">
                       <Form.Label style={{color: 'black'}}>Password</Form.Label>
                       <Form.Control
-                      type="passwrod"
+                      type="password"
                       name="password"
                       placeholder="Enter a password"
                       required
@@ -156,9 +159,9 @@ const Register = () => {
                   </Form.Group>
 
                   <Form.Group className="mb-3">
-                      <Form.Label style={{color: 'black'}}>Password</Form.Label>
+                      <Form.Label style={{color: 'black'}}>Confirm Password</Form.Label>
                       <Form.Control
-                      type="passwrod"
+                      type="password"
                       name="confirmPassword"
                       placeholder="Re-enter your password"
                       required
@@ -208,7 +211,7 @@ const Register = () => {
                       <Form.Control
                         type="text"
                         name="affiliation"
-                        placeholder="Independent Professional, Mississippi Stae, Google, etc."
+                        placeholder="Independent Professional, Mississippi State, Google, etc."
                         onChange={handleChange}
                         required
                       />
