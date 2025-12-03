@@ -208,7 +208,7 @@ const Register = () => {
                       <Form.Control
                         type="text"
                         name="affiliation"
-                        placeholder="Independent Professional, Mississippi Stae, Google, etc."
+                        placeholder="Independent Professional, Mississippi State, Google, etc."
                         onChange={handleChange}
                         required
                       />
