@@ -20,7 +20,7 @@ const Register = () => {
     interests: '',
     affiliation: 'Independent Professional',
     expertise: '',
-    history: ''
+    history: '',
   });
 
   const [error, setError] = useState('');
@@ -36,8 +36,14 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate the second tab fields
+    if (!formData.interests || !formData.affiliation || !formData.expertise) {
+      setError('Please fill out all required fields');
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
 
@@ -59,23 +65,48 @@ const Register = () => {
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Failed to register');
+      setError('Failed to register');
     }
   };
 
   //handle tabs
   const [activeTab, setActiveTab] = useState('first');
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+
   const handleNext = () => {
     if (activeTab === 'first') {
-      setActiveTab('second');
+      // TODO: Add input validation
+      if(!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.confirmPassword) {
+        setError('Please fill out all required fields');
+        return;
+      }
+
+      if (!validateEmail(formData.email)) {
+        setError('Please enter a valid email');
+        return;
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        setError('Passwords do not match');
+        return;
+      }
+
+      setError('');
+      setActiveTab('second')
     }
+
     else if (activeTab === 'second') {
-      setActiveTab('third')
+      setActiveTab('third');
     }
   };
 
   const handlePrevious = () => {
+    setError('');
     if (activeTab === 'second') {
       setActiveTab('first');
     }
@@ -98,14 +129,27 @@ const Register = () => {
         </Navbar>
 
       <Container>
-      <h1>AI Connect: Account Registration</h1>
+      <h1 style={{textAlign: 'center'}}>AI Connect: Account Registration</h1>
       <p style={{ textAlign: 'center' }}>Join AI Connect to hear from industry professionals.</p>
+     
+      {error && (
+        <div style={{ 
+          color: 'red', 
+          backgroundColor: '#ffe6e6',
+          padding: '10px',
+          marginBottom: '15px',
+          borderRadius: '5px',
+          textAlign: 'center' 
+        }}>
+          {error}
+        </div>
+      )}
 
       <div className="form-container">
 
         <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} style={{display: 'none'}}>
           <Tab eventKey="first" title="Part 1">
-              <Form className="mt-4">
+              <div className="mt-4">
               <Row>
                   <Col md={4}>
                   <p className='text-muted'>1/2 Register</p>
@@ -163,7 +207,7 @@ const Register = () => {
                       <Form.Control
                       type="password"
                       name="confirmPassword"
-                      placeholder="Re-enter your password"
+                      placeholder="Confirm your password"
                       required
                       onChange={handleChange}
                       />
@@ -175,7 +219,7 @@ const Register = () => {
                   Next
                   </Button>
               </div>
-              </Form>
+              </div>
           </Tab>
 
           <Tab eventKey="second" title="Part 2">

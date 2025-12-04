@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Navbar, Nav, Button } from 'react-bootstrap';
+import { Navbar, Nav, Button} from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { NavLink, Link } from 'react-router-dom';
 
@@ -14,18 +14,21 @@ function Auth() {
 
   const [users, setUsers] = useState([]);
 
-  useEffect(() => {
-      const fetchUser = async () => {
-          try {
-              const response = await fetch(`http://localhost:5000/users`);
-              const data = await response.json();
-              setUsers(data);
-          } catch (error) {
-              console.error('Error fetching profile:', error);
-          }
-      };
-      fetchUser();
-  });
+  const [showPassword, setShowPassword] = useState(false);
+
+  // TODO: Determine if we need this
+  // useEffect(() => {
+  //     const fetchUser = async () => {
+  //         try {
+  //             const response = await fetch(`http://localhost:5000/users`);
+  //             const data = await response.json();
+  //             setUsers(data);
+  //         } catch (error) {
+  //             console.error('Error fetching profile:', error);
+  //         }
+  //     };
+  //     fetchUser();
+  // });
 
   const handleChange = (e) => {
     setFormData({
@@ -59,9 +62,11 @@ function Auth() {
         }, 500);
       } else {
         setError(data.message || 'Invalid email or password');
+        setLoading(false);
       }
     } catch (error) {
       setError('Failed to connect to server');
+      setLoading(false);
     }
   };
 
@@ -100,16 +105,29 @@ function Auth() {
               required
             />
           </div>
-          <div style={{ marginBottom: '15px' }}>
+          <div style={{ position: 'relative', marginBottom: '15px' }}>
             <label style={{ display: 'block', marginBottom: '5px' }}>Password:</label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               value={formData.password}
               onChange={handleChange}
               style={{ width: '100%', padding: '8px' }}
               required
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position:'absolute',
+                right:'10px',
+                top:'35px',
+                background: 'none',
+                border:'none',
+                cursor:'pointer'}}
+                >
+                  {showPassword ? '🙈' : '👁️'} 
+            </button>
           </div>
           <Button 
             type="submit" 
