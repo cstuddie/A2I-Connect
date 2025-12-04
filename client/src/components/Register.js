@@ -3,13 +3,6 @@ import { Form, Button, Container, Row, Col, Tabs, Tab, Nav, Navbar } from 'react
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import './Base.css'; // Importing styles
 
-// check for strength of password on registration
-/* 
-  Saving server.js hashing lines
-  const hashedPassword = await bcrypt.hash(password, 10);
-  : hashedPassword
-*/
-
 const Register = () => {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -37,7 +30,7 @@ const Register = () => {
     e.preventDefault();
 
     // Validate the second tab fields
-    if (!formData.interests || !formData.affiliation || !formData.expertise) {
+    if (!formData.interests.trim() || !formData.affiliation.trim() || !formData.expertise.trim()) {
       setError('Please fill out all required fields');
       return;
     }
@@ -61,45 +54,37 @@ const Register = () => {
         alert('Registration successful!');
         navigate('/login');
       } else {
-        alert(result.error);
+        setError(result.error || 'Registration failed');
       }
     } catch (error) {
       console.error('Error:', error);
-      setError('Failed to register');
+      setError('Failed to register. Please try again.');
     }
   };
 
   //handle tabs
   const [activeTab, setActiveTab] = useState('first');
 
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-
   const handleNext = () => {
     if (activeTab === 'first') {
-      // TODO: Add input validation
-      if(!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.confirmPassword) {
-        setError('Please fill out all required fields');
-        return;
-      }
 
-      if (!validateEmail(formData.email)) {
-        setError('Please enter a valid email');
-        return;
-      }
+      // Whitespace validation
+      if( !formData.firstName.trim() || !formData.lastName.trim() || 
+          !formData.email.trim() || !formData.password.trim() || 
+          !formData.confirmPassword.trim()) {
+            setError('Please fill out all fields. Spaces-only entries are not allowed.');
+            return;
+          }
 
+      // Password match validation 
       if (formData.password !== formData.confirmPassword) {
         setError('Passwords do not match');
         return;
       }
 
       setError('');
-      setActiveTab('second')
+      setActiveTab('second');
     }
-
     else if (activeTab === 'second') {
       setActiveTab('third');
     }
@@ -111,7 +96,7 @@ const Register = () => {
       setActiveTab('first');
     }
     else if (activeTab === 'third') {
-      setActiveTab('second')
+      setActiveTab('second');
     }
   };
 
@@ -149,7 +134,7 @@ const Register = () => {
 
         <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} style={{display: 'none'}}>
           <Tab eventKey="first" title="Part 1">
-              <div className="mt-4">
+              <Form onSubmit={(e) => { e.preventDefault(); handleNext(); }} className="mt-4">
               <Row>
                   <Col md={4}>
                   <p className='text-muted'>1/2 Register</p>
@@ -159,7 +144,7 @@ const Register = () => {
                   <Col md={8}>
 
                   <Form.Group className="mb-3">
-                      <Form.Label style={{color: 'black'}}>First</Form.Label>
+                      <Form.Label style={{color: 'black'}}>First Name</Form.Label>
                       <Form.Control
                       type="text"
                       name="firstName"
@@ -198,6 +183,7 @@ const Register = () => {
                       name="password"
                       placeholder="Enter a password"
                       required
+                      minLength={8}
                       onChange={handleChange}
                       />
                   </Form.Group>
@@ -215,11 +201,11 @@ const Register = () => {
                   </Col>
               </Row>
               <div className="d-flex justify-content-end mt-3">
-                  <Button variant="dark" onClick={handleNext}>
+                  <Button variant="dark" type="submit">
                   Next
                   </Button>
               </div>
-              </div>
+              </Form>
           </Tab>
 
           <Tab eventKey="second" title="Part 2">
@@ -286,7 +272,7 @@ const Register = () => {
                         as="textarea"
                         name="history"
                         style={{ height: '100px', resize: 'none' }}
-                        placeholder="Process enginner at Exxon, Art director at MoMa"
+                        placeholder="Process engineer at Exxon, Art director at MoMa"
                         onChange={handleChange}
                       />
                     </Col>
@@ -305,30 +291,6 @@ const Register = () => {
                 </Form>
           </Tab>
           </Tabs>
-
-        {/* <form onSubmit={handleSubmit}>
-          <label htmlFor="firstName">First Name</label>
-          <input type="text" id="firstName" name="firstName" placeholder=="James" required onChange={handleChange} />
-
-          <label htmlFor="lastName">Last Name</label>
-          <input type="text" id="lastName" name="lastName" placeholder=="Smith" required onChange={handleChange} />
-
-          <label htmlFor="email">Email Address</label>
-          <input type="email" id="email" name="email" placeholder=="example@domain.com" required onChange={handleChange} />
-
-          <label htmlFor="password">Password</label>
-          <input type="password" id="password" name="password" placeholder=="Enter a password" required onChange={handleChange} />
-
-          <label htmlFor="confirmPassword">Confirm Password</label>
-          <input type="password" id="confirmPassword" name="confirmPassword" placeholder=="Re-enter your password" required onChange={handleChange} />
-          
-          <br />
-          <button type="submit" >Register Account</button>
-
-          <NavLink to="/Login" style={{ paddingLeft: "10px"}}>
-            Already have an account?
-          </NavLink>
-        </form> */}
       </div>
       </Container>
     </div>
