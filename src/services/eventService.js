@@ -25,12 +25,21 @@ exports.getCourseColumnsForField = async (field) => {
 };
 
 exports.requestSpeaker = async (payload) => {
-  const { requesterID, topic, description, field, deliveryMethod, status, date, affiliation, course } = payload;
-  const [requestID] = await db('events').insert({
-    requesterID, topic, description, field, deliveryMethod, status, date, affiliation, course,
-    created_at: new Date(), updated_at: new Date()
+  const { RequesterID, Topic, Description, Date: EventDate, EventStatus, ExpertiseID, DeliveryMethod } = payload;
+  
+  const [eventID] = await db('Event').insert({
+    RequesterID,
+    Topic,
+    Description,
+    Date: EventDate,
+    EventStatus,
+    ExpertiseID,
+    DeliveryMethod,
+    created_at: new Date(),
+    updated_at: new Date()
   });
-  return requestID;
+  
+  return eventID;
 };
 
 exports.recommendedEvents = async (userID) => {
