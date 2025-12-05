@@ -68,3 +68,24 @@ exports.getCoursesByUser = async (req, res) => {
     res.status(500).json({ error: 'An error occured on courses' });
   }
 };
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const profileData = req.body;
+    
+    // Validate required fields
+    if (!profileData.FirstName || !profileData.LastName) {
+      return res.status(400).json({ error: 'First name and last name are required' });
+    }
+    
+    await userService.updateProfile(id, profileData);
+    
+    // Fetch and return updated profile
+    const updatedProfile = await userService.getProfileByID(id);
+    res.json({ message: 'Profile updated successfully', profile: updatedProfile });
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+};
