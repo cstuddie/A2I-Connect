@@ -13,7 +13,7 @@ exports.getAllInterests = async () => {
 
 exports.getExpertise = () => db('Expertise').select('*');
 
-exports.getProfileByID = (id) => db('user').where('ID', id).first();
+exports.getProfileByID = (id) => db('User').where('ID', id).first();
 
 exports.getTrueInterests = async (userID) => {
   const userInterests = await db('interests').where('userID', userID).first();
@@ -39,4 +39,20 @@ exports.getCoursesByUser = async (userID) => {
     }
   }
   return result;
+};
+
+exports.updateProfile = async (id, profileData) => {
+  const { FirstName, LastName, Bio, Affiliation, ExpertiseID, Role } = profileData;
+  
+  return db('User')
+    .where('ID', id)
+    .update({
+      FirstName,
+      LastName,
+      Bio,
+      Affiliation,
+      ExpertiseID,
+      Role,
+      updated_at: db.fn.now()
+    });
 };
