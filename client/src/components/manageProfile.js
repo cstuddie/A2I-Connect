@@ -41,11 +41,6 @@ const EditProfile = () => {
     fetchProfile();
   }, [userID]);
 
-  useEffect(() => {
-    console.log('profileInfo', profileInfo);
-    console.log(profileInfo.name);
-  }, [profileInfo]);
-
   const handleProfileChange = async (e) => {
     setProfileInfo({ ...profileInfo, [e.target.name]: e.target.value });
   };

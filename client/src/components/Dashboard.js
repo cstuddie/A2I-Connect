@@ -108,7 +108,7 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/profile/${userID}`);
+                const response = await fetch(`http://localhost:3001/users/${userID}`);
                 const data = await response.json();
                 if (data && data.length > 0) {
                     setProfileInfo(data[0]);
@@ -129,7 +129,7 @@ const Dashboard = () => {
 
         for (const requesterId of requesterIds) {
             try {
-                const profileResponse = await fetch(`http://localhost:5000/profile/${requesterId}`);
+                const profileResponse = await fetch(`http://localhost:3001/users/${requesterId}`);
                 const profileData = await profileResponse.json();
                 requesterNameMap[requesterId] = profileData && profileData[0] && profileData[0].name ? profileData[0].name : "Unknown Requester";
             } catch (error) {
@@ -140,7 +140,7 @@ const Dashboard = () => {
 
         for (const instructorId of instructorIds) {
             try {
-                const profileResponse = await fetch(`http://localhost:5000/profile/${instructorId}`);
+                const profileResponse = await fetch(`http://localhost:3001/users/${instructorId}`);
                 const profileData = await profileResponse.json();
                 instructorNameMap[instructorId] = profileData && profileData[0] && profileData[0].name ? profileData[0].name : "Unknown Instructor";
             } catch (error) {
@@ -154,83 +154,64 @@ const Dashboard = () => {
     };
 
     // Get upcoming events for user
-    useEffect(() => {
-        const fetchUpcoming = async () => {
-            try {
-                const response = await fetch(`http://localhost:5000/events/${userID}`);
-                const data = await response.json();
-                setUpcomingEvents(data);
-                fetchProfileNames(data, setRequesterNameMap, setInstructorNameMap);
-            } catch (error) {
-                console.error('Error fetching upcoming events:', error);
-            }
-        };
-        fetchUpcoming();
-    }, [userID]);
+    // useEffect(() => {
+    //     const fetchUpcoming = async () => {
+    //         try {
+    //             const response = await fetch(`http://localhost:3001/events/${userID}`);
+    //             const data = await response.json();
+    //             setUpcomingEvents(data);
+    //             fetchProfileNames(data, setRequesterNameMap, setInstructorNameMap);
+    //         } catch (error) {
+    //             console.error('Error fetching upcoming events:', error);
+    //         }
+    //     };
+    //     fetchUpcoming();
+    // }, [userID]);
 
-    // Get recommended events for user
-    useEffect(() => {
-        const fetchRecommended = async () => {
-            try {
-                const response = await fetch(`http://localhost:5000/recommendedEvents/${userID}`);
-                const data = await response.json();
-                setRecommendedEvents(data);
-                fetchProfileNames(data, setRecommendedRequesterNameMap, setRecommendedInstructorNameMap);
-            } catch (error) {
-                console.error('Error fetching recommended events:', error);
-            }
-        };
-        fetchRecommended();
-    }, [userID]);
+    // // Get recommended events for user
+    // useEffect(() => {
+    //     const fetchRecommended = async () => {
+    //         try {
+    //             const response = await fetch(`http://localhost:3001/recommendedEvents/${userID}`);
+    //             const data = await response.json();
+    //             setRecommendedEvents(data);
+    //             fetchProfileNames(data, setRecommendedRequesterNameMap, setRecommendedInstructorNameMap);
+    //         } catch (error) {
+    //             console.error('Error fetching recommended events:', error);
+    //         }
+    //     };
+    //     fetchRecommended();
+    // }, [userID]);
 
-    // Get interests
-    useEffect(() => {
-        const fetchInterests = async () => {
-            try {
-                const response = await fetch(`http://localhost:5000/trueInterests/${userID}`);
-                const data = await response.json();
-                setTrueInterests(data);
-            } catch (error) {
-                console.error('Error fetching interests:', error)
-            }
-        };
-        fetchInterests();
-    });
+    // // Get interests
+    // useEffect(() => {
+    //     const fetchInterests = async () => {
+    //         try {
+    //             const response = await fetch(`http://localhost:3001/trueInterests/${userID}`);
+    //             const data = await response.json();
+    //             setTrueInterests(data);
+    //         } catch (error) {
+    //             console.error('Error fetching interests:', error)
+    //         }
+    //     };
+    //     fetchInterests();
+    // });
 
-
-    // Get upcoming events for user
-    useEffect(() => {
-        const fetchUpcoming = async () => {
-            try {
-                const response = await fetch(`http://localhost:5000/events/${userID}`);
-                const data = await response.json();
-                if (Array.isArray(data)) {
-                    setUpcomingEvents(data);
-                    fetchProfileNames(data, setRequesterNameMap, setInstructorNameMap);
-                }
-            } catch (error) {
-                console.error('Error fetching upcoming events:', error);
-            }
-        };
-        fetchUpcoming();
-    }, [userID]);
-
-    // Get recommended events for user
-    useEffect(() => {
-        const fetchRecommended = async () => {
-            try {
-                const response = await fetch(`http://localhost:5000/recommendedEvents/${userID}`);
-                const data = await response.json();
-                if (Array.isArray(data)) {
-                    setRecommendedEvents(data);
-                    fetchProfileNames(data, setRecommendedRequesterNameMap, setRecommendedInstructorNameMap);
-                }
-            } catch (error) {
-                console.error('Error fetching recommended events:', error);
-            }
-        };
-        fetchRecommended();
-    }, [userID]);
+    // useEffect(() => {
+    //     const fetchRecommended = async () => {
+    //         try {
+    //             const response = await fetch(`http://localhost:3001/recommendedEvents/${userID}`);
+    //             const data = await response.json();
+    //             if (Array.isArray(data)) {
+    //                 setRecommendedEvents(data);
+    //                 fetchProfileNames(data, setRecommendedRequesterNameMap, setRecommendedInstructorNameMap);
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching recommended events:', error);
+    //         }
+    //     };
+    //     fetchRecommended();
+    // }, [userID]);
 
     return (
         <div>

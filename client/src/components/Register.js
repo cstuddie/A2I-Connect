@@ -29,36 +29,40 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate the second tab fields
-    if(!formData.affiliation.trim() || !formData.expertiseID.trim()) {
-      setError('Please fill out all required fields');
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
+    const payload = {
+      firstName: formData.firstName.trim(),
+      lastName: formData.lastName.trim(),
+      email: formData.email.trim(),
+      password: formData.password,
+      role: Number(formData.role),
+      expertiseID: formData.expertiseID ? Number(formData.expertiseID) : null,
+      bio: formData.bio || null,
+      affiliation: formData.affiliation || null
+    };
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+      const res = await fetch("http://localhost:3001/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       });
 
-      const result = await response.json();
-      if (response.ok) {
-        alert('Registration successful!');
-        navigate('/login');
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Registration successful");
+        navigate("/login");
       } else {
-        setError(result.error || 'Registration failed');
+        setError(data.error || "Registration failed");
       }
-    } catch (error) {
-      console.error('Error:', error);
-      setError('Failed to register. Please try again.');
+    } catch (err) {
+      setError("Server error during registration");
+      console.error(err);
     }
   };
 

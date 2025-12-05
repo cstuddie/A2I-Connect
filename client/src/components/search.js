@@ -37,7 +37,7 @@ const Search = () => {
 useEffect(() => {
     const fetchProfile = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/profile/${userID}`);
+            const response = await fetch(`http://localhost:3001/users/${userID}`);
             const data = await response.json();
             setProfileInfo(data[0]);
         } catch (error) {
@@ -50,7 +50,7 @@ useEffect(() => {
 
   const handleTopicSearch = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/search/topic/${searchTerm}`);
+      const response = await fetch(`http://localhost:3001/search/topic/${searchTerm}`);
       const data = await response.json();
       setSearchResults(data);
       fetchProfileNames(data, setRequesterNameMap, setInstructorNameMap);
@@ -62,7 +62,7 @@ useEffect(() => {
   // Here just in case we want to come back to field search
   // const handleFieldSearch = async () => {
   //   try {
-  //     const response = await fetch(`http://localhost:5000/search/field/${searchTerm}`);
+  //     const response = await fetch(`http://localhost:3001/search/field/${searchTerm}`);
   //     const data = await response.json();
   //     setSearchResults(data);
   //     fetchProfileNames(data, setRequesterNameMap, setInstructorNameMap);
@@ -71,16 +71,31 @@ useEffect(() => {
   //   }
   // };
 
-  const fetchAllEvents = async () => {
+const fetchAllEvents = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/events`);
+      const response = await fetch(`http://localhost:3001/events/`);
       const data = await response.json();
-      setSearchResults(data);
-      fetchProfileNames(data, setRequesterNameMap, setInstructorNameMap);
+
+      const mappedData = data.map(event => ({
+        eventID: event.EventID,
+        topic: event.Topic,
+        description: event.Description,
+        date: event.Date,
+        requesterID: event.RequesterID,
+        instructorID: event.InstructorID,
+        field: event.Field,
+        course: event.Course,
+        deliveryMethod: event.DeliveryMethod,
+        status: event.EventStatus,
+      }));
+
+      setSearchResults(mappedData);
+      fetchProfileNames(mappedData, setRequesterNameMap, setInstructorNameMap);
     } catch (error) {
       console.error('Error fetching all events:', error);
     }
-  }
+  };
+
 
   const handleSearch = () => {
     if (searchTerm.trim() === '') {
@@ -94,44 +109,45 @@ useEffect(() => {
     // }
   };
 
-  const fetchProfileNames = async (events, setRequesterNames, setInstructorNames) => {
-    const requesterIds = new Set(events.map(event => event.requesterID).filter(id => id));
-    const instructorIds = new Set(events.map(event => event.instructorID).filter(id => id));
+const fetchProfileNames = async (events, setRequesterNames, setInstructorNames) => {
+  const requesterIds = new Set(events.map(event => event.requesterID).filter(id => id));
+  const instructorIds = new Set(events.map(event => event.instructorID).filter(id => id));
 
-    const requesterNameMap = {};
-    const instructorNameMap = {};
+  const requesterNameMap = {};
+  const instructorNameMap = {};
 
-    for (const requesterId of requesterIds) {
-        try {
-            const profileResponse = await fetch(`http://localhost:5000/profile/${requesterId}`);
-            const profileData = await profileResponse.json();
-            requesterNameMap[requesterId] = profileData && profileData[0] && profileData[0].name ? profileData[0].name : "Unknown Requester";
-        } catch (error) {
-            console.error(`Error fetching requester profile for ${requesterId}:`, error);
-            requesterNameMap[requesterId] = "Unknown Requester";
-        }
-    }
+  const fetchName = async (userID, fallback = "Unknown User") => {
+      try {
+        const res = await fetch(`http://localhost:3001/users/${userID}`);
+        const data = await res.json();
+        const profile = Array.isArray(data) ? data[0] : data; // Handle both array and object
+        if (!profile) return fallback;
 
-    for (const instructorId of instructorIds) {
-        try {
-            const profileResponse = await fetch(`http://localhost:5000/profile/${instructorId}`);
-            const profileData = await profileResponse.json();
-            instructorNameMap[instructorId] = profileData && profileData[0] && profileData[0].name ? profileData[0].name : "Unknown Instructor";
-        } catch (error) {
-            console.error(`Error fetching instructor profile for ${instructorId}:`, error);
-            instructorNameMap[instructorId] = "Instructor Needed";
-        }
-    }
+        return (profile.FirstName && profile.LastName)
+          ? `${profile.FirstName} ${profile.LastName}`
+          : profile.name || fallback;
+      } catch (err) {
+        console.error(`Error fetching user ${userID}:`, err);
+        return fallback;
+      }
+    };
+
+    await Promise.all([...requesterIds].map(async id => {
+      requesterNameMap[id] = await fetchName(id, "Unknown Requester");
+    }));
+
+    await Promise.all([...instructorIds].map(async id => {
+      instructorNameMap[id] = await fetchName(id, "Instructor Needed");
+    }));
 
     setRequesterNames(requesterNameMap);
     setInstructorNames(instructorNameMap);
   };
-
   
   const fetchCourses = async (field) => {
     try {
       const adjustedField = field.toLowerCase().replace(/ /g, '_');
-      const response = await fetch(`http://localhost:5000/filteredCourses/${adjustedField}`);
+      const response = await fetch(`http://localhost:3001/filteredCourses/${adjustedField}`);
       const data = await response.json();
       setCourses(data);
     } catch (error) {
@@ -166,7 +182,7 @@ useEffect(() => {
 
   return (
     <div className="search-container">
-      <UserHeader name={profileInfo.name} />
+      <UserHeader name={profileInfo?.FirstName || "Loading..."} />
 
       <Container>
       <div className="search-type-container">
