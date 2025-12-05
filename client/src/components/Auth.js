@@ -3,6 +3,7 @@ import { Navbar, Nav, Button} from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { NavLink, Link } from 'react-router-dom';
 
+
 function Auth() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -12,35 +13,39 @@ function Auth() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const [users, setUsers] = useState([]);
-
-  const [showPassword, setShowPassword] = useState(false);
-
-  // TODO: Determine if we need this
-  // useEffect(() => {
-  //     const fetchUser = async () => {
-  //         try {
-  //             const response = await fetch(`http://localhost:5000/users`);
-  //             const data = await response.json();
-  //             setUsers(data);
-  //         } catch (error) {
-  //             console.error('Error fetching profile:', error);
-  //         }
-  //     };
-  //     fetchUser();
-  // });
+  useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+     setError(''); 
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    if(!formData.email.trim() || !formData.password.trim()) {
+      setError('Please fill out all fields. Spaces-only entries are not allowed.')
+      setLoading(false);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailRegex.test(formData.email.trim())) {
+      setError('Please enter a valid email address');
+      setLoading(false);
+      return;
+    }
   
     try {
       const response = await fetch('http://localhost:5000/api/auth/login', {
@@ -61,11 +66,13 @@ function Auth() {
           navigate('/dashboard');
         }, 500);
       } else {
-        setError(data.message || 'Invalid email or password');
+        const errorMessage = data.message || 'Invalid email or password';
+        setError(errorMessage);
         setLoading(false);
       }
     } catch (error) {
-      setError('Failed to connect to server');
+      console.error('Login error', error);
+      setError('Unable to connect to server. Please check your internet connection and try again.');
       setLoading(false);
     }
   };
@@ -91,7 +98,19 @@ function Auth() {
 
       <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
         <h1>Login</h1>
-        {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+        {error && (
+          <div style={{
+            color: 'red',
+            backgroundColor:'#ffe6e6',
+            padding:'10px',
+            marginBottom:'15px',
+            borderRadius:'5px',
+            textAlign:'center',
+            border:'1px solid #ffcccc'
+          }}>
+            {error}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '15px' }}>
@@ -105,29 +124,16 @@ function Auth() {
               required
             />
           </div>
-          <div style={{ position: 'relative', marginBottom: '15px' }}>
+          <div style={{ marginBottom: '15px' }}>
             <label style={{ display: 'block', marginBottom: '5px' }}>Password:</label>
             <input
-              type={showPassword ? "text" : "password"}
+              type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               style={{ width: '100%', padding: '8px' }}
               required
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              style={{
-                position:'absolute',
-                right:'10px',
-                top:'35px',
-                background: 'none',
-                border:'none',
-                cursor:'pointer'}}
-                >
-                  {showPassword ? '🙈' : '👁️'} 
-            </button>
           </div>
           <Button 
             type="submit" 
@@ -144,6 +150,12 @@ function Auth() {
             {loading ? 'Logging in...' : 'Login'}
           </Button>
         </form>
+        <div style={{textAlign:'center', marginTop:'15px', color:'#666'}}>
+            Don't have an account?{' '}
+            <Link to="/Register" style={{color:'#0B3444', textDecoration:'none'}}>
+              Sign up here
+            </Link>
+        </div>
       </div>
     </div>
   );
