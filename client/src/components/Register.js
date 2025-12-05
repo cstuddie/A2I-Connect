@@ -10,10 +10,10 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 1, // Default to regular user (1 = user, 2 = instructor/expert)
-    expertiseID: '', // will be a dropdown selection
-    bio: '',
+    interests: '',
     affiliation: 'Independent Professional',
+    expertise: '',
+    history: '',
   });
 
   const [error, setError] = useState('');
@@ -30,7 +30,7 @@ const Register = () => {
     e.preventDefault();
 
     // Validate the second tab fields
-    if(!formData.affiliation.trim() || !formData.expertiseID.trim()) {
+    if (!formData.interests.trim() || !formData.affiliation.trim() || !formData.expertise.trim()) {
       setError('Please fill out all required fields');
       return;
     }
@@ -41,7 +41,7 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/register', {
+      const response = await fetch('http://localhost:5000/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,13 +86,6 @@ const Register = () => {
       setActiveTab('second');
     }
     else if (activeTab === 'second') {
-
-      if(!formData.affiliation.trim() || !formData.expertiseID) {
-        setError('Please fill out all required fields (Role, Expertise, and Affiliation)')
-        return;
-      }
-
-      setError('')
       setActiveTab('third');
     }
   };
@@ -155,7 +148,6 @@ const Register = () => {
                       <Form.Control
                       type="text"
                       name="firstName"
-                      value={formData.firstName}
                       placeholder="John"
                       required
                       onChange={handleChange}
@@ -167,7 +159,6 @@ const Register = () => {
                       <Form.Control
                       type="text"
                       name="lastName"
-                      value={formData.lastName}
                       placeholder="Doe"
                       required
                       onChange={handleChange}
@@ -179,7 +170,6 @@ const Register = () => {
                       <Form.Control
                       type="email"
                       name="email"
-                      value={formData.email}
                       placeholder="example@domain.com"
                       required
                       onChange={handleChange}
@@ -191,7 +181,6 @@ const Register = () => {
                       <Form.Control
                       type="password"
                       name="password"
-                      value={formData.password}
                       placeholder="Enter a password"
                       required
                       minLength={8}
@@ -204,7 +193,6 @@ const Register = () => {
                       <Form.Control
                       type="password"
                       name="confirmPassword"
-                      value={formData.confirmPassword}
                       placeholder="Confirm your password"
                       required
                       onChange={handleChange}
@@ -230,75 +218,66 @@ const Register = () => {
                   </Col>
                   <Col md={8}>
 
-  <Form.Group as={Row} className="mb-3">
-    <Form.Label column sm="2">
-      Role:
-    </Form.Label>
-    <Col sm="10">
-      <Form.Select
-        name="role"
-        value={formData.role}
-        onChange={handleChange}
-        required
-      >
-        <option value={1}>User (seeking expertise)</option>
-        <option value={2}>Expert (offering expertise)</option>
-      </Form.Select>
-    </Col>
-  </Form.Group>
+                  <Form.Group as={Row} className="mb-3">
+                    <Form.Label column sm="2">
+                      Interests:
+                    </Form.Label>
+                    <Col sm="10">
+                      <Form.Control
+                        type="text"
+                        name="interests"
+                        placeholder="Blockchain, Sustainable Architecture, Virtual Reality, etc."
+                        onChange={handleChange}
+                        required
+                      />
+                    </Col>
+                  </Form.Group>
 
-  <Form.Group as={Row} className="mb-3">
-    <Form.Label column sm="2">
-      Expertise:
-    </Form.Label>
-    <Col sm="10">
-      <Form.Select
-        name="expertiseID"
-        value={formData.expertiseID}
-        onChange={handleChange}
-        required
-      >
-        <option value="">Select your expertise...</option>
-        <option value={1}>Web Development</option>
-        <option value={2}>Data Science</option>
-        <option value={3}>AI & Machine Learning</option>
-        <option value={4}>Cybersecurity</option>
-      </Form.Select>
-    </Col>
-  </Form.Group>
+                  <Form.Group as={Row} className="mb-3">
+                    <Form.Label column sm="2">
+                      Affiliation:
+                    </Form.Label>
+                    <Col sm="10">
+                      <Form.Control
+                        type="text"
+                        name="affiliation"
+                        placeholder="Independent Professional, Mississippi State, Google, etc."
+                        onChange={handleChange}
+                        required
+                      />
+                    </Col>
+                  </Form.Group>
 
-  <Form.Group as={Row} className="mb-3">
-    <Form.Label column sm="2">
-      Affiliation:
-    </Form.Label>
-    <Col sm="10">
-      <Form.Control
-        type="text"
-        name="affiliation"
-        value={formData.affiliation}
-        placeholder="Independent Professional, Mississippi State, Google, etc."
-        onChange={handleChange}
-        required
-      />
-    </Col>
-  </Form.Group>
+                  <Form.Group as={Row} className="mb-3">
+                    <Form.Label column sm="2">
+                      Expertise:
+                    </Form.Label>
+                    <Col sm="10">
+                      <Form.Control
+                        type="text"
+                        name="expertise"
+                        placeholder="Fine Arts, Renewable Energy, Artificial Intelligence, etc."
+                        onChange={handleChange}
+                        required
+                      />
+                    </Col>
+                  </Form.Group>
 
-  <Form.Group as={Row} className="mb-3">
-    <Form.Label column sm="2">
-      Bio:
-    </Form.Label>
-    <Col sm="10">
-      <Form.Control
-        as="textarea"
-        name="bio"
-        value={formData.bio}
-        style={{ height: '100px', resize: 'none' }}
-        placeholder="Tell us about yourself and your professional background..."
-        onChange={handleChange}
-      />
-    </Col>
-  </Form.Group>
-</Col>
+                  <Form.Group as={Row} className="mb-3">
+                    <Form.Label column sm="2">
+                      History:
+                    </Form.Label>
+                    <Col sm="10">
+                      <Form.Control
+                        as="textarea"
+                        name="history"
+                        style={{ height: '100px', resize: 'none' }}
+                        placeholder="Process engineer at Exxon, Art director at MoMa"
+                        onChange={handleChange}
+                      />
+                    </Col>
+                  </Form.Group>
+                  </Col>
                   </Row>
 
                   <div className="d-flex justify-content-between mt-3">
