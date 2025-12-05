@@ -22,10 +22,13 @@ exports.getCourseColumnsForField = async (req, res) => {
 
 exports.requestSpeaker = async (req, res) => {
   try {
-    const requestID = await eventService.requestSpeaker(req.body);
-    res.status(201).json({ message: 'Speaker request submitted successfully', requestID });
+    const eventID = await eventService.requestSpeaker(req.body);
+    res.status(201).json({ 
+      message: 'Event request submitted successfully', 
+      eventID 
+    });
   } catch (e) {
-    console.error('Database error:', e);
+    console.error('Error creating event:', e);
     res.status(500).json({ error: 'An error occurred while submitting your request.' });
   }
 };
