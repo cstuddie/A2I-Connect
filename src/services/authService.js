@@ -2,7 +2,7 @@ const db = require('../../db/knex');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const USERS_TABLE = 'users';           // change if your table name differs
+const USERS_TABLE = 'users';     
 
 exports.register = async ({ email, password, name }) => {
   if (!email || !password) throw new Error('Email and password required');
