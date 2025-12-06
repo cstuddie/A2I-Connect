@@ -103,6 +103,24 @@ const Dashboard = () => {
     const [recommendedRequesterNameMap, setRecommendedRequesterNameMap] = useState({});
     const [recommendedInstructorNameMap, setRecommendedInstructorNameMap] = useState({});
     const [trueInterests, setTrueInterests] = useState([])
+    const [expertiseMap, setExpertiseMap] = useState({});
+
+    useEffect(() => {
+      const fetchExpertise = async () => {
+        try {
+          const res = await fetch('http://localhost:3001/users/expertise/');
+          const data = await res.json();
+          const map = {};
+          data.forEach(item => {
+            map[item.ID] = item.Title;
+          });
+          setExpertiseMap(map);
+        } catch (e) {
+          console.error('Error fetching expertise:', e);
+        }
+      };
+      fetchExpertise();
+    }, []);
 
     // Fetches info for the profile
     useEffect(() => {
@@ -121,52 +139,55 @@ const Dashboard = () => {
     }, [userID]);
 
     const fetchProfileNames = async (events, setRequesterNames, setInstructorNames) => {
-        const requesterIds = new Set(events.map(event => event.requesterID).filter(id => id));
-        const instructorIds = new Set(events.map(event => event.instructorID).filter(id => id));
+      const requesterIds = new Set(events.map(event => event.RequesterID).filter(id => id));
+      const instructorIds = new Set(events.map(event => event.InstructorID).filter(id => id));
 
-        const requesterNameMap = {};
-        const instructorNameMap = {};
+      const requesterNameMap = {};
+      const instructorNameMap = {};
 
-        for (const requesterId of requesterIds) {
-            try {
-                const profileResponse = await fetch(`http://localhost:3001/users/${requesterId}`);
-                const profileData = await profileResponse.json();
-                requesterNameMap[requesterId] = profileData && profileData[0] && profileData[0].name ? profileData[0].name : "Unknown Requester";
-            } catch (error) {
-                console.error(`Error fetching requester profile for ${requesterId}:`, error);
-                requesterNameMap[requesterId] = "Unknown Requester";
-            }
+      for (const requesterId of requesterIds) {
+        try {
+          const profileResponse = await fetch(`http://localhost:3001/users/${requesterId}`);
+          const profileData = await profileResponse.json();
+          requesterNameMap[requesterId] = profileData && profileData.FirstName
+            ? `${profileData.FirstName} ${profileData.LastName}`
+            : "Unknown Requester";
+        } catch (error) {
+          console.error(`Error fetching requester profile for ${requesterId}:`, error);
+          requesterNameMap[requesterId] = "Unknown Requester";
         }
+      }
 
-        for (const instructorId of instructorIds) {
-            try {
-                const profileResponse = await fetch(`http://localhost:3001/users/${instructorId}`);
-                const profileData = await profileResponse.json();
-                instructorNameMap[instructorId] = profileData && profileData[0] && profileData[0].name ? profileData[0].name : "Unknown Instructor";
-            } catch (error) {
-                console.error(`Error fetching instructor profile for ${instructorId}:`, error);
-                instructorNameMap[instructorId] = "Unknown Instructor";
-            }
+      for (const instructorId of instructorIds) {
+        try {
+          const profileResponse = await fetch(`http://localhost:3001/users/${instructorId}`);
+          const profileData = await profileResponse.json();
+          instructorNameMap[instructorId] = profileData && profileData.FirstName
+            ? `${profileData.FirstName} ${profileData.LastName}`
+            : "Unknown Instructor";
+        } catch (error) {
+          console.error(`Error fetching instructor profile for ${instructorId}:`, error);
+          instructorNameMap[instructorId] = "Unknown Instructor";
         }
+      }
 
-        setRequesterNames(requesterNameMap);
-        setInstructorNames(instructorNameMap);
+      setRequesterNames(requesterNameMap);
+      setInstructorNames(instructorNameMap);
     };
 
-    // Get upcoming events for user
-    // useEffect(() => {
-    //     const fetchUpcoming = async () => {
-    //         try {
-    //             const response = await fetch(`http://localhost:3001/events/${userID}`);
-    //             const data = await response.json();
-    //             setUpcomingEvents(data);
-    //             fetchProfileNames(data, setRequesterNameMap, setInstructorNameMap);
-    //         } catch (error) {
-    //             console.error('Error fetching upcoming events:', error);
-    //         }
-    //     };
-    //     fetchUpcoming();
-    // }, [userID]);
+    useEffect(() => {
+        const fetchUpcoming = async () => {
+            try {
+                const response = await fetch(`http://localhost:3001/events/${userID}`);
+                const data = await response.json();
+                setUpcomingEvents(data);
+                fetchProfileNames(data, setRequesterNameMap, setInstructorNameMap);
+            } catch (error) {
+                console.error('Error fetching upcoming events:', error);
+            }
+        };
+        fetchUpcoming();
+    }, [userID]);
 
     // // Get recommended events for user
     // useEffect(() => {
@@ -228,12 +249,12 @@ const Dashboard = () => {
                   {recommendedEvents.map((event) => (
                     <Col sm={6} lg={4} key={event.eventID}>
                       <EventCard
-                        eventID={event.eventID}
-                        topic={event.topic}
-                        requester={recommendedRequesterNameMap[event.requesterID] || "None"}
-                        instructor={recommendedInstructorNameMap[event.instructorID] || "None"}
-                        course = {event.course}
-                        date={event.date}
+                        eventID={event.ID} 
+                        topic={event.Topic}
+                        requester={requesterNameMap[event.RequesterID] || "TBD"} 
+                        instructor={instructorNameMap[event.InstructorID] || "TBD"}
+                        course={expertiseMap[event.ExpertiseID] || "TBD"} 
+                        date={event.Date}
                       />
                     </Col>
                   ))}
@@ -253,12 +274,12 @@ const Dashboard = () => {
                   {upcomingEvents.map((event) => (
                     <Col sm={6} lg={4} key={event.eventID}>
                       <EventCard
-                        eventID={event.eventID}
-                        topic={event.topic}
-                        requester={requesterNameMap[event.requesterID] || "None"}
-                        instructor={instructorNameMap[event.instructorID] || "None"}
-                        course={event.course}
-                        date={event.date}
+                        eventID={event.ID} 
+                        topic={event.Topic}
+                        requester={requesterNameMap[event.RequesterID] || "TBD"} 
+                        instructor={instructorNameMap[event.InstructorID] || "TBD"}
+                        course={expertiseMap[event.ExpertiseID] || "TBD"} 
+                        date={event.Date}
                       />
                     </Col>
                   ))}

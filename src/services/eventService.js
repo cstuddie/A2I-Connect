@@ -25,7 +25,7 @@ exports.getCourseColumnsForField = async (field) => {
 };
 
 exports.getEventsByUser = async (userID) => {
-  return db('Event').where('RequesterID', userID).orWhere('ExpertiseID', userID);
+  return db('Event').where('RequesterID', userID).orWhere('InstructorID', userID);
 };
 
 exports.requestSpeaker = async (payload) => {
