@@ -1,12 +1,12 @@
 const db = require('../../db/knex');
 
-exports.getAllProfiles = () => db('user').select('*');
+exports.getAllProfiles = () => db('User').select('*');
 
 exports.getInterestsByUser = (userID) =>
-  db('interests').where('userID', userID).first();
+  db('Interests').where('userID', userID).first();
 
 exports.getAllInterests = async () => {
-  const all = await db('interests');
+  const all = await db('Interests');
   if (!all || !all.length) return [];
   return Object.keys(all[0]);
 };
