@@ -3,7 +3,6 @@
  * @returns { Promise<void> }
  */
 exports.seed = async function (knex) {
-  // Reset User and also clear UserInterests (it depends on User IDs)
   await knex.raw('SET FOREIGN_KEY_CHECKS = 0');
   await knex('UserInterests').truncate().catch(() => {});
   await knex('User').truncate();
@@ -16,7 +15,7 @@ exports.seed = async function (knex) {
       Role: 1,
       FirstName: 'Alice',
       LastName: 'Johnson',
-      ExpertiseID: 1, // Web Development
+      ExpertiseID: 1, 
       Bio: 'Front-end developer with 5 years of experience.',
       Rating: 4.5,
       Status: 1,
@@ -28,7 +27,7 @@ exports.seed = async function (knex) {
       Role: 2,
       FirstName: 'Bob',
       LastName: 'Smith',
-      ExpertiseID: 2, // Data Science
+      ExpertiseID: 2, 
       Bio: 'Data scientist who loves Python and R.',
       Rating: 4.7,
       Status: 1,
@@ -40,7 +39,7 @@ exports.seed = async function (knex) {
       Role: 1,
       FirstName: 'Carol',
       LastName: 'Williams',
-      ExpertiseID: 3, // AI & ML
+      ExpertiseID: 3, 
       Bio: 'Machine learning enthusiast.',
       Rating: 4.8,
       Status: 1,

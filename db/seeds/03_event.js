@@ -14,7 +14,7 @@ exports.seed = async function (knex) {
       Description: 'Looking for guidance on building a React application.',
       Date: '2025-12-10',
       EventStatus: 1,
-      ExpertiseID: 1, // Web Development
+      ExpertiseID: 1, 
       DeliveryMethod: 'Online'
     },
     {
@@ -23,7 +23,7 @@ exports.seed = async function (knex) {
       Description: 'Need help cleaning and analyzing a dataset.',
       Date: '2025-12-15',
       EventStatus: 1,
-      ExpertiseID: 2, // Data Science
+      ExpertiseID: 2, 
       DeliveryMethod: 'In-person'
     }
   ]);

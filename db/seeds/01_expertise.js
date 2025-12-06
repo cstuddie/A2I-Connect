@@ -3,7 +3,6 @@
  * @returns { Promise<void> }
  */
 exports.seed = async function (knex) {
-  // Reset Expertise safely
   await knex.raw('SET FOREIGN_KEY_CHECKS = 0');
   await knex('Expertise').truncate();
   await knex.raw('SET FOREIGN_KEY_CHECKS = 1');

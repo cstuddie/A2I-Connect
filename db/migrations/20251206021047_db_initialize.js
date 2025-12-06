@@ -3,7 +3,6 @@
  * @returns { Promise<void> }
  */
 exports.up = async function (knex) {
-  // 1) Drop all existing tables except Knex's own bookkeeping tables
   await knex.raw('SET FOREIGN_KEY_CHECKS = 0;');
 
   const tables = await knex.raw('SHOW TABLES');
@@ -12,7 +11,6 @@ exports.up = async function (knex) {
   for (const row of tables[0]) {
     const tableName = row[tableKey];
 
-    // Do NOT drop Knex's internal tables
     if (tableName === 'knex_migrations' || tableName === 'knex_migrations_lock') {
       continue;
     }
@@ -22,7 +20,6 @@ exports.up = async function (knex) {
 
   await knex.raw('SET FOREIGN_KEY_CHECKS = 1;');
 
-  // 2) Recreate core schema (Expertise, User, Event, Conversation, Message, Reviews)
 
   await knex.schema.createTable('Expertise', (table) => {
     table.increments('ID');
@@ -60,7 +57,6 @@ exports.up = async function (knex) {
       .inTable('User')
       .onDelete('CASCADE');
 
-    // InstructorID added here (was separate migration before)
     table
       .integer('InstructorID')
       .unsigned()
