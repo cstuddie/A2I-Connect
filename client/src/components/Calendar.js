@@ -8,6 +8,7 @@ const Calendar = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [events, setEvents] = useState([]);
     const [profileNames, setProfileNames] = useState({});
+    const [expertiseMap, setExpertiseMap] = useState({});
     const userID = localStorage.getItem('userID') || 2;
 
     const [profileInfo, setProfileInfo] = useState({
@@ -18,16 +19,13 @@ const Calendar = () => {
             affiliation: '',
         });
 
-    // Fetch events and profile names
     useEffect(() => {
     const fetchData = async () => {
             try {
-                // Fetch events
                 const eventsResponse = await fetch(`http://localhost:3001/events/${userID}`);
                 const eventsData = await eventsResponse.json();
                 setEvents(Array.isArray(eventsData) ? eventsData : []);
 
-                // Fetch all users to map IDs to names
                 const usersResponse = await fetch('http://localhost:3001/users');
                 const usersData = await usersResponse.json();
 
@@ -38,6 +36,17 @@ const Calendar = () => {
                     });
                 }
                 setProfileNames(namesMap);
+
+                const expertiseResponse = await fetch('http://localhost:3001/users/expertise');
+                const expertiseData = await expertiseResponse.json();
+
+                const expertiseMap = {};
+                if (Array.isArray(expertiseData)) {
+                    expertiseData.forEach(exp => {
+                        expertiseMap[exp.ID] = exp.Title;
+                    });
+                }
+                setExpertiseMap(expertiseMap);
 
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -61,7 +70,6 @@ const Calendar = () => {
         fetchProfile();
     }, [userID]);
 
-    // Navigation functions
     const prevMonth = () => {
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
     };
@@ -70,16 +78,14 @@ const Calendar = () => {
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
     };
 
-    // Check if a date has events
     const hasEvents = (day) => {
         const dateStr = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         return events.some(event => {
-            const eventDate = event.Date.split('T')[0]; // Remove time portion if exists
+            const eventDate = event.Date.split('T')[0]; 
             return eventDate === dateStr;
         });
     };
 
-    // Get events for a specific day
     const getEventsForDay = (day) => {
         const dateStr = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         return events.filter(event => {
@@ -88,7 +94,6 @@ const Calendar = () => {
         });
     };
 
-    // Render calendar days
     const renderCalendar = () => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
@@ -97,12 +102,10 @@ const Calendar = () => {
 
         const days = [];
         
-        // Empty cells for days before the first day of the month
         for (let i = 0; i < firstDayOfMonth; i++) {
             days.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
         }
 
-        // Cells for each day of the month
         for (let day = 1; day <= daysInMonth; day++) {
             const dayEvents = getEventsForDay(day);
             const isToday = new Date().toDateString() === new Date(year, month, day).toDateString();
@@ -119,7 +122,7 @@ const Calendar = () => {
                             {dayEvents.map(event => (
                                 <div key={event.ID} className="event-tooltip-item">
                                     <Link to={`/Event/${event.ID}`} style={{textDecoration: 'none'}}><h4><b>{event.Topic}</b></h4></Link>
-                                    <p>With: {event.ExpertiseID ? profileNames[event.ExpertiseID] || 'TBD' : 'TBD'}</p>
+                                    <p>With: {event.InstructorID ? profileNames[event.InstructorID] || 'TBD' : 'TBD'}</p>
                                 </div>
                             ))}
                         </div>
@@ -131,10 +134,8 @@ const Calendar = () => {
         return days;
     };
 
-    // Format month and year for display
     const monthYearString = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
 
-    // Get events for the current month
     const currentMonthEvents = events.filter(event => {
         const eventDate = new Date(event.Date);
         return eventDate.getMonth() === currentDate.getMonth() && 
@@ -173,8 +174,8 @@ const Calendar = () => {
                                 <div key={event.ID} className="event-item">
                                     <Link to={`/Event/${event.ID}`} style={{textDecoration: 'none'}}><strong>{event.Topic}</strong></Link>
                                     <p>
-                                        {new Date(event.Date).toLocaleDateString()} • {event.field} • 
-                                        {event.ExpertiseID ? ` With: ${profileNames[event.ExpertiseID] || 'TBD'}` : ' (Instructor TBD)'}
+                                        {new Date(event.Date).toLocaleDateString()} • {expertiseMap[event.ExpertiseID]} • 
+                                        {event.InstructorID ? ` With: ${profileNames[event.InstructorID] || 'TBD'}` : ' (Instructor TBD)'}
                                     </p>
                                     <p>Status: {event.EventStatus} • Method: {event.DeliveryMethod}</p>
                                 </div>
