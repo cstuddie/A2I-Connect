@@ -3,7 +3,9 @@
  * @returns { Promise<void> }
  */
 exports.seed = async function (knex) {
-  await knex('Message').del();
+  await knex.raw('SET FOREIGN_KEY_CHECKS = 0');
+  await knex('Message').truncate();
+  await knex.raw('SET FOREIGN_KEY_CHECKS = 1');
 
   await knex('Message').insert([
     {
