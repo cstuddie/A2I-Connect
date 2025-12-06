@@ -3,7 +3,9 @@
  * @returns { Promise<void> }
  */
 exports.seed = async function (knex) {
-  await knex('Conversation').del();
+  await knex.raw('SET FOREIGN_KEY_CHECKS = 0');
+  await knex('Conversation').truncate();
+  await knex.raw('SET FOREIGN_KEY_CHECKS = 1');
 
   await knex('Conversation').insert([
     { InitiatorID: 1, RecieverID: 2, AssociatedEventID: 1 },

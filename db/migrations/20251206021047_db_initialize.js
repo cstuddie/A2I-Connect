@@ -3,16 +3,26 @@
  * @returns { Promise<void> }
  */
 exports.up = async function (knex) {
+  // 1) Drop all existing tables except Knex's own bookkeeping tables
   await knex.raw('SET FOREIGN_KEY_CHECKS = 0;');
 
-  const tables = await knex.raw("SHOW TABLES");
+  const tables = await knex.raw('SHOW TABLES');
   const tableKey = `Tables_in_${process.env.DB_NAME}`;
+
   for (const row of tables[0]) {
     const tableName = row[tableKey];
+
+    // Do NOT drop Knex's internal tables
+    if (tableName === 'knex_migrations' || tableName === 'knex_migrations_lock') {
+      continue;
+    }
+
     await knex.schema.dropTableIfExists(tableName);
   }
 
   await knex.raw('SET FOREIGN_KEY_CHECKS = 1;');
+
+  // 2) Recreate core schema (Expertise, User, Event, Conversation, Message, Reviews)
 
   await knex.schema.createTable('Expertise', (table) => {
     table.increments('ID');
@@ -42,12 +52,23 @@ exports.up = async function (knex) {
 
   await knex.schema.createTable('Event', (table) => {
     table.increments('ID');
+
     table
       .integer('RequesterID')
       .unsigned()
       .references('ID')
       .inTable('User')
       .onDelete('CASCADE');
+
+    // InstructorID added here (was separate migration before)
+    table
+      .integer('InstructorID')
+      .unsigned()
+      .references('ID')
+      .inTable('User')
+      .onDelete('CASCADE')
+      .nullable();
+
     table.string('Topic').notNullable();
     table.text('Description');
     table.date('Date');
@@ -127,6 +148,14 @@ exports.up = async function (knex) {
       .inTable('User')
       .onDelete('CASCADE');
   });
+
+  // 3) UserInterests table (no foreign keys, just integer IDs)
+  await knex.schema.createTable('UserInterests', (table) => {
+    table.increments('ID').primary();
+    table.integer('UserID').unsigned().notNullable();
+    table.integer('InterestID').unsigned().notNullable();
+    table.unique(['UserID', 'InterestID']);
+  });
 };
 
 /**
@@ -134,6 +163,7 @@ exports.up = async function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = async function (knex) {
+  await knex.schema.dropTableIfExists('UserInterests');
   await knex.schema.dropTableIfExists('Reviews');
   await knex.schema.dropTableIfExists('Message');
   await knex.schema.dropTableIfExists('Conversation');
@@ -141,5 +171,3 @@ exports.down = async function (knex) {
   await knex.schema.dropTableIfExists('User');
   await knex.schema.dropTableIfExists('Expertise');
 };
-
-

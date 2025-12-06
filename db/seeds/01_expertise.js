@@ -3,7 +3,10 @@
  * @returns { Promise<void> }
  */
 exports.seed = async function (knex) {
-  await knex('Expertise').del();
+  // Reset Expertise safely
+  await knex.raw('SET FOREIGN_KEY_CHECKS = 0');
+  await knex('Expertise').truncate();
+  await knex.raw('SET FOREIGN_KEY_CHECKS = 1');
 
   await knex('Expertise').insert([
     { Field: 1, Title: 'Web Development' },
