@@ -7,5 +7,6 @@ router.get('/event-call-courses/:field', eventController.getCourseColumnsForFiel
 router.post('/request-speaker', eventController.requestSpeaker);
 router.post('/', eventController.requestSpeaker);
 router.get('/recommendedEvents/:userID', eventController.recommendedEvents);
+router.get('/:userID', eventController.getEventsForUser);
 
 module.exports = router;
