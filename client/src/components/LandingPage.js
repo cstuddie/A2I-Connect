@@ -26,7 +26,7 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch('http://localhost:5000/users/');
+        const res = await fetch('http://localhost:3001/users/');
         const data = await res.json();
         setProfessionals(data);
 
@@ -46,7 +46,7 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchExpertise = async () => {
       try {
-        const res = await fetch('http://localhost:5000/users/expertise');
+        const res = await fetch('http://localhost:3001/users/expertise');
         const data = await res.json();
         const map = {};
         data.forEach(e => {
@@ -63,7 +63,7 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetch('http://localhost:5000/events/');
+        const res = await fetch('http://localhost:3001/events/');
         const data = await res.json();
         const eventArray = Array.isArray(data) ? data : data.events || [];
         setEvents(eventArray);
