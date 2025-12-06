@@ -20,6 +20,17 @@ exports.getCourseColumnsForField = async (req, res) => {
   }
 };
 
+exports.getEventsForUser = async (req, res) => {
+  const userID = req.params.userID;
+  try {
+    const events = await eventService.getEventsByUser(userID);
+    res.json(events);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch events' });
+  }
+};
+
 exports.requestSpeaker = async (req, res) => {
   try {
     const eventID = await eventService.requestSpeaker(req.body);

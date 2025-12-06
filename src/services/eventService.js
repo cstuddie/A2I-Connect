@@ -24,6 +24,10 @@ exports.getCourseColumnsForField = async (field) => {
   return columns[0].map(c => c.Field).filter(c => c !== 'userID');
 };
 
+exports.getEventsByUser = async (userID) => {
+  return db('Event').where('RequesterID', userID).orWhere('ExpertiseID', userID);
+};
+
 exports.requestSpeaker = async (payload) => {
   const { RequesterID, Topic, Description, Date: EventDate, EventStatus, ExpertiseID, DeliveryMethod } = payload;
   

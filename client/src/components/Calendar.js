@@ -20,21 +20,23 @@ const Calendar = () => {
 
     // Fetch events and profile names
     useEffect(() => {
-        const fetchData = async () => {
+    const fetchData = async () => {
             try {
                 // Fetch events
-                const eventsResponse = await fetch(`http://localhost:5000/events/${userID}`);
+                const eventsResponse = await fetch(`http://localhost:3001/events/${userID}`);
                 const eventsData = await eventsResponse.json();
-                setEvents(eventsData);
+                setEvents(Array.isArray(eventsData) ? eventsData : []);
 
-                // Fetch all profiles to map IDs to names
-                const profilesResponse = await fetch('http://localhost:5000/profiles');
-                const profilesData = await profilesResponse.json();
-                
+                // Fetch all users to map IDs to names
+                const usersResponse = await fetch('http://localhost:3001/users');
+                const usersData = await usersResponse.json();
+
                 const namesMap = {};
-                profilesData.forEach(profile => {
-                    namesMap[profile.userID] = profile.name;
-                });
+                if (Array.isArray(usersData)) {
+                    usersData.forEach(user => {
+                        namesMap[user.ID] = `${user.FirstName} ${user.LastName}`;
+                    });
+                }
                 setProfileNames(namesMap);
 
             } catch (error) {
@@ -47,7 +49,7 @@ const Calendar = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/profile/${userID}`);
+                const response = await fetch(`http://localhost:3001/users/${userID}`);
                 const data = await response.json();
                 if (data && data.length > 0) {
                     setProfileInfo(data[0]);
@@ -72,7 +74,7 @@ const Calendar = () => {
     const hasEvents = (day) => {
         const dateStr = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         return events.some(event => {
-            const eventDate = event.date.split('T')[0]; // Remove time portion if exists
+            const eventDate = event.Date.split('T')[0]; // Remove time portion if exists
             return eventDate === dateStr;
         });
     };
@@ -81,7 +83,7 @@ const Calendar = () => {
     const getEventsForDay = (day) => {
         const dateStr = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         return events.filter(event => {
-            const eventDate = event.date.split('T')[0];
+            const eventDate = event.Date.split('T')[0];
             return eventDate === dateStr;
         });
     };
@@ -115,9 +117,9 @@ const Calendar = () => {
                     {dayEvents.length > 0 && (
                         <div className="day-events-tooltip">
                             {dayEvents.map(event => (
-                                <div key={event.eventID} className="event-tooltip-item">
-                                    <Link to={`/Event/${event.eventID}`} style={{textDecoration: 'none'}}><h4><b>{event.topic}</b></h4></Link>
-                                    <p>With: {event.instructorID ? profileNames[event.instructorID] || 'TBD' : 'TBD'}</p>
+                                <div key={event.ID} className="event-tooltip-item">
+                                    <Link to={`/Event/${event.ID}`} style={{textDecoration: 'none'}}><h4><b>{event.Topic}</b></h4></Link>
+                                    <p>With: {event.ExpertiseID ? profileNames[event.ExpertiseID] || 'TBD' : 'TBD'}</p>
                                 </div>
                             ))}
                         </div>
@@ -134,14 +136,14 @@ const Calendar = () => {
 
     // Get events for the current month
     const currentMonthEvents = events.filter(event => {
-        const eventDate = new Date(event.date);
+        const eventDate = new Date(event.Date);
         return eventDate.getMonth() === currentDate.getMonth() && 
                eventDate.getFullYear() === currentDate.getFullYear();
     });
 
     return (
         <div>
-            <UserHeader name={profileInfo.name}/>
+            <UserHeader name={profileInfo.FirstName}/>
             <div className="container">
                 <main className="calendar-main">
                     <div className="month-navigation">
@@ -168,13 +170,13 @@ const Calendar = () => {
                         <h3>Your Events This Month</h3>
                         {currentMonthEvents.length > 0 ? (
                             currentMonthEvents.map(event => (
-                                <div key={event.eventID} className="event-item">
-                                    <Link to={`/Event/${event.eventID}`} style={{textDecoration: 'none'}}><strong>{event.topic}</strong></Link>
+                                <div key={event.ID} className="event-item">
+                                    <Link to={`/Event/${event.ID}`} style={{textDecoration: 'none'}}><strong>{event.Topic}</strong></Link>
                                     <p>
-                                        {new Date(event.date).toLocaleDateString()} • {event.field} • 
-                                        {event.instructorID ? ` With: ${profileNames[event.instructorID] || 'TBD'}` : ' (Instructor TBD)'}
+                                        {new Date(event.Date).toLocaleDateString()} • {event.field} • 
+                                        {event.ExpertiseID ? ` With: ${profileNames[event.ExpertiseID] || 'TBD'}` : ' (Instructor TBD)'}
                                     </p>
-                                    <p>Status: {event.status} • Method: {event.deliveryMethod}</p>
+                                    <p>Status: {event.EventStatus} • Method: {event.DeliveryMethod}</p>
                                 </div>
                             ))
                         ) : (
