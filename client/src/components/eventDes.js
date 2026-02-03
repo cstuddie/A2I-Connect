@@ -1,156 +1,109 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
-import { NavLink, Link } from "react-router-dom";
 import { UserHeader } from './Dashboard';
-import "./Base.css"; 
+import "./Base.css";
 
 const EventDescription = () => {
-    // Changes the current user (keeping main's comment but using auth logic)
-    const userID = localStorage.getItem('userID') || null;
-    const navigate = useNavigate();
+  const userID = localStorage.getItem('userID');
+  const navigate = useNavigate();
+  const { eventID } = useParams();
 
-    // State for profile info
-    const [profileInfo, setProfileInfo] = useState({
-        name: 'empty',
-        interests: 'empty',
-        history: 'empty',
-        expertise: 'empty',
-        affiliation: 'empty',
-    });
+  const [profileInfo, setProfileInfo] = useState(null);
+  const [event, setEvent] = useState(null);
 
-    // Fetches info for the profile
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const response = await fetch(`http://localhost:5000/profile/${userID}`);
-                const data = await response.json();
-                setProfileInfo(data[0]);
-            } catch (error) {
-                console.error('Error fetching profile:', error);
-            }
-        };
-        if (userID) {
-            fetchProfile();
+  useEffect(() => {
+    if (!userID) {
+      navigate('/login');
+      return;
+    }
+
+    const fetchProfile = async () => {
+      try {
+        const res = await fetch(`http://localhost:3001/users/${userID}`);
+        const data = await res.json();
+        setProfileInfo(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchProfile();
+  }, [userID, navigate]);
+
+  useEffect(() => {
+    console.log('eventID from params:', eventID);
+    const fetchEvent = async () => {
+      try {
+        const res = await fetch(`http://localhost:3001/events/${eventID}`);
+        const data = await res.json();
+        setEvent(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchEvent();
+  }, [eventID]);
+
+  return (
+    <div>
+      <UserHeader
+        name={
+          profileInfo
+            ? `${profileInfo.FirstName} ${profileInfo.LastName}`
+            : ''
         }
-        else {
-          navigate('/login');
-        }
-    }, [userID]);
+      />
 
-    // get eventID from url
-    const { eventID } = useParams();
-    
+      <Container className="my-4">
+        <h1 className="text-center mb-4">Event Description</h1>
 
-    const [event, setEvent] = useState({
-        topic: 'empty',
-        description: 'empty',
-        date: 'empty',
-        field: 'empty',
-        course: 'empty',
-        deliveryMethod: 'empty',
-        status: 'empty',
-        requesterID: 'empty',
-        instructorID: 'empty',
-    });
+        <Card>
+          <Card.Body>
+            <Card.Title className="mb-3">
+              <strong>{event?.Topic || 'N/A'}</strong>
+            </Card.Title>
 
-    const [instructor, setInstructor] = useState({
-        name: 'empty',
-    });
+            <Row>
+              <Col md={6} className="mb-3">
+                <strong>Instructor:</strong>{' '}
+                {event?.InstructorName || 'Unassigned'}
+              </Col>
 
-    const [requester, setRequester] = useState({
-        name: 'empty',
-    });
+              <Col md={6} className="mb-3">
+                <strong>Requester:</strong>{' '}
+                {event?.RequesterName || 'N/A'}
+              </Col>
 
-    // fetch event
-    useEffect(() => {
-        
-        const fetchEvent = async () => {
-            try {
-                const response = await fetch(`http://localhost:5000/event/${eventID}`);
-                const data = await response.json();
-                setEvent(data[0]);
-            } catch (error) {
-                console.error('Error fetching event:', error);
-            }
-        };
+              <Col md={6} className="mb-3">
+                <strong>Date:</strong>{' '}
+                {event?.Date
+                  ? new Date(event.Date).toLocaleDateString()
+                  : 'N/A'}
+              </Col>
 
-        fetchEvent();
-    }, [eventID]);
+              <Col md={6} className="mb-3">
+                <strong>Delivery Method:</strong>{' '}
+                {event?.DeliveryMethod || 'N/A'}
+              </Col>
 
+              <Col md={6} className="mb-3">
+                <strong>Status:</strong>{' '}
+                {event?.EventStatus ?? 'N/A'}
+              </Col>
 
-
-    // fetch instructor
-    useEffect(() => {
-        const fetchInstructor = async () => {
-            try {
-                const response = await fetch(`http://localhost:5000/profile/${event.instructorID}`);
-                const data = await response.json();
-                setInstructor(data[0]);
-            } catch (error) {
-                console.error('Error fetching instructor:', error);
-            }
-        };
-        fetchInstructor();
-    }, [event]);
-
-    // fetch requester
-    useEffect(() => {
-        const fetchRequester = async () => {
-            try {
-                const response = await fetch(`http://localhost:5000/profile/${event.requesterID}`);
-                const data = await response.json();
-                setRequester(data[0]);
-            } catch (error) {
-                console.error('Error fetching requester:', error);
-            }
-        };
-        fetchRequester();
-    }, [event]);
-
-
-    return (
-        <div>
-        <UserHeader name={profileInfo.name} />
-  
-        <Container className="my-4">
-          <h1 className="text-center mb-4">Event Description</h1>
-  
-          <Card>
-            <Card.Body>
-              <Card.Title className="mb-3"><strong>{event?.topic || 'N/A'}</strong></Card.Title>
-  
-              <Row>
-                <Col md={6} className="mb-3">
-                  <p className="mb-1"><strong>Instructor:</strong> {instructor?.name || 'N/A'}</p>
-                </Col>
-                <Col md={6} className="mb-3">
-                  <p className="mb-1"><strong>Requester:</strong> {requester?.name || 'N/A'}</p>
-                </Col>
-                <Col md={6} className="mb-3">
-                  <p className="mb-1"><strong>Date:</strong> {new Date(event?.date).toLocaleString() || 'N/A'}</p>
-                </Col>
-                <Col md={6} className="mb-3">
-                  <p className="mb-1"><strong>Delivery Method:</strong> {event?.deliveryMethod || 'N/A'}</p>
-                </Col>
-                <Col md={6} className="mb-3">
-                  <p className="mb-1"><strong>Field:</strong> {event?.field || 'N/A'}</p>
-                </Col>
-                <Col md={6} className="mb-3">
-                  <p className="mb-1"><strong>Course:</strong> {event?.course || 'N/A'}</p>
-                </Col>
-                <Col md={6} className="mb-3">
-                  <p className="mb-1"><strong>Status:</strong> {event?.status || 'N/A'}</p>
-                </Col>
-                <Col md={12} className="mb-3">
-                  <p className="mb-1"><strong>Description:</strong><br /> {event?.description || 'N/A'}</p>
-                </Col>
-              </Row>
-            </Card.Body>
-          </Card>
-        </Container>
-      </div>
-    );
+              <Col md={12} className="mb-3">
+                <strong>Description:</strong>
+                <br />
+                {event?.Description || 'N/A'}
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
+      </Container>
+    </div>
+  );
 };
 
 export default EventDescription;

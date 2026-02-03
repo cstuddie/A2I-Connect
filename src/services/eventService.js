@@ -28,6 +28,25 @@ exports.getEventsByUser = async (userID) => {
   return db('Event').where('RequesterID', userID).orWhere('InstructorID', userID);
 };
 
+exports.getEventByID = async (eventID) => {
+  return db('Event as e')
+    .leftJoin('User as r', 'e.RequesterID', 'r.ID')
+    .leftJoin('User as i', 'e.InstructorID', 'i.ID')
+    .select(
+      'e.*',
+      db.raw("CONCAT(r.FirstName, ' ', r.LastName) as RequesterName"),
+      db.raw("CONCAT(i.FirstName, ' ', i.LastName) as InstructorName")
+    )
+    .where('e.ID', eventID)
+    .first();
+};
+
+exports.searchEvents = async (term) => {
+  return db('Event')
+    .where('Topic', 'like', `%${term}%`)
+    .select('*');
+};
+
 exports.requestSpeaker = async (payload) => {
   const { RequesterID, Topic, Description, Date: EventDate, EventStatus, ExpertiseID, DeliveryMethod } = payload;
   

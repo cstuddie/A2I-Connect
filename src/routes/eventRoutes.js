@@ -3,10 +3,12 @@ const router = express.Router();
 const eventController = require('../controllers/eventController');
 
 router.get('/', eventController.getAllEvents);
+router.get('/user/:userID', eventController.getEventsForUser);
+router.get('/recommended/:userID', eventController.recommendedEvents);
 router.get('/event-call-courses/:field', eventController.getCourseColumnsForField);
-router.post('/request-speaker', eventController.requestSpeaker);
+router.get('/topic/:term', eventController.searchEvents);
+router.get('/:eventID', eventController.getEventByID);
 router.post('/', eventController.requestSpeaker);
-router.get('/recommendedEvents/:userID', eventController.recommendedEvents);
-router.get('/:userID', eventController.getEventsForUser);
+
 
 module.exports = router;
