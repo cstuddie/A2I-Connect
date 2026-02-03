@@ -20,6 +20,8 @@ const EditProfile = () => {
     Role: 1
   });
 
+  const [errors, setErrors] = useState({});
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -42,11 +44,44 @@ const EditProfile = () => {
   }, [userID]);
 
   const handleProfileChange = async (e) => {
-    setProfileInfo({ ...profileInfo, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    setProfileInfo(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setErrors(prev => ({
+      ...prev,
+      [name]: '',
+    }));
   };
 
   const handleSubmitProfile = async (e) => {
     e.preventDefault();
+
+    
+    const newErrors = {};
+
+    if (!profileInfo.FirstName.trim()) {
+      newErrors.FirstName = 'First name is required';
+    }
+    if (!profileInfo.LastName.trim()) {
+      newErrors.LastName = 'Last name is required';
+    }
+    if (!profileInfo.Affiliation.trim()) {
+      newErrors.Affiliation = 'Affiliation is required';
+    }
+    if (!profileInfo.Bio.trim()) {
+      newErrors.Bio = 'Bio is required';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
 
     try {
       const response = await fetch(`http://localhost:3001/users/${userID}`, {
@@ -107,8 +142,11 @@ const EditProfile = () => {
                             name="FirstName"
                             value={profileInfo.FirstName || ''}
                             onChange={handleProfileChange}
-                            required
+                            isInvalid={!!errors.FirstName}
                           />
+                          <Form.Control.Feedback type="invalid">
+                            {errors.FirstName}
+                          </Form.Control.Feedback>
                         </Col>
                       </Form.Group>
 
@@ -122,8 +160,11 @@ const EditProfile = () => {
                             name="LastName"
                             value={profileInfo.LastName || ''}
                             onChange={handleProfileChange}
-                            required
+                            isInvalid={!!errors.LastName}
                           />
+                          <Form.Control.Feedback type="invalid">
+                            {errors.LastName}
+                          </Form.Control.Feedback>
                         </Col>
                       </Form.Group>
 
@@ -137,7 +178,11 @@ const EditProfile = () => {
                             name="Affiliation"
                             value={profileInfo.Affiliation || ''}
                             onChange={handleProfileChange}
+                            isInvalid={!!errors.Affiliation}
                           />
+                          <Form.Control.Feedback type="invalid">
+                            {errors.Affiliation}
+                          </Form.Control.Feedback>
                         </Col>
                       </Form.Group>
 
@@ -153,7 +198,11 @@ const EditProfile = () => {
                             value={profileInfo.Bio || ''}
                             onChange={handleProfileChange}
                             placeholder="Tell us about yourself..."
+                            isInvalid={!!errors.Bio}
                           />
+                          <Form.Control.Feedback type="invalid">
+                            {errors.Bio}
+                          </Form.Control.Feedback>
                         </Col>
                       </Form.Group>
 
