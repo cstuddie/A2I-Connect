@@ -93,16 +93,16 @@ const AdminEvents = () => {
     const fetchData = async () => {
       try {
         // Fetch all events
-        const eventsResponse = await fetch('http://localhost:5000/events');
+        const eventsResponse = await fetch('http://localhost:3001/events');
         const eventsData = await eventsResponse.json();
         
         // Fetch all users for dropdown selection
-        const usersResponse = await fetch('http://localhost:5000/users');
+        const usersResponse = await fetch('http://localhost:3001/users');
         const usersData = await usersResponse.json();
         setUsers(usersData);
         
         // Fetch all profiles to map user IDs to names
-        const profilesResponse = await fetch('http://localhost:5000/profiles');
+        const profilesResponse = await fetch('http://localhost:3001/profiles');
         const profilesData = await profilesResponse.json();
         
         // Create a map of userID to profile information

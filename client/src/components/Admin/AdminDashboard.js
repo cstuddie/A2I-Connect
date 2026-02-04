@@ -83,11 +83,11 @@ const AdminDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         // Fetch users count
-        const usersResponse = await fetch('http://localhost:5000/users');
+        const usersResponse = await fetch('http://localhost:3001/users');
         const usersData = await usersResponse.json();
         
         // Fetch events data
-        const eventsResponse = await fetch('http://localhost:5000/events');
+        const eventsResponse = await fetch('http://localhost:3001/events');
         const eventsData = await eventsResponse.json();
         
         // Process data for stats
@@ -109,7 +109,7 @@ const AdminDashboard = () => {
         // Get user profiles for the recent users
         const userProfiles = await Promise.all(
           sortedUsers.map(async (user) => {
-            const profileResponse = await fetch(`http://localhost:5000/profile/${user.userID}`);
+            const profileResponse = await fetch(`http://localhost:3001/profile/${user.userID}`);
             const profileData = await profileResponse.json();
             return { ...user, profile: profileData[0] || {} };
           })
@@ -129,7 +129,7 @@ const AdminDashboard = () => {
             let instructorName = "Not Assigned";
             
             if (event.requesterID) {
-              const requesterResponse = await fetch(`http://localhost:5000/profile/${event.requesterID}`);
+              const requesterResponse = await fetch(`http://localhost:3001/profile/${event.requesterID}`);
               const requesterData = await requesterResponse.json();
               if (requesterData && requesterData[0]) {
                 requesterName = requesterData[0].name;
@@ -137,7 +137,7 @@ const AdminDashboard = () => {
             }
             
             if (event.instructorID) {
-              const instructorResponse = await fetch(`http://localhost:5000/profile/${event.instructorID}`);
+              const instructorResponse = await fetch(`http://localhost:3001/profile/${event.instructorID}`);
               const instructorData = await instructorResponse.json();
               if (instructorData && instructorData[0]) {
                 instructorName = instructorData[0].name;
