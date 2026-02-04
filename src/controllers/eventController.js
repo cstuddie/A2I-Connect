@@ -52,3 +52,32 @@ exports.recommendedEvents = async (req, res) => {
     res.status(500).json({ error: 'An error occured on recEvents' });
   }
 };
+
+exports.searchEvents = async (req, res) => {
+  const { term } = req.params;
+    try {
+      const events = await eventService.searchEvents(term);
+      res.json(events);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Server error' });
+    }
+}
+
+exports.getEventByID = async (req, res) => {
+  const { eventID } = req.params;
+
+  try {
+    const event = await eventService.getEventByID(eventID);
+
+    if (!event) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
+    res.json(event);
+  } catch (err) {
+    console.error('Fetch event error:', err);
+    res.status(500).json({ error: 'Failed to fetch event' });
+  }
+};
+

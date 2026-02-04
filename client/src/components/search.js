@@ -50,34 +50,12 @@ useEffect(() => {
 
   const handleTopicSearch = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/search/topic/${searchTerm}`);
+      const response = await fetch(`http://localhost:3001/events/topic/${searchTerm}`);
       const data = await response.json();
-      setSearchResults(data);
-      fetchProfileNames(data, setRequesterNameMap, setInstructorNameMap);
-    } catch (error) {
-      console.error('Error searching for events:', error);
-    }
-  };
+      const eventsArray = Array.isArray(data) ? data : [];
 
-  // Here just in case we want to come back to field search
-  // const handleFieldSearch = async () => {
-  //   try {
-  //     const response = await fetch(`http://localhost:3001/search/field/${searchTerm}`);
-  //     const data = await response.json();
-  //     setSearchResults(data);
-  //     fetchProfileNames(data, setRequesterNameMap, setInstructorNameMap);
-  //   } catch (error) {
-  //     console.error('Error searching for events:', error);
-  //   }
-  // };
-
-const fetchAllEvents = async () => {
-    try {
-      const response = await fetch(`http://localhost:3001/events/`);
-      const data = await response.json();
-
-      const mappedData = data.map(event => ({
-        eventID: event.EventID,
+      const mappedData = eventsArray.map(event => ({
+        eventID: event.ID,
         topic: event.Topic,
         description: event.Description,
         date: event.Date,
@@ -92,9 +70,38 @@ const fetchAllEvents = async () => {
       setSearchResults(mappedData);
       fetchProfileNames(mappedData, setRequesterNameMap, setInstructorNameMap);
     } catch (error) {
-      console.error('Error fetching all events:', error);
+      console.error('Error searching for events:', error);
+      setSearchResults([]);
     }
   };
+
+
+  const fetchAllEvents = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/events/`);
+        const data = await response.json();
+        const eventsArray = Array.isArray(data) ? data : [];
+
+        const mappedData = eventsArray.map(event => ({
+          eventID: event.ID,
+          topic: event.Topic,
+          description: event.Description,
+          date: event.Date,
+          requesterID: event.RequesterID,
+          instructorID: event.InstructorID,
+          field: event.Field,
+          course: event.Course,
+          deliveryMethod: event.DeliveryMethod,
+          status: event.EventStatus,
+        }));
+
+        setSearchResults(mappedData);
+        fetchProfileNames(mappedData, setRequesterNameMap, setInstructorNameMap);
+      } catch (error) {
+        console.error('Error fetching all events:', error);
+        setSearchResults([]);
+      }
+    };
 
 
   const handleSearch = () => {
@@ -104,9 +111,6 @@ const fetchAllEvents = async () => {
     else {
       handleTopicSearch();
     }
-    // else {
-    //   handleFieldSearch();
-    // }
   };
 
 const fetchProfileNames = async (events, setRequesterNames, setInstructorNames) => {
@@ -287,7 +291,7 @@ const fetchProfileNames = async (events, setRequesterNames, setInstructorNames) 
               <ListGroup variant='flush'>
                 {filteredResults.map((event) => (
                   <ListGroup.Item key={event.eventID}>
-                    <Link to={`/Event/${event.eventID}`} className="text-decoration-none" style={{color: 'black'}}><strong>{event.topic}</strong></ Link><br />
+                    <Link to={`/events/${event.eventID}`} className="text-decoration-none" style={{color: 'black'}}><strong>{event.topic}</strong></ Link><br />
                     <strong>Date:</strong> {new Date(event.date).toLocaleString()}<br />
                     <strong>Requester:</strong> {requesterNameMap[event.requesterID] || 'Unknown Requester'}<br />
                     <strong>Instructor:</strong> {instructorNameMap[event.instructorID] || 'Instructor Needed'}<br />
