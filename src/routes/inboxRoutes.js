@@ -4,6 +4,6 @@ const inboxController = require('../controllers/inboxController');
 
 router.post('/:conversationID', inboxController.sendMessage);
 router.get('/:conversationID', inboxController.loadMessagesForConversation);
-router.get('/', inboxController.loadConversations);
+router.get('/:userID', inboxController.loadConversations);
 
 module.exports = router;
