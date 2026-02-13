@@ -4,7 +4,7 @@ import { Container, Row, Col, Button, Card, Badge, Navbar, Nav, NavDropdown } fr
 import  { FaUserCircle } from 'react-icons/fa';
 import "./Base.css"; 
 
-export function UserHeader ({name}) {
+export function UserHeader () {
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userID');

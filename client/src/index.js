@@ -44,6 +44,10 @@ const router = createBrowserRouter([
     element: <EventDescription />
   },
   {
+    path:'/inbox',
+    element: <Inbox/>
+  },
+  {
     path:'/RequestSpeaker',
     element: <RequestSpeaker />
   },
