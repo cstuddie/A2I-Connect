@@ -33,6 +33,9 @@ export function UserHeader ({name}) {
               </Nav.Link>
             </Nav>
             <Nav className="ms-auto">
+                <Nav.Link as={Link} to="/Message">
+                  Email
+                </Nav.Link>
                 <NavDropdown title={<FaUserCircle size={40} /> } id="basic-nav-dropdown">
                 <NavDropdown.Item href="/EditProfile" className='custom-dropdown-link'>Account</NavDropdown.Item>
                 <NavDropdown.Divider />
