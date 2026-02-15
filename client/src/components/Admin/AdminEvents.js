@@ -5,7 +5,7 @@ import '../Base.css';
 // Reusing AdminHeader component
 function AdminHeader() {
   const navigate = useNavigate();
-  
+
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminID');
@@ -59,6 +59,13 @@ function AdminHeader() {
   );
 }
 
+const STATUS_MAP = {
+  1: 'Pending',
+  2: 'Scheduled',
+  3: 'Completed',
+  4: 'Cancelled'
+};
+
 const AdminEvents = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
@@ -69,19 +76,17 @@ const AdminEvents = () => {
     topic: '',
     description: '',
     date: '',
-    field: '',
     deliveryMethod: '',
-    status: '',
+    eventStatus: '',
     instructorID: ''
   });
   const [filters, setFilters] = useState({
-    field: '',
     status: '',
     deliveryMethod: ''
   });
   const [users, setUsers] = useState([]);
-  const [profiles, setProfiles] = useState({});
-  
+  const [userMap, setUserMap] = useState({});
+
   useEffect(() => {
     // Check if admin is logged in
     const adminToken = localStorage.getItem('adminToken');
@@ -95,35 +100,26 @@ const AdminEvents = () => {
         // Fetch all events
         const eventsResponse = await fetch('http://localhost:3001/events');
         const eventsData = await eventsResponse.json();
-        
-        // Fetch all users for dropdown selection
+
+        // Fetch all users for name lookup and dropdown
         const usersResponse = await fetch('http://localhost:3001/users');
         const usersData = await usersResponse.json();
         setUsers(usersData);
-        
-        // Fetch all profiles to map user IDs to names
-        const profilesResponse = await fetch('http://localhost:3001/profiles');
-        const profilesData = await profilesResponse.json();
-        
-        // Create a map of userID to profile information
-        const profileMap = {};
-        profilesData.forEach(profile => {
-          profileMap[profile.userID] = profile;
+
+        // Build user ID -> name map
+        const map = {};
+        usersData.forEach(u => {
+          map[u.ID] = `${u.FirstName} ${u.LastName}`;
         });
-        setProfiles(profileMap);
-        
+        setUserMap(map);
+
         // Enhance events with requester and instructor names
-        const enhancedEvents = eventsData.map(event => {
-          const requesterProfile = profileMap[event.requesterID];
-          const instructorProfile = event.instructorID ? profileMap[event.instructorID] : null;
-          
-          return {
-            ...event,
-            requesterName: requesterProfile ? requesterProfile.name : 'Unknown',
-            instructorName: instructorProfile ? instructorProfile.name : 'Not Assigned'
-          };
-        });
-        
+        const enhancedEvents = eventsData.map(event => ({
+          ...event,
+          requesterName: map[event.RequesterID] || 'Unknown',
+          instructorName: event.InstructorID ? (map[event.InstructorID] || 'Unknown') : 'Not Assigned'
+        }));
+
         setEvents(enhancedEvents);
         setLoading(false);
       } catch (error) {
@@ -137,86 +133,68 @@ const AdminEvents = () => {
 
   const handleEditEvent = (event) => {
     setEditingEvent(event);
+    const dateStr = event.Date ? event.Date.split('T')[0] : '';
     setEventFormData({
-      topic: event.topic,
-      description: event.description,
-      date: event.date.split('T')[0], // Format date for input
-      field: event.field,
-      deliveryMethod: event.deliveryMethod,
-      status: event.status,
-      instructorID: event.instructorID || ''
+      topic: event.Topic,
+      description: event.Description || '',
+      date: dateStr,
+      deliveryMethod: event.DeliveryMethod || '',
+      eventStatus: event.EventStatus || '',
+      instructorID: event.InstructorID || ''
     });
   };
 
   const handleUpdateEvent = async (e) => {
     e.preventDefault();
-    
-    try {
-      // In a real application, you would make an API call to update the event
-      // For now, we'll just update the UI
-      
-      // Update local state
-      setEvents(events.map(event => {
-        if (event.eventID === editingEvent.eventID) {
-          const instructorProfile = eventFormData.instructorID ? profiles[eventFormData.instructorID] : null;
-          
-          return {
-            ...event,
-            topic: eventFormData.topic,
-            description: eventFormData.description,
-            date: eventFormData.date,
-            field: eventFormData.field,
-            deliveryMethod: eventFormData.deliveryMethod,
-            status: eventFormData.status,
-            instructorID: eventFormData.instructorID === '' ? null : eventFormData.instructorID,
-            instructorName: instructorProfile ? instructorProfile.name : 'Not Assigned'
-          };
-        }
-        return event;
-      }));
-      
-      setEditingEvent(null);
-      alert('Event updated successfully');
-    } catch (error) {
-      console.error('Error updating event:', error);
-      alert('Error updating event');
-    }
+
+    // Update local state (no API endpoint for event update yet)
+    setEvents(events.map(event => {
+      if (event.ID === editingEvent.ID) {
+        return {
+          ...event,
+          Topic: eventFormData.topic,
+          Description: eventFormData.description,
+          Date: eventFormData.date,
+          DeliveryMethod: eventFormData.deliveryMethod,
+          EventStatus: Number(eventFormData.eventStatus),
+          InstructorID: eventFormData.instructorID === '' ? null : Number(eventFormData.instructorID),
+          instructorName: eventFormData.instructorID ? (userMap[eventFormData.instructorID] || 'Unknown') : 'Not Assigned'
+        };
+      }
+      return event;
+    }));
+
+    setEditingEvent(null);
+    alert('Event updated successfully');
   };
 
   const handleDeleteEvent = async (eventID) => {
     if (window.confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
-      try {
-        // In a real application, you would make an API call to delete the event
-        // For now, we'll just update the UI
-        setEvents(events.filter(event => event.eventID !== eventID));
-        alert('Event deleted successfully');
-      } catch (error) {
-        console.error('Error deleting event:', error);
-        alert('Error deleting event');
-      }
+      // Update local state (no API endpoint for event delete yet)
+      setEvents(events.filter(event => event.ID !== eventID));
+      alert('Event deleted successfully');
     }
   };
 
   // Filter events based on search term and filters
   const filteredEvents = events.filter(event => {
     const searchTermLower = searchTerm.toLowerCase();
-    const matchesSearch = 
-      event.topic.toLowerCase().includes(searchTermLower) ||
-      event.description.toLowerCase().includes(searchTermLower) ||
-      event.requesterName.toLowerCase().includes(searchTermLower) ||
-      event.instructorName.toLowerCase().includes(searchTermLower);
-    
-    const matchesField = !filters.field || event.field === filters.field;
-    const matchesStatus = !filters.status || event.status === filters.status;
-    const matchesDeliveryMethod = !filters.deliveryMethod || event.deliveryMethod === filters.deliveryMethod;
-    
-    return matchesSearch && matchesField && matchesStatus && matchesDeliveryMethod;
+    const matchesSearch =
+      (event.Topic || '').toLowerCase().includes(searchTermLower) ||
+      (event.Description || '').toLowerCase().includes(searchTermLower) ||
+      (event.requesterName || '').toLowerCase().includes(searchTermLower) ||
+      (event.instructorName || '').toLowerCase().includes(searchTermLower);
+
+    const statusLabel = STATUS_MAP[event.EventStatus] || '';
+    const matchesStatus = !filters.status || statusLabel === filters.status;
+    const matchesDeliveryMethod = !filters.deliveryMethod || event.DeliveryMethod === filters.deliveryMethod;
+
+    return matchesSearch && matchesStatus && matchesDeliveryMethod;
   });
 
-  // Get unique fields, statuses, and delivery methods for filter dropdowns
-  const uniqueFields = [...new Set(events.map(event => event.field))];
-  const uniqueStatuses = [...new Set(events.map(event => event.status))];
-  const uniqueDeliveryMethods = [...new Set(events.map(event => event.deliveryMethod))];
+  // Get unique values for filter dropdowns
+  const uniqueStatuses = [...new Set(events.map(event => STATUS_MAP[event.EventStatus]).filter(Boolean))];
+  const uniqueDeliveryMethods = [...new Set(events.map(event => event.DeliveryMethod).filter(Boolean))];
 
   if (loading) {
     return (
@@ -232,21 +210,21 @@ const AdminEvents = () => {
   return (
     <div>
       <AdminHeader />
-      
+
       <div style={{ padding: '20px' }}>
         <h1>Event Management</h1>
-        
+
         {/* Edit Event Modal */}
         {editingEvent && (
-          <div style={{ 
-            position: 'fixed', 
-            top: 0, 
-            left: 0, 
-            right: 0, 
-            bottom: 0, 
-            backgroundColor: 'rgba(0,0,0,0.5)', 
-            display: 'flex', 
-            justifyContent: 'center', 
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            justifyContent: 'center',
             alignItems: 'center',
             zIndex: 1000
           }}>
@@ -262,31 +240,16 @@ const AdminEvents = () => {
                   onChange={(e) => setEventFormData({...eventFormData, topic: e.target.value})}
                   required
                 />
-                
+
                 <label htmlFor="description">Description</label>
                 <textarea
                   id="description"
                   name="description"
                   value={eventFormData.description}
                   onChange={(e) => setEventFormData({...eventFormData, description: e.target.value})}
-                  required
                   style={{ minHeight: '100px' }}
                 />
-                
-                <label htmlFor="field">Field</label>
-                <select
-                  id="field"
-                  name="field"
-                  value={eventFormData.field}
-                  onChange={(e) => setEventFormData({...eventFormData, field: e.target.value})}
-                  required
-                >
-                  <option value="">Select a field</option>
-                  {uniqueFields.map(field => (
-                    <option key={field} value={field}>{field}</option>
-                  ))}
-                </select>
-                
+
                 <label htmlFor="date">Date</label>
                 <input
                   type="date"
@@ -294,37 +257,34 @@ const AdminEvents = () => {
                   name="date"
                   value={eventFormData.date}
                   onChange={(e) => setEventFormData({...eventFormData, date: e.target.value})}
-                  required
                 />
-                
+
                 <label htmlFor="deliveryMethod">Delivery Method</label>
                 <select
                   id="deliveryMethod"
                   name="deliveryMethod"
                   value={eventFormData.deliveryMethod}
                   onChange={(e) => setEventFormData({...eventFormData, deliveryMethod: e.target.value})}
-                  required
                 >
                   <option value="">Select delivery method</option>
                   <option value="Online">Online</option>
                   <option value="In-Person">In-Person</option>
                 </select>
-                
-                <label htmlFor="status">Status</label>
+
+                <label htmlFor="eventStatus">Status</label>
                 <select
-                  id="status"
-                  name="status"
-                  value={eventFormData.status}
-                  onChange={(e) => setEventFormData({...eventFormData, status: e.target.value})}
-                  required
+                  id="eventStatus"
+                  name="eventStatus"
+                  value={eventFormData.eventStatus}
+                  onChange={(e) => setEventFormData({...eventFormData, eventStatus: e.target.value})}
                 >
                   <option value="">Select status</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Scheduled">Scheduled</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Cancelled">Cancelled</option>
+                  <option value="1">Pending</option>
+                  <option value="2">Scheduled</option>
+                  <option value="3">Completed</option>
+                  <option value="4">Cancelled</option>
                 </select>
-                
+
                 <label htmlFor="instructorID">Instructor</label>
                 <select
                   id="instructorID"
@@ -333,16 +293,16 @@ const AdminEvents = () => {
                   onChange={(e) => setEventFormData({...eventFormData, instructorID: e.target.value})}
                 >
                   <option value="">Not Assigned</option>
-                  {users.map(user => (
-                    <option key={user.userID} value={user.userID}>
-                      {profiles[user.userID]?.name || user.email}
+                  {users.filter(u => u.Role === 2).map(user => (
+                    <option key={user.ID} value={user.ID}>
+                      {user.FirstName} {user.LastName}
                     </option>
                   ))}
                 </select>
-                
+
                 <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => setEditingEvent(null)}
                     style={{ marginRight: '10px', backgroundColor: '#f0f0f0', color: '#333' }}
                   >
@@ -354,7 +314,7 @@ const AdminEvents = () => {
             </div>
           </div>
         )}
-        
+
         {/* Search and Filters */}
         <div style={{ marginBottom: '20px' }}>
           <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
@@ -365,29 +325,18 @@ const AdminEvents = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ flex: 1, padding: '10px', fontSize: '16px' }}
             />
-            <button 
+            <button
               onClick={() => {
                 setSearchTerm('');
-                setFilters({ field: '', status: '', deliveryMethod: '' });
+                setFilters({ status: '', deliveryMethod: '' });
               }}
               style={{ padding: '10px', backgroundColor: '#f0f0f0', color: '#333' }}
             >
               Clear Filters
             </button>
           </div>
-          
+
           <div style={{ display: 'flex', gap: '10px' }}>
-            <select
-              value={filters.field}
-              onChange={(e) => setFilters({...filters, field: e.target.value})}
-              style={{ flex: 1, padding: '8px' }}
-            >
-              <option value="">All Fields</option>
-              {uniqueFields.map(field => (
-                <option key={field} value={field}>{field}</option>
-              ))}
-            </select>
-            
             <select
               value={filters.status}
               onChange={(e) => setFilters({...filters, status: e.target.value})}
@@ -398,7 +347,7 @@ const AdminEvents = () => {
                 <option key={status} value={status}>{status}</option>
               ))}
             </select>
-            
+
             <select
               value={filters.deliveryMethod}
               onChange={(e) => setFilters({...filters, deliveryMethod: e.target.value})}
@@ -411,7 +360,7 @@ const AdminEvents = () => {
             </select>
           </div>
         </div>
-        
+
         {/* Events Table */}
         <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white' }}>
           <thead>
@@ -421,7 +370,6 @@ const AdminEvents = () => {
               <th style={{ padding: '12px', textAlign: 'left' }}>Requester</th>
               <th style={{ padding: '12px', textAlign: 'left' }}>Instructor</th>
               <th style={{ padding: '12px', textAlign: 'left' }}>Date</th>
-              <th style={{ padding: '12px', textAlign: 'left' }}>Field</th>
               <th style={{ padding: '12px', textAlign: 'left' }}>Delivery</th>
               <th style={{ padding: '12px', textAlign: 'left' }}>Status</th>
               <th style={{ padding: '12px', textAlign: 'left' }}>Actions</th>
@@ -430,38 +378,37 @@ const AdminEvents = () => {
           <tbody>
             {filteredEvents.length > 0 ? (
               filteredEvents.map((event) => (
-                <tr key={event.eventID} style={{ borderBottom: '1px solid #ddd' }}>
-                  <td style={{ padding: '12px' }}>{event.eventID}</td>
-                  <td style={{ padding: '12px' }}>{event.topic}</td>
+                <tr key={event.ID} style={{ borderBottom: '1px solid #ddd' }}>
+                  <td style={{ padding: '12px' }}>{event.ID}</td>
+                  <td style={{ padding: '12px' }}>{event.Topic}</td>
                   <td style={{ padding: '12px' }}>{event.requesterName}</td>
                   <td style={{ padding: '12px' }}>{event.instructorName}</td>
-                  <td style={{ padding: '12px' }}>{new Date(event.date).toLocaleDateString()}</td>
-                  <td style={{ padding: '12px' }}>{event.field}</td>
-                  <td style={{ padding: '12px' }}>{event.deliveryMethod}</td>
+                  <td style={{ padding: '12px' }}>{event.Date ? new Date(event.Date).toLocaleDateString() : 'No Date'}</td>
+                  <td style={{ padding: '12px' }}>{event.DeliveryMethod || 'N/A'}</td>
                   <td style={{ padding: '12px' }}>
-                    <span style={{ 
-                      padding: '5px 8px', 
-                      borderRadius: '4px', 
+                    <span style={{
+                      padding: '5px 8px',
+                      borderRadius: '4px',
                       fontSize: '14px',
-                      backgroundColor: event.status === 'Pending' ? '#ffcb5b' : 
-                                        event.status === 'Scheduled' ? '#5bc0de' : 
-                                        event.status === 'Completed' ? '#5cb85c' : '#d9534f',
-                      color: event.status === 'Pending' ? '#000' : '#fff'
+                      backgroundColor: event.EventStatus === 1 ? '#ffcb5b' :
+                                        event.EventStatus === 2 ? '#5bc0de' :
+                                        event.EventStatus === 3 ? '#5cb85c' : '#d9534f',
+                      color: event.EventStatus === 1 ? '#000' : '#fff'
                     }}>
-                      {event.status}
+                      {STATUS_MAP[event.EventStatus] || 'Unknown'}
                     </span>
                   </td>
                   <td style={{ padding: '12px' }}>
-                    <button 
-                      className="cta-button" 
+                    <button
+                      className="cta-button"
                       onClick={() => handleEditEvent(event)}
                       style={{ padding: '5px 10px', fontSize: '14px', marginRight: '5px' }}
                     >
                       Edit
                     </button>
-                    <button 
-                      className="cta-button" 
-                      onClick={() => handleDeleteEvent(event.eventID)}
+                    <button
+                      className="cta-button"
+                      onClick={() => handleDeleteEvent(event.ID)}
                       style={{ padding: '5px 10px', fontSize: '14px', backgroundColor: '#d9534f' }}
                     >
                       Delete
@@ -471,7 +418,7 @@ const AdminEvents = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="9" style={{ padding: '20px', textAlign: 'center' }}>
+                <td colSpan="8" style={{ padding: '20px', textAlign: 'center' }}>
                   No events found matching your search criteria.
                 </td>
               </tr>
