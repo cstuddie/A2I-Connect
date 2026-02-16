@@ -33,7 +33,7 @@ export function UserHeader () {
               </Nav.Link>
             </Nav>
             <Nav className="ms-auto">
-                <Nav.Link as={Link} to="/Message">
+                <Nav.Link as={Link} to="/Inbox">
                   Email
                 </Nav.Link>
                 <NavDropdown title={<FaUserCircle size={40} /> } id="basic-nav-dropdown">

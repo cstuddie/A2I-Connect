@@ -341,3 +341,172 @@ p {
   }
   }
   
+/* ==================== INBOX STYLES ==================== */
+
+/* Inbox Container */
+.inbox-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* Left Side - Conversation List */
+.conversation-list {
+    width: 350px;
+    border-right: 1px solid #e5e5e5;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.list-header {
+    padding: 20px 16px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.list-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+}
+
+.conversations {
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Conversation Card */
+.convo-card {
+    padding: 16px;
+    border-bottom: 1px solid #e5e5e5;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    background-color: white;
+}
+
+.convo-card:hover {
+    background-color: #f5f5f5;
+}
+
+.convo-card.active {
+    background-color: #e3f2fd;
+    border-left: 3px solid #2196F3;
+}
+
+.convo-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.convo-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.convo-card-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+}
+
+.convo-card-timestamp {
+    font-size: 12px;
+    color: #999;
+}
+
+.convo-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.convo-card-message {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.unread-badge {
+    background-color: #2196F3;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 0px 6px;
+    border-radius: 50%;
+    min-width: 20px;
+    text-align: center;
+    line-height: 1;
+}
+
+/* Right Side - Chat View */
+.chat-view {
+    flex: 1;
+    background-color: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.no-chat-selected {
+    color: #999;
+    font-size: 18px;
+}
+
+/* Loading and Error States */
+.inbox-loading,
+.inbox-error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 18px;
+    color: #666;
+}
+
+.inbox-error {
+    color: #d32f2f;
+}
+
+.no-conversations {
+    padding: 20px;
+    text-align: center;
+    color: #999;
+    font-size: 16px;
+}
+
+/* Update list-header to flex layout */
+.list-header {
+    padding: 20px 16px;
+    border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Back Button */
+.back-btn {
+    background-color: transparent;
+    color: #2196F3;
+    border: 1px solid #2196F3;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    width: auto;
+    align-self: flex-start;
+}
+
+.back-btn:hover {
+    background-color: #e3f2fd;
+    cursor: pointer;
+}
