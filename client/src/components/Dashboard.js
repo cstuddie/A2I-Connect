@@ -1,15 +1,53 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Link } from "react-router-dom";
-import { Container, Row, Col, Button, Card, Badge, Navbar, Nav, NavDropdown } from 'react-bootstrap';
-import  { FaUserCircle } from 'react-icons/fa';
+import { NavLink, Link, useNavigate } from "react-router-dom";
+import { Container, Row, Col, Button, Card, Badge, Navbar, Nav, NavDropdown, Form, FormControl } from 'react-bootstrap';
+import  { FaUserCircle, FaSearch } from 'react-icons/fa';
 import "./Base.css"; 
 
 export function UserHeader () {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [showResults, setShowResults] = useState(false);
+    const [searching, setSearching] = useState(false);
+    const navigate = useNavigate();
+
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userID');
         window.location.href = '/login';
     }
+
+    // Search for users
+    const handleSearch = async (query) => {
+        setSearchQuery(query);
+        
+        if (!query.trim()) {
+            setSearchResults([]);
+            setShowResults(false);
+            return;
+        }
+
+        try {
+            setSearching(true);
+            const response = await fetch(`http://localhost:3001/users/search?q=${query}`);
+            const data = await response.json();
+            setSearchResults(data);
+            setShowResults(true);
+        } catch (error) {
+            console.error('Error searching users:', error);
+        } finally {
+            setSearching(false);
+        }
+    };
+
+    const handleResultClick = (userId) => {
+        // Navigate to user profile or do something else
+        console.log('Clicked user:', userId);
+        setShowResults(false);
+        setSearchQuery('');
+        // You can navigate to a profile page or open inbox
+        // navigate(`/profile/${userId}`);
+    };
 
     return (
         <Navbar bg="white" variant="light" expand="lg" sticky="top" className='border-bottom'>
@@ -32,6 +70,51 @@ export function UserHeader () {
                 Browse Events
               </Nav.Link>
             </Nav>
+
+            {/* Search Bar */}
+            <Form className="d-flex mx-3 position-relative search-form">
+              <div className="search-wrapper">
+                <FormControl
+                  type="search"
+                  placeholder="Search users..."
+                  className="search-input"
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  onBlur={() => setTimeout(() => setShowResults(false), 200)}
+                />
+                <FaSearch className="search-icon" />
+                
+                {/* Search Results Dropdown */}
+                {showResults && (
+                  <div className="search-results-dropdown">
+                    {searching && (
+                      <div className="search-result-item searching">Searching...</div>
+                    )}
+                    
+                    {!searching && searchResults.length === 0 && (
+                      <div className="search-result-item no-results">No users found</div>
+                    )}
+                    
+                    {!searching && searchResults.map(user => (
+                      <div 
+                        key={user.ID}
+                        className="search-result-item"
+                        onClick={() => handleResultClick(user.ID)}
+                      >
+                        <div className="search-result-name">
+                          {user.FirstName} {user.LastName}
+                        </div>
+                        <div className="search-result-details">
+                          {user.Affiliation && <span>{user.Affiliation}</span>}
+                          {user.Email && <span className="text-muted"> • {user.Email}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Form>
+
             <Nav className="ms-auto">
                 <Nav.Link as={Link} to="/Inbox">
                   Email
@@ -260,4 +343,4 @@ const Dashboard = () => {
       );
 };
 
-export default Dashboard;
+export default Dashboard; 
