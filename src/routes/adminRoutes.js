@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../../db/knex');
 const { requireAdmin } = require('../middleware/auth');
+const adminController = require('../controllers/adminController');
 
 const router = express.Router();
 
@@ -35,5 +36,9 @@ router.post('/admin-login', async (req, res) => {
 router.get('/verify', requireAdmin, (req, res) => {
   res.json({ message: 'Admin verified', userID: req.user.id });
 });
+
+// User management
+router.delete('/users/:userID', requireAdmin, adminController.deleteUser);
+router.post('/users/:userID/ban', requireAdmin, adminController.banUser);
 
 module.exports = router;

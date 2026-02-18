@@ -22,6 +22,11 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
+    const banned = await db("Banned").where({ Email: email }).first();
+    if (banned) {
+      return res.status(403).json({ error: "This email has been banned" });
+    }
+
     const existing = await db("User").where({ Email: email }).first();
     if (existing) {
       return res.status(400).json({ error: "Email already exists" });
