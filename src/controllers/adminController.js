@@ -1,4 +1,5 @@
 const adminService = require('../services/adminService');
+const db = require('../../db/knex');
 
 exports.updateEventStatus = async (req, res) => {
   const { eventID } = req.params;
@@ -23,12 +24,28 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+exports.banUser = async (req, res) => {
+  const { userID } = req.params;
+  try {
+    const user = await db('User').where('ID', userID).first();
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    await adminService.setEmailToBanned(user.Email);
+    await adminService.deleteUserCascade(userID);
+
+    res.json({ message: 'User banned successfully' });
+  } catch (e) {
+    console.error('Error banning user:', e);
+    res.status(500).json({ error: 'Error banning user' });
+  }
+};
+
 exports.getAdmin = async (req, res) => {
   const { adminID } = req.params;
   try {
     const admin = await adminService.getAdmin(adminID);
     if (!admin) return res.status(404).json({ message: 'Admin not found' });
-    delete admin.password;
+    delete admin.Password;
     res.json(admin);
   } catch (e) {
     console.error('Error fetching admin details:', e);

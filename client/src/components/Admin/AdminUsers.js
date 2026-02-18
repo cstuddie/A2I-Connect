@@ -79,6 +79,7 @@ const AdminUsers = () => {
     firstName: '',
     lastName: ''
   });
+  const [banTarget, setBanTarget] = useState(null);
 
   useEffect(() => {
     // Check if admin is logged in
@@ -179,6 +180,29 @@ const AdminUsers = () => {
         console.error('Error deleting user:', error);
         alert('Error deleting user');
       }
+    }
+  };
+
+  const handleBanUser = async () => {
+    if (!banTarget) return;
+    try {
+      const adminToken = localStorage.getItem('adminToken');
+      const response = await fetch(`http://localhost:3001/admin/users/${banTarget.ID}/ban`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+
+      if (response.ok) {
+        setUsers(users.filter(u => u.ID !== banTarget.ID));
+        setBanTarget(null);
+        alert('User banned successfully');
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to ban user');
+      }
+    } catch (error) {
+      console.error('Error banning user:', error);
+      alert('Error banning user');
     }
   };
 
@@ -415,6 +439,42 @@ const AdminUsers = () => {
           </div>
         )}
 
+        {/* Ban Confirmation Modal */}
+        {banTarget && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000
+          }}>
+            <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '8px', width: '450px', maxWidth: '90%', textAlign: 'center' }}>
+              <h2 style={{ marginBottom: '15px' }}>Ban User</h2>
+              <p>Are you sure you want to ban <strong>{banTarget.FirstName} {banTarget.LastName}</strong> ({banTarget.Email})?</p>
+              <p style={{ color: '#d9534f', fontSize: '14px', marginTop: '10px' }}>This will delete their account and prevent them from re-registering.</p>
+              <div style={{ marginTop: '25px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                <button
+                  onClick={() => setBanTarget(null)}
+                  style={{ padding: '10px 20px', width: 'auto', backgroundColor: '#f0f0f0', color: '#333', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleBanUser}
+                  style={{ padding: '10px 20px', width: 'auto', backgroundColor: '#d9534f', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
+                >
+                  Confirm Ban
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Search and User List */}
         <div style={{ marginBottom: '20px' }}>
           <input
@@ -462,6 +522,13 @@ const AdminUsers = () => {
                       style={{ padding: '5px 10px', fontSize: '14px', backgroundColor: '#d9534f' }}
                     >
                       Delete
+                    </button>
+                    <button
+                      className="cta-button"
+                      onClick={() => setBanTarget(user)}
+                      style={{ padding: '5px 10px', fontSize: '14px', backgroundColor: '#c9302c', marginLeft: '5px' }}
+                    >
+                      Ban
                     </button>
                   </td>
                 </tr>
