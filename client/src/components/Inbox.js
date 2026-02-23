@@ -8,8 +8,7 @@ const Inbox = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-
-    const userID = localStorage.getItem('userId');
+    const userID = localStorage.getItem('userID');
 
     // Fetch conversations from backend
     useEffect(() => {
