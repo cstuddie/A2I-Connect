@@ -5,7 +5,7 @@ import '../Base.css';
 // Reusing AdminHeader component
 function AdminHeader() {
   const navigate = useNavigate();
-  
+
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminID');
@@ -67,8 +67,8 @@ const AdminUsers = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [userFormData, setUserFormData] = useState({
     email: '',
-    name: '',
-    expertise: '',
+    firstName: '',
+    lastName: '',
     affiliation: ''
   });
   const [showAddUserForm, setShowAddUserForm] = useState(false);
@@ -79,6 +79,7 @@ const AdminUsers = () => {
     firstName: '',
     lastName: ''
   });
+  const [banTarget, setBanTarget] = useState(null);
 
   useEffect(() => {
     // Check if admin is logged in
@@ -90,25 +91,9 @@ const AdminUsers = () => {
 
     const fetchUsers = async () => {
       try {
-        // Fetch all users
         const usersResponse = await fetch('http://localhost:3001/users');
         const usersData = await usersResponse.json();
-        
-        // Fetch profiles for each user
-        const enhancedUsers = await Promise.all(
-          usersData.map(async (user) => {
-            try {
-              const profileResponse = await fetch(`http://localhost:3001/profile/${user.userID}`);
-              const profileData = await profileResponse.json();
-              return { ...user, profile: profileData[0] || {} };
-            } catch (error) {
-              console.error(`Error fetching profile for user ${user.userID}:`, error);
-              return { ...user, profile: {} };
-            }
-          })
-        );
-        
-        setUsers(enhancedUsers);
+        setUsers(usersData);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching users:', error);
@@ -122,51 +107,45 @@ const AdminUsers = () => {
   const handleEditUser = (user) => {
     setEditingUser(user);
     setUserFormData({
-      email: user.email,
-      name: user.profile?.name || '',
-      expertise: user.profile?.expertise || '',
-      affiliation: user.profile?.affiliation || ''
+      email: user.Email,
+      firstName: user.FirstName,
+      lastName: user.LastName,
+      affiliation: user.Affiliation || ''
     });
   };
 
-const handleUpdateUser = async (e) => {
+  const handleUpdateUser = async (e) => {
     e.preventDefault();
-    
+
     try {
       const adminToken = localStorage.getItem('adminToken');
-      
-      // Update user profile
-      const profileResponse = await fetch(`http://localhost:3001/profile/${editingUser.userID}`, {
+
+      const response = await fetch(`http://localhost:3001/users/${editingUser.ID}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${adminToken}`
         },
         body: JSON.stringify({
-          name: userFormData.name,
-          expertise: userFormData.expertise,
-          affiliation: userFormData.affiliation
+          FirstName: userFormData.firstName,
+          LastName: userFormData.lastName,
+          Affiliation: userFormData.affiliation
         }),
       });
 
-      if (profileResponse.ok) {
-        // Update local state
+      if (response.ok) {
         setUsers(users.map(user => {
-          if (user.userID === editingUser.userID) {
+          if (user.ID === editingUser.ID) {
             return {
               ...user,
-              email: userFormData.email,
-              profile: {
-                ...user.profile,
-                name: userFormData.name,
-                expertise: userFormData.expertise,
-                affiliation: userFormData.affiliation
-              }
+              FirstName: userFormData.firstName,
+              LastName: userFormData.lastName,
+              Affiliation: userFormData.affiliation
             };
           }
           return user;
         }));
-        
+
         setEditingUser(null);
         alert('User updated successfully');
       } else {
@@ -178,11 +157,11 @@ const handleUpdateUser = async (e) => {
     }
   };
 
-const handleDeleteUser = async (userID) => {
+  const handleDeleteUser = async (userID) => {
     if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
       try {
         const adminToken = localStorage.getItem('adminToken');
-        
+
         const response = await fetch(`http://localhost:3001/admin/users/${userID}`, {
           method: 'DELETE',
           headers: {
@@ -191,7 +170,7 @@ const handleDeleteUser = async (userID) => {
         });
 
         if (response.ok) {
-          setUsers(users.filter(user => user.userID !== userID));
+          setUsers(users.filter(user => user.ID !== userID));
           alert('User deleted successfully');
         } else {
           const error = await response.json();
@@ -204,16 +183,39 @@ const handleDeleteUser = async (userID) => {
     }
   };
 
+  const handleBanUser = async () => {
+    if (!banTarget) return;
+    try {
+      const adminToken = localStorage.getItem('adminToken');
+      const response = await fetch(`http://localhost:3001/admin/users/${banTarget.ID}/ban`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${adminToken}` }
+      });
+
+      if (response.ok) {
+        setUsers(users.filter(u => u.ID !== banTarget.ID));
+        setBanTarget(null);
+        alert('User banned successfully');
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Failed to ban user');
+      }
+    } catch (error) {
+      console.error('Error banning user:', error);
+      alert('Error banning user');
+    }
+  };
+
   const handleAddUser = async (e) => {
     e.preventDefault();
-    
+
     if (newUserData.password !== newUserData.confirmPassword) {
       alert('Passwords do not match');
       return;
     }
-    
+
     try {
-      const response = await fetch('http://localhost:3001/register', {
+      const response = await fetch('http://localhost:3001/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -223,26 +225,18 @@ const handleDeleteUser = async (userID) => {
           lastName: newUserData.lastName,
           email: newUserData.email,
           password: newUserData.password,
-          confirmPassword: newUserData.confirmPassword
+          role: 1
         }),
       });
 
       const result = await response.json();
-      
+
       if (response.ok) {
-        // Fetch the newly created user to get full details
+        // Re-fetch users to get the new user with correct data
         const userResponse = await fetch('http://localhost:3001/users');
         const usersData = await userResponse.json();
-        const newUser = usersData.find(user => user.email === newUserData.email);
-        
-        if (newUser) {
-          const profileResponse = await fetch(`http://localhost:3001/profile/${newUser.userID}`);
-          const profileData = await profileResponse.json();
-          
-          // Add the new user to the state
-          setUsers([...users, { ...newUser, profile: profileData[0] || {} }]);
-        }
-        
+        setUsers(usersData);
+
         // Reset form and hide it
         setNewUserData({
           email: '',
@@ -265,11 +259,11 @@ const handleDeleteUser = async (userID) => {
   // Filter users based on search term
   const filteredUsers = users.filter(user => {
     const searchTermLower = searchTerm.toLowerCase();
+    const fullName = `${user.FirstName} ${user.LastName}`.toLowerCase();
     return (
-      user.email.toLowerCase().includes(searchTermLower) ||
-      (user.profile?.name || '').toLowerCase().includes(searchTermLower) ||
-      (user.profile?.expertise || '').toLowerCase().includes(searchTermLower) ||
-      (user.profile?.affiliation || '').toLowerCase().includes(searchTermLower)
+      (user.Email || '').toLowerCase().includes(searchTermLower) ||
+      fullName.includes(searchTermLower) ||
+      (user.Affiliation || '').toLowerCase().includes(searchTermLower)
     );
   });
 
@@ -287,19 +281,19 @@ const handleDeleteUser = async (userID) => {
   return (
     <div>
       <AdminHeader />
-      
+
       <div style={{ padding: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h1>User Management</h1>
-          <button 
-            className="cta-button" 
+          <button
+            className="cta-button"
             onClick={() => setShowAddUserForm(!showAddUserForm)}
             style={{ padding: '10px 15px' }}
           >
             {showAddUserForm ? 'Cancel' : 'Add New User'}
           </button>
         </div>
-        
+
         {/* Add User Form */}
         {showAddUserForm && (
           <div className="form-container" style={{ marginBottom: '30px' }}>
@@ -329,7 +323,7 @@ const handleDeleteUser = async (userID) => {
                   />
                 </div>
               </div>
-              
+
               <label htmlFor="email">Email</label>
               <input
                 type="email"
@@ -339,7 +333,7 @@ const handleDeleteUser = async (userID) => {
                 onChange={(e) => setNewUserData({...newUserData, email: e.target.value})}
                 required
               />
-              
+
               <label htmlFor="password">Password</label>
               <input
                 type="password"
@@ -349,7 +343,7 @@ const handleDeleteUser = async (userID) => {
                 onChange={(e) => setNewUserData({...newUserData, password: e.target.value})}
                 required
               />
-              
+
               <label htmlFor="confirmPassword">Confirm Password</label>
               <input
                 type="password"
@@ -359,10 +353,10 @@ const handleDeleteUser = async (userID) => {
                 onChange={(e) => setNewUserData({...newUserData, confirmPassword: e.target.value})}
                 required
               />
-              
+
               <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setShowAddUserForm(false)}
                   style={{ marginRight: '10px', backgroundColor: '#f0f0f0', color: '#333' }}
                 >
@@ -373,18 +367,18 @@ const handleDeleteUser = async (userID) => {
             </form>
           </div>
         )}
-        
+
         {/* Edit User Modal */}
         {editingUser && (
-          <div style={{ 
-            position: 'fixed', 
-            top: 0, 
-            left: 0, 
-            right: 0, 
-            bottom: 0, 
-            backgroundColor: 'rgba(0,0,0,0.5)', 
-            display: 'flex', 
-            justifyContent: 'center', 
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            justifyContent: 'center',
             alignItems: 'center',
             zIndex: 1000
           }}>
@@ -397,30 +391,30 @@ const handleDeleteUser = async (userID) => {
                   id="email"
                   name="email"
                   value={userFormData.email}
-                  onChange={(e) => setUserFormData({...userFormData, email: e.target.value})}
                   required
-                  disabled // Email should not be editable
+                  disabled
                 />
-                
-                <label htmlFor="name">Full Name</label>
+
+                <label htmlFor="firstName">First Name</label>
                 <input
                   type="text"
-                  id="name"
-                  name="name"
-                  value={userFormData.name}
-                  onChange={(e) => setUserFormData({...userFormData, name: e.target.value})}
+                  id="firstName"
+                  name="firstName"
+                  value={userFormData.firstName}
+                  onChange={(e) => setUserFormData({...userFormData, firstName: e.target.value})}
                   required
                 />
-                
-                <label htmlFor="expertise">Expertise</label>
+
+                <label htmlFor="lastName">Last Name</label>
                 <input
                   type="text"
-                  id="expertise"
-                  name="expertise"
-                  value={userFormData.expertise}
-                  onChange={(e) => setUserFormData({...userFormData, expertise: e.target.value})}
+                  id="lastName"
+                  name="lastName"
+                  value={userFormData.lastName}
+                  onChange={(e) => setUserFormData({...userFormData, lastName: e.target.value})}
+                  required
                 />
-                
+
                 <label htmlFor="affiliation">Affiliation</label>
                 <input
                   type="text"
@@ -429,10 +423,10 @@ const handleDeleteUser = async (userID) => {
                   value={userFormData.affiliation}
                   onChange={(e) => setUserFormData({...userFormData, affiliation: e.target.value})}
                 />
-                
+
                 <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => setEditingUser(null)}
                     style={{ marginRight: '10px', backgroundColor: '#f0f0f0', color: '#333' }}
                   >
@@ -444,25 +438,61 @@ const handleDeleteUser = async (userID) => {
             </div>
           </div>
         )}
-        
+
+        {/* Ban Confirmation Modal */}
+        {banTarget && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000
+          }}>
+            <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '8px', width: '450px', maxWidth: '90%', textAlign: 'center' }}>
+              <h2 style={{ marginBottom: '15px' }}>Ban User</h2>
+              <p>Are you sure you want to ban <strong>{banTarget.FirstName} {banTarget.LastName}</strong> ({banTarget.Email})?</p>
+              <p style={{ color: '#d9534f', fontSize: '14px', marginTop: '10px' }}>This will delete their account and prevent them from re-registering.</p>
+              <div style={{ marginTop: '25px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                <button
+                  onClick={() => setBanTarget(null)}
+                  style={{ padding: '10px 20px', width: 'auto', backgroundColor: '#f0f0f0', color: '#333', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleBanUser}
+                  style={{ padding: '10px 20px', width: 'auto', backgroundColor: '#d9534f', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
+                >
+                  Confirm Ban
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Search and User List */}
         <div style={{ marginBottom: '20px' }}>
           <input
             type="text"
-            placeholder="Search users by name, email, expertise..."
+            placeholder="Search users by name, email, affiliation..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ width: '100%', padding: '10px', fontSize: '16px' }}
           />
         </div>
-        
+
         <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: 'white' }}>
           <thead>
             <tr style={{ backgroundColor: '#0B3444', color: 'white' }}>
               <th style={{ padding: '12px', textAlign: 'left' }}>ID</th>
               <th style={{ padding: '12px', textAlign: 'left' }}>Name</th>
               <th style={{ padding: '12px', textAlign: 'left' }}>Email</th>
-              <th style={{ padding: '12px', textAlign: 'left' }}>Expertise</th>
+              <th style={{ padding: '12px', textAlign: 'left' }}>Role</th>
               <th style={{ padding: '12px', textAlign: 'left' }}>Affiliation</th>
               <th style={{ padding: '12px', textAlign: 'left' }}>Created</th>
               <th style={{ padding: '12px', textAlign: 'left' }}>Actions</th>
@@ -471,27 +501,34 @@ const handleDeleteUser = async (userID) => {
           <tbody>
             {filteredUsers.length > 0 ? (
               filteredUsers.map((user) => (
-                <tr key={user.userID} style={{ borderBottom: '1px solid #ddd' }}>
-                  <td style={{ padding: '12px' }}>{user.userID}</td>
-                  <td style={{ padding: '12px' }}>{user.profile?.name || 'No Name'}</td>
-                  <td style={{ padding: '12px' }}>{user.email}</td>
-                  <td style={{ padding: '12px' }}>{user.profile?.expertise || 'Not specified'}</td>
-                  <td style={{ padding: '12px' }}>{user.profile?.affiliation || 'Not specified'}</td>
+                <tr key={user.ID} style={{ borderBottom: '1px solid #ddd' }}>
+                  <td style={{ padding: '12px' }}>{user.ID}</td>
+                  <td style={{ padding: '12px' }}>{user.FirstName} {user.LastName}</td>
+                  <td style={{ padding: '12px' }}>{user.Email}</td>
+                  <td style={{ padding: '12px' }}>{user.Role === 2 ? 'Expert' : 'User'}</td>
+                  <td style={{ padding: '12px' }}>{user.Affiliation || 'Not specified'}</td>
                   <td style={{ padding: '12px' }}>{new Date(user.created_at).toLocaleDateString()}</td>
                   <td style={{ padding: '12px' }}>
-                    <button 
-                      className="cta-button" 
+                    <button
+                      className="cta-button"
                       onClick={() => handleEditUser(user)}
                       style={{ padding: '5px 10px', fontSize: '14px', marginRight: '5px' }}
                     >
                       Edit
                     </button>
-                    <button 
-                      className="cta-button" 
-                      onClick={() => handleDeleteUser(user.userID)}
+                    <button
+                      className="cta-button"
+                      onClick={() => handleDeleteUser(user.ID)}
                       style={{ padding: '5px 10px', fontSize: '14px', backgroundColor: '#d9534f' }}
                     >
                       Delete
+                    </button>
+                    <button
+                      className="cta-button"
+                      onClick={() => setBanTarget(user)}
+                      style={{ padding: '5px 10px', fontSize: '14px', backgroundColor: '#c9302c', marginLeft: '5px' }}
+                    >
+                      Ban
                     </button>
                   </td>
                 </tr>

@@ -82,72 +82,49 @@ const AdminDashboard = () => {
 
     const fetchDashboardData = async () => {
       try {
-        // Fetch users count
+        // Fetch users
         const usersResponse = await fetch('http://localhost:3001/users');
         const usersData = await usersResponse.json();
-        
-        // Fetch events data
+
+        // Fetch events
         const eventsResponse = await fetch('http://localhost:3001/events');
         const eventsData = await eventsResponse.json();
-        
+
+        // Build a lookup map for user names by ID
+        const userMap = {};
+        usersData.forEach(u => {
+          userMap[u.ID] = `${u.FirstName} ${u.LastName}`;
+        });
+
         // Process data for stats
-        const pendingEvents = eventsData.filter(event => event.status === 'Pending').length;
-        const scheduledEvents = eventsData.filter(event => event.status === 'Scheduled').length;
-        
+        const pendingEvents = eventsData.filter(event => event.EventStatus === 1).length;
+        const scheduledEvents = eventsData.filter(event => event.EventStatus === 2).length;
+
         setStats({
           totalUsers: usersData.length,
           totalEvents: eventsData.length,
           pendingEvents,
           scheduledEvents
         });
-        
+
         // Get 5 most recent users
-        const sortedUsers = [...usersData].sort((a, b) => 
+        const sortedUsers = [...usersData].sort((a, b) =>
           new Date(b.created_at) - new Date(a.created_at)
         ).slice(0, 5);
-        
-        // Get user profiles for the recent users
-        const userProfiles = await Promise.all(
-          sortedUsers.map(async (user) => {
-            const profileResponse = await fetch(`http://localhost:3001/profile/${user.userID}`);
-            const profileData = await profileResponse.json();
-            return { ...user, profile: profileData[0] || {} };
-          })
-        );
-        
-        setRecentUsers(userProfiles);
-        
-        // Get 5 most recent events
-        const sortedEvents = [...eventsData].sort((a, b) => 
+
+        setRecentUsers(sortedUsers);
+
+        // Get 5 most recent events with names
+        const sortedEvents = [...eventsData].sort((a, b) =>
           new Date(b.created_at) - new Date(a.created_at)
         ).slice(0, 5);
-        
-        // Enhance events with requester and instructor names
-        const enhancedEvents = await Promise.all(
-          sortedEvents.map(async (event) => {
-            let requesterName = "Unknown";
-            let instructorName = "Not Assigned";
-            
-            if (event.requesterID) {
-              const requesterResponse = await fetch(`http://localhost:3001/profile/${event.requesterID}`);
-              const requesterData = await requesterResponse.json();
-              if (requesterData && requesterData[0]) {
-                requesterName = requesterData[0].name;
-              }
-            }
-            
-            if (event.instructorID) {
-              const instructorResponse = await fetch(`http://localhost:3001/profile/${event.instructorID}`);
-              const instructorData = await instructorResponse.json();
-              if (instructorData && instructorData[0]) {
-                instructorName = instructorData[0].name;
-              }
-            }
-            
-            return { ...event, requesterName, instructorName };
-          })
-        );
-        
+
+        const enhancedEvents = sortedEvents.map(event => ({
+          ...event,
+          requesterName: userMap[event.RequesterID] || 'Unknown',
+          instructorName: event.InstructorID ? (userMap[event.InstructorID] || 'Unknown') : 'Not Assigned'
+        }));
+
         setRecentEvents(enhancedEvents);
         setLoading(false);
       } catch (error) {
@@ -227,12 +204,12 @@ const AdminDashboard = () => {
             </thead>
             <tbody>
               {recentUsers.map((user) => (
-                <tr key={user.userID} style={{ borderBottom: '1px solid #ddd' }}>
-                  <td style={{ padding: '12px' }}>{user.userID}</td>
-                  <td style={{ padding: '12px' }}>{user.profile?.name || 'No Name'}</td>
-                  <td style={{ padding: '12px' }}>{user.email}</td>
-                  <td style={{ padding: '12px' }}>{user.profile?.expertise || 'Not specified'}</td>
-                  <td style={{ padding: '12px' }}>{user.profile?.affiliation || 'Not specified'}</td>
+                <tr key={user.ID} style={{ borderBottom: '1px solid #ddd' }}>
+                  <td style={{ padding: '12px' }}>{user.ID}</td>
+                  <td style={{ padding: '12px' }}>{user.FirstName} {user.LastName}</td>
+                  <td style={{ padding: '12px' }}>{user.Email}</td>
+                  <td style={{ padding: '12px' }}>{user.ExpertiseID || 'Not specified'}</td>
+                  <td style={{ padding: '12px' }}>{user.Affiliation || 'Not specified'}</td>
                   <td style={{ padding: '12px' }}>
                   </td>
                 </tr>
@@ -264,22 +241,22 @@ const AdminDashboard = () => {
             </thead>
             <tbody>
               {recentEvents.map((event) => (
-                <tr key={event.eventID} style={{ borderBottom: '1px solid #ddd' }}>
-                  <td style={{ padding: '12px' }}>{event.eventID}</td>
-                  <td style={{ padding: '12px' }}>{event.topic}</td>
+                <tr key={event.ID} style={{ borderBottom: '1px solid #ddd' }}>
+                  <td style={{ padding: '12px' }}>{event.ID}</td>
+                  <td style={{ padding: '12px' }}>{event.Topic}</td>
                   <td style={{ padding: '12px' }}>{event.requesterName}</td>
                   <td style={{ padding: '12px' }}>{event.instructorName}</td>
-                  <td style={{ padding: '12px' }}>{new Date(event.date).toLocaleDateString()}</td>
+                  <td style={{ padding: '12px' }}>{event.Date ? new Date(event.Date).toLocaleDateString() : 'No Date'}</td>
                   <td style={{ padding: '12px' }}>
-                    <span style={{ 
-                      padding: '5px 8px', 
-                      borderRadius: '4px', 
+                    <span style={{
+                      padding: '5px 8px',
+                      borderRadius: '4px',
                       fontSize: '14px',
-                      backgroundColor: event.status === 'Pending' ? '#ffcb5b' : 
-                                        event.status === 'Scheduled' ? '#5bc0de' : '#5cb85c',
-                      color: event.status === 'Pending' ? '#000' : '#fff'
+                      backgroundColor: event.EventStatus === 1 ? '#ffcb5b' :
+                                        event.EventStatus === 2 ? '#5bc0de' : '#5cb85c',
+                      color: event.EventStatus === 1 ? '#000' : '#fff'
                     }}>
-                      {event.status}
+                      {event.EventStatus === 1 ? 'Pending' : event.EventStatus === 2 ? 'Scheduled' : 'Completed'}
                     </span>
                   </td>
                   <td style={{ padding: '12px' }}>
