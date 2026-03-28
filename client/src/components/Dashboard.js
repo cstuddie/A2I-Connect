@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, Link } from "react-router-dom";
 import { Container, Row, Col, Button, Card, Badge, Navbar, Nav, NavDropdown } from 'react-bootstrap';
 import  { FaUserCircle } from 'react-icons/fa';
-import "./Base.css"; 
+import NotificationWidget from './NotificationWidget';
+import "./Base.css";
 
 export function UserHeader ({name}) {
+    const userID = localStorage.getItem('userID');
+
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userID');
@@ -32,7 +35,10 @@ export function UserHeader ({name}) {
                 Browse Events
               </Nav.Link>
             </Nav>
-            <Nav className="ms-auto">
+            <Nav className="ms-auto align-items-center">
+                <Nav.Item>
+                  <NotificationWidget />
+                </Nav.Item>
                 <NavDropdown title={<FaUserCircle size={40} /> } id="basic-nav-dropdown">
                 <NavDropdown.Item href="/EditProfile" className='custom-dropdown-link'>Account</NavDropdown.Item>
                 <NavDropdown.Divider />
