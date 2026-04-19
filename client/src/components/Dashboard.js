@@ -6,8 +6,6 @@ import NotificationWidget from './NotificationWidget';
 import "./Base.css";
 
 export function UserHeader ({name}) {
-    const userID = localStorage.getItem('userID');
-
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userID');

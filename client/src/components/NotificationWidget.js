@@ -1,26 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Badge } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaBell, FaEnvelope, FaComment, FaCalendarAlt } from 'react-icons/fa';
+import { FaBell } from 'react-icons/fa';
+import { relativeTime, getTypeIcon } from '../utils/notificationHelpers';
 import './Notifications.css';
-
-const TYPE_ICONS = {
-  message_request:  <FaEnvelope size={16} />,
-  incoming_message: <FaComment size={16} />,
-  event_update:     <FaCalendarAlt size={16} />,
-  session_reminder: <FaBell size={16} />,
-};
-
-function relativeTime(dateStr) {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins  = Math.floor(diff / 60_000);
-  const hours = Math.floor(diff / 3_600_000);
-  const days  = Math.floor(diff / 86_400_000);
-  if (mins < 1)   return 'just now';
-  if (mins < 60)  return `${mins}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  return `${days}d ago`;
-}
 
 export default function NotificationWidget() {
   const userID = localStorage.getItem('userID');
@@ -31,12 +14,10 @@ export default function NotificationWidget() {
   const [dropdownOpen,  setDropdownOpen]  = useState(false);
   const [loading,       setLoading]       = useState(false);
 
-  const dropdownRef = useRef(null);
-  const navigate    = useNavigate();
+  const navigate = useNavigate();
 
   const authHeaders = { Authorization: `Bearer ${token}` };
 
-  // ── Polling: unread count every 30 seconds ──────────────────────────────
   const pollCount = useCallback(() => {
     if (!userID || !token) return;
     fetch(`http://localhost:3001/notifications/${userID}/unread-count`, {
@@ -53,7 +34,6 @@ export default function NotificationWidget() {
     return () => clearInterval(id);
   }, [pollCount]);
 
-  // ── Fetch notification list when dropdown opens ─────────────────────────
   const fetchList = useCallback(() => {
     if (!userID || !token) return;
     setLoading(true);
@@ -73,7 +53,6 @@ export default function NotificationWidget() {
 
   const closeDropdown = () => setDropdownOpen(false);
 
-  // ── Mark single notification as read ────────────────────────────────────
   const handleItemClick = async (notification) => {
     if (!notification.IsRead) {
       try {
@@ -96,7 +75,6 @@ export default function NotificationWidget() {
     setDropdownOpen(false);
   };
 
-  // ── Mark all as read ─────────────────────────────────────────────────────
   const markAllRead = async (e) => {
     e.stopPropagation();
     try {
@@ -116,7 +94,6 @@ export default function NotificationWidget() {
       className="notification-widget"
       onMouseEnter={openDropdown}
       onMouseLeave={closeDropdown}
-      ref={dropdownRef}
     >
       <div className="notification-icon-wrapper">
         <FaBell size={22} color="#0B3444" />
@@ -151,7 +128,7 @@ export default function NotificationWidget() {
                   onClick={() => handleItemClick(n)}
                 >
                   <span className="notification-item-icon">
-                    {TYPE_ICONS[n.Type] || <FaBell size={16} />}
+                    {getTypeIcon(n.Type, 16)}
                   </span>
                   <div className="notification-item-content">
                     <div className="notification-item-title">{n.Title}</div>

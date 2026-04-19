@@ -1,14 +1,3 @@
-/**
- * reminderJob.js — Hourly session reminder scheduler.
- *
- * Runs immediately on require() and then every hour.
- * Exports runReminderCheck() so it can be called directly in tests.
- *
- * To test manually in a Node REPL or test file:
- *   const { runReminderCheck } = require('./src/jobs/reminderJob');
- *   await runReminderCheck();
- */
-
 const db = require('../../db/knex');
 const { createNotification } = require('../utils/notificationUtils');
 

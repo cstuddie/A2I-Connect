@@ -1,16 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { FaBell, FaEnvelope, FaComment, FaCalendarAlt } from 'react-icons/fa';
+import { relativeTime, getTypeIcon } from '../utils/notificationHelpers';
 import { UserHeader } from './Dashboard';
 import './Notifications.css';
-
-const TYPE_ICONS = {
-  message_request:  <FaEnvelope size={18} />,
-  incoming_message: <FaComment size={18} />,
-  event_update:     <FaCalendarAlt size={18} />,
-  session_reminder: <FaBell size={18} />,
-};
 
 const LEAD_HOUR_OPTIONS = [
   { value: 1,  label: '1 hour before' },
@@ -21,17 +14,6 @@ const LEAD_HOUR_OPTIONS = [
   { value: 48, label: '48 hours before' },
 ];
 
-function relativeTime(dateStr) {
-  const diff  = Date.now() - new Date(dateStr).getTime();
-  const mins  = Math.floor(diff / 60_000);
-  const hours = Math.floor(diff / 3_600_000);
-  const days  = Math.floor(diff / 86_400_000);
-  if (mins < 1)   return 'just now';
-  if (mins < 60)  return `${mins}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  return `${days}d ago`;
-}
-
 export default function NotificationsPage() {
   const userID   = localStorage.getItem('userID');
   const token    = localStorage.getItem('token');
@@ -40,11 +22,9 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
   const [activeTab,     setActiveTab]     = useState('all');
   const [loading,       setLoading]       = useState(false);
-
-  // Preferences state
-  const [prefs,        setPrefs]        = useState(null);
-  const [prefSaving,   setPrefSaving]   = useState(false);
-  const [prefSavedMsg, setPrefSavedMsg] = useState('');
+  const [prefs,        setPrefs]          = useState(null);
+  const [prefSaving,   setPrefSaving]     = useState(false);
+  const [prefSavedMsg, setPrefSavedMsg]   = useState('');
 
   const authHeaders = {
     'Content-Type': 'application/json',
@@ -80,7 +60,6 @@ export default function NotificationsPage() {
       .catch(() => {});
   }, [userID, token]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Mark single read ─────────────────────────────────────────────────────
   const markRead = async (notificationID) => {
     try {
       await fetch(`http://localhost:3001/notifications/${notificationID}/read`, {
@@ -93,7 +72,6 @@ export default function NotificationsPage() {
     } catch (_) {}
   };
 
-  // ── Mark all read ─────────────────────────────────────────────────────────
   const markAllRead = async () => {
     try {
       await fetch(`http://localhost:3001/notifications/${userID}/read-all`, {
@@ -104,7 +82,6 @@ export default function NotificationsPage() {
     } catch (_) {}
   };
 
-  // ── Save preferences ─────────────────────────────────────────────────────
   const savePreferences = async (e) => {
     e.preventDefault();
     setPrefSaving(true);
@@ -132,7 +109,6 @@ export default function NotificationsPage() {
     setPrefs((prev) => ({ ...prev, [field]: value }));
   };
 
-  // ── Filter notifications by tab ──────────────────────────────────────────
   const displayed = activeTab === 'unread'
     ? notifications.filter((n) => !n.IsRead)
     : notifications;
@@ -145,7 +121,6 @@ export default function NotificationsPage() {
 
       <Container className="notifications-page-body">
         <Row>
-          {/* ── Preferences sidebar ────────────────────────────────────── */}
           <Col sm={12} md={3} className="mb-4 mb-md-0">
             <div className="notifications-sidebar">
               <h5>Notification Settings</h5>
@@ -214,7 +189,6 @@ export default function NotificationsPage() {
             </div>
           </Col>
 
-          {/* ── Notifications list ─────────────────────────────────────── */}
           <Col sm={12} md={9}>
             <div className="notifications-list-panel">
               <div className="notifications-list-header">
@@ -288,7 +262,7 @@ export default function NotificationsPage() {
                     className={`notification-row${n.IsRead ? '' : ' unread'}`}
                   >
                     <span className="notification-row-icon">
-                      {TYPE_ICONS[n.Type] || <FaBell size={18} />}
+                      {getTypeIcon(n.Type, 18)}
                     </span>
 
                     <div className="notification-row-content">
