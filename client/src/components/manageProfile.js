@@ -2,8 +2,10 @@ import './Base.css';
 import { NavLink, Link } from "react-router-dom";
 import React, { useEffect, useState } from 'react';
 import { UserHeader } from './Dashboard';
-import { Form, Button, Container, Row, Col, Tab, Tabs, Nav } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col, Tab, Tabs, Nav, Table } from 'react-bootstrap';
 import axios from 'axios';
+
+const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const EditProfile = () => {
 
@@ -21,6 +23,17 @@ const EditProfile = () => {
   });
 
   const [errors, setErrors] = useState({});
+
+  // Availability state
+  const [availability, setAvailability] = useState([]);
+  const [newSlot, setNewSlot] = useState({ DayOfWeek: 'Monday', StartTime: '09:00', EndTime: '17:00' });
+  const [availabilityError, setAvailabilityError] = useState('');
+
+  // Account state
+  const [emailForm, setEmailForm] = useState({ newEmail: '', password: '' });
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [accountError, setAccountError] = useState('');
+  const [accountSuccess, setAccountSuccess] = useState('');
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -43,6 +56,20 @@ const EditProfile = () => {
     fetchProfile();
   }, [userID]);
 
+  // Fetch existing availability
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/users/availability/${userID}`);
+        const data = await response.json();
+        setAvailability(data || []);
+      } catch (error) {
+        console.error('Error fetching availability:', error);
+      }
+    };
+    fetchAvailability();
+  }, [userID]);
+
   const handleProfileChange = async (e) => {
     const { name, value } = e.target;
 
@@ -60,7 +87,7 @@ const EditProfile = () => {
   const handleSubmitProfile = async (e) => {
     e.preventDefault();
 
-    
+
     const newErrors = {};
 
     if (!profileInfo.FirstName.trim()) {
@@ -110,6 +137,127 @@ const EditProfile = () => {
     }
   };
 
+  const handleAddSlot = () => {
+    setAvailabilityError('');
+
+    if (newSlot.StartTime >= newSlot.EndTime) {
+      setAvailabilityError('Start time must be before end time.');
+      return;
+    }
+
+    setAvailability(prev => [...prev, { ...newSlot }]);
+    setNewSlot({ DayOfWeek: 'Monday', StartTime: '09:00', EndTime: '17:00' });
+  };
+
+  const handleRemoveSlot = (index) => {
+    setAvailability(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSaveAvailability = async () => {
+    setAvailabilityError('');
+    try {
+      const response = await fetch(`http://localhost:3001/users/availability/${userID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slots: availability }),
+      });
+
+      if (response.ok) {
+        alert('Availability updated successfully!');
+      } else {
+        const data = await response.json();
+        setAvailabilityError(data.error || 'Failed to update availability');
+      }
+    } catch (error) {
+      console.error('Error updating availability:', error);
+      setAvailabilityError('Error updating availability');
+    }
+  };
+
+  const handleUpdateEmail = async (e) => {
+    e.preventDefault();
+    setAccountError('');
+    setAccountSuccess('');
+
+    if (!emailForm.newEmail.trim() || !emailForm.password.trim()) {
+      setAccountError('All fields are required.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailForm.newEmail.trim())) {
+      setAccountError('Please enter a valid email address.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3001/users/email/${userID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newEmail: emailForm.newEmail.trim(), password: emailForm.password }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setAccountSuccess('Email updated successfully!');
+        setEmailForm({ newEmail: '', password: '' });
+        setProfileInfo(prev => ({ ...prev, Email: emailForm.newEmail.trim() }));
+      } else {
+        setAccountError(data.error || 'Failed to update email.');
+      }
+    } catch (error) {
+      console.error('Error updating email:', error);
+      setAccountError('Error updating email.');
+    }
+  };
+
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    setAccountError('');
+    setAccountSuccess('');
+
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      setAccountError('All fields are required.');
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      setAccountError('New password must be at least 6 characters.');
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setAccountError('New passwords do not match.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:3001/users/password/${userID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword: passwordForm.currentPassword, newPassword: passwordForm.newPassword }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setAccountSuccess('Password updated successfully!');
+        setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        setAccountError(data.error || 'Failed to update password.');
+      }
+    } catch (error) {
+      console.error('Error updating password:', error);
+      setAccountError('Error updating password.');
+    }
+  };
+
+  const formatTime = (time) => {
+    if (!time) return '';
+    const [hours, minutes] = time.split(':');
+    const h = parseInt(hours, 10);
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const displayH = h % 12 || 12;
+    return `${displayH}:${minutes} ${ampm}`;
+  };
+
   return (
     <div>
       <UserHeader name={`${profileInfo.FirstName} ${profileInfo.LastName}`} />
@@ -122,6 +270,12 @@ const EditProfile = () => {
               <Nav variant="pills" className="flex-column custom-pills">
                 <Nav.Item>
                   <Nav.Link eventKey="first">Profile</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey="second">Availability</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey="third">Account</Nav.Link>
                 </Nav.Item>
               </Nav>
             </Col>
@@ -212,7 +366,193 @@ const EditProfile = () => {
                         </Button>
                       </div>
                     </Form>
-                  </ div>
+                  </div>
+                </Tab.Pane>
+
+                <Tab.Pane eventKey="second">
+                  <h1 className="text-center mt-4">Manage Availability</h1>
+                  <p className="text-center mb-4 text-muted">Set your available time slots so others can see when you're free.</p>
+
+                  {availabilityError && (
+                    <div className="alert alert-danger">{availabilityError}</div>
+                  )}
+
+                  {/* Add new slot */}
+                  <div className="form-container">
+                    <h5>Add a Time Slot</h5>
+                    <Form.Group as={Row} className="mb-3">
+                      <Form.Label column sm="2">Day:</Form.Label>
+                      <Col sm="10">
+                        <Form.Control
+                          as="select"
+                          value={newSlot.DayOfWeek}
+                          onChange={(e) => setNewSlot({ ...newSlot, DayOfWeek: e.target.value })}
+                        >
+                          {DAYS_OF_WEEK.map(day => (
+                            <option key={day} value={day}>{day}</option>
+                          ))}
+                        </Form.Control>
+                      </Col>
+                    </Form.Group>
+
+                    <Form.Group as={Row} className="mb-3">
+                      <Form.Label column sm="2">Start Time:</Form.Label>
+                      <Col sm="10">
+                        <Form.Control
+                          type="time"
+                          value={newSlot.StartTime}
+                          onChange={(e) => setNewSlot({ ...newSlot, StartTime: e.target.value })}
+                        />
+                      </Col>
+                    </Form.Group>
+
+                    <Form.Group as={Row} className="mb-3">
+                      <Form.Label column sm="2">End Time:</Form.Label>
+                      <Col sm="10">
+                        <Form.Control
+                          type="time"
+                          value={newSlot.EndTime}
+                          onChange={(e) => setNewSlot({ ...newSlot, EndTime: e.target.value })}
+                        />
+                      </Col>
+                    </Form.Group>
+
+                    <div className="text-center mb-4">
+                      <Button variant="outline-dark" onClick={handleAddSlot}>
+                        Add Slot
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Current slots */}
+                  {availability.length > 0 ? (
+                    <Table striped bordered hover className="mt-3" style={{ verticalAlign: 'middle' }}>
+                      <thead>
+                        <tr>
+                          <th>Day</th>
+                          <th>Start Time</th>
+                          <th>End Time</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {availability.map((slot, index) => (
+                          <tr key={index} style={{ verticalAlign: 'middle' }}>
+                            <td>{slot.DayOfWeek}</td>
+                            <td>{formatTime(slot.StartTime)}</td>
+                            <td>{formatTime(slot.EndTime)}</td>
+                            <td>
+                              <Button
+                                variant="outline-danger"
+                                style={{ width: 'auto' }}
+                                onClick={() => handleRemoveSlot(index)}
+                              >
+                                Remove
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  ) : (
+                    <p className="text-muted text-center mt-3">No availability slots set yet.</p>
+                  )}
+
+                  <div className="text-center mt-3 mb-4">
+                    <Button variant="dark" onClick={handleSaveAvailability}>
+                      Save Availability
+                    </Button>
+                  </div>
+                </Tab.Pane>
+
+                <Tab.Pane eventKey="third">
+                  <h1 className="text-center mt-4">Account Settings</h1>
+                  <p className="text-center mb-4 text-muted">Change your email or password.</p>
+
+                  {accountError && (
+                    <div className="alert alert-danger">{accountError}</div>
+                  )}
+                  {accountSuccess && (
+                    <div className="alert alert-success">{accountSuccess}</div>
+                  )}
+
+                  <div className="form-container mb-4">
+                    <h5>Change Email</h5>
+                    <p className="text-muted">Current email: {profileInfo.Email}</p>
+                    <Form onSubmit={handleUpdateEmail}>
+                      <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm="3">New Email:</Form.Label>
+                        <Col sm="9">
+                          <Form.Control
+                            type="email"
+                            value={emailForm.newEmail}
+                            onChange={(e) => setEmailForm({ ...emailForm, newEmail: e.target.value })}
+                            placeholder="Enter new email"
+                          />
+                        </Col>
+                      </Form.Group>
+                      <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm="3">Password:</Form.Label>
+                        <Col sm="9">
+                          <Form.Control
+                            type="password"
+                            value={emailForm.password}
+                            onChange={(e) => setEmailForm({ ...emailForm, password: e.target.value })}
+                            placeholder="Confirm your current password"
+                          />
+                        </Col>
+                      </Form.Group>
+                      <div className="text-center">
+                        <Button variant="dark" type="submit">
+                          Update Email
+                        </Button>
+                      </div>
+                    </Form>
+                  </div>
+
+                  <div className="form-container mb-4">
+                    <h5>Change Password</h5>
+                    <Form onSubmit={handleUpdatePassword}>
+                      <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm="3">Current Password:</Form.Label>
+                        <Col sm="9">
+                          <Form.Control
+                            type="password"
+                            value={passwordForm.currentPassword}
+                            onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+                            placeholder="Enter current password"
+                          />
+                        </Col>
+                      </Form.Group>
+                      <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm="3">New Password:</Form.Label>
+                        <Col sm="9">
+                          <Form.Control
+                            type="password"
+                            value={passwordForm.newPassword}
+                            onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                            placeholder="Enter new password (min 6 characters)"
+                          />
+                        </Col>
+                      </Form.Group>
+                      <Form.Group as={Row} className="mb-3">
+                        <Form.Label column sm="3">Confirm Password:</Form.Label>
+                        <Col sm="9">
+                          <Form.Control
+                            type="password"
+                            value={passwordForm.confirmPassword}
+                            onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                            placeholder="Confirm new password"
+                          />
+                        </Col>
+                      </Form.Group>
+                      <div className="text-center">
+                        <Button variant="dark" type="submit">
+                          Update Password
+                        </Button>
+                      </div>
+                    </Form>
+                  </div>
                 </Tab.Pane>
               </Tab.Content>
             </Col>
