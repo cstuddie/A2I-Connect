@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Badge } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaBell } from 'react-icons/fa';
@@ -14,7 +14,8 @@ export default function NotificationWidget() {
   const [dropdownOpen,  setDropdownOpen]  = useState(false);
   const [loading,       setLoading]       = useState(false);
 
-  const navigate = useNavigate();
+  const navigate   = useNavigate();
+  const widgetRef  = useRef(null);
 
   const authHeaders = { Authorization: `Bearer ${token}` };
 
@@ -46,12 +47,22 @@ export default function NotificationWidget() {
       .finally(() => setLoading(false));
   }, [userID, token]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const openDropdown = () => {
-    setDropdownOpen(true);
-    fetchList();
-  };
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (widgetRef.current && !widgetRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [dropdownOpen]);
 
-  const closeDropdown = () => setDropdownOpen(false);
+  const toggleDropdown = () => {
+    if (!dropdownOpen) fetchList();
+    setDropdownOpen((prev) => !prev);
+  };
 
   const handleItemClick = async (notification) => {
     if (!notification.IsRead) {
@@ -92,10 +103,9 @@ export default function NotificationWidget() {
   return (
     <div
       className="notification-widget"
-      onMouseEnter={openDropdown}
-      onMouseLeave={closeDropdown}
+      ref={widgetRef}
     >
-      <div className="notification-icon-wrapper">
+      <div className="notification-icon-wrapper" onClick={toggleDropdown} style={{ cursor: 'pointer' }}>
         <FaBell size={22} color="#0B3444" />
         {unreadCount > 0 && (
           <Badge pill bg="danger" className="notification-badge">

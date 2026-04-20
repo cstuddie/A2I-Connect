@@ -210,7 +210,7 @@ export default function NotificationsPage() {
                   )}
                 </h5>
 
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div className="notifications-header-actions">
                   <div className="notifications-tabs">
                     <button
                       className={activeTab === 'all' ? 'active' : ''}
