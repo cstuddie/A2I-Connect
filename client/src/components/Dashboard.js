@@ -132,7 +132,7 @@ export function EventCard({ eventID, topic, instructor, requester, date, course 
   return (
     <Card className="h-100 shadow-sm">
       <Card.Body>
-        <Card.Title as={Link} to={`/Event/${eventID}`} className="text-decoration-none">
+        <Card.Title as={Link} to={`/events/${eventID}`} className="text-decoration-none">
           <b>{topic}</b>
         </Card.Title>
 
