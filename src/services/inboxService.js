@@ -45,20 +45,31 @@ exports.getAllConversations = async (userID) => {
     .orderBy('m.TimeStamp', 'desc');
 };
 
-exports.getMessagesForConversation = async (conversationID) => db('Message').where('ConversationID', conversationID).orderBy('TimeStamp', "asc");
+exports.getMessagesForConversation = async (conversationID) =>
+  db('Message')
+    .where('ConversationID', conversationID)
+    .select('ID', 'TimeStamp', 'Content', 'SenderID', 'ConversationID', 'Read', 'FileName', 'FileType')
+    .orderBy('TimeStamp', 'asc');
 
-exports.sendMessage = async ({ Content, SenderID, ConversationID }) => {
-  const [id] = await db("Message").insert({
-    Content,
+exports.sendMessage = async ({ Content, SenderID, ConversationID, FileName = null, FileType = null, FileData = null }) => {
+  const [id] = await db('Message').insert({
+    Content: Content || '',
     SenderID,
     ConversationID,
-    Read: false
+    Read: false,
+    FileName,
+    FileType,
+    FileData
   });
 
-  return db("Message")
+  return db('Message')
+    .select('ID', 'TimeStamp', 'Content', 'SenderID', 'ConversationID', 'Read', 'FileName', 'FileType')
     .where({ ID: id })
     .first();
 };
+
+exports.getMessageFile = async (messageID) =>
+  db('Message').select('FileData', 'FileType', 'FileName').where('ID', messageID).first();
 
 exports.createConversation = async ({ initiatorID, receiverID, associatedEventID = null }) => {
   // Check if conversation already exists

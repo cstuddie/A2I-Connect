@@ -27,19 +27,38 @@ exports.sendMessage = async (req, res) => {
         const conversationID = req.params.conversationID;
         const { Content, SenderID } = req.body;
 
+        let FileName = null, FileType = null, FileData = null;
+        if (req.file) {
+            FileName = req.file.originalname;
+            FileType = req.file.mimetype;
+            FileData = req.file.buffer;
+        }
+
         const result = await inboxService.sendMessage({
-            Content,
-            SenderID,
-            ConversationID: conversationID
+            Content, SenderID, ConversationID: conversationID, FileName, FileType, FileData
         });
 
         res.status(201).json(result);
     } catch (e) {
         console.error('Error sending message:', e);
-        res.status(500).json({
-            error: 'An error occurred sending message',
-            details: e.message
-        });
+        res.status(500).json({ error: 'An error occurred sending message', details: e.message });
+    }
+};
+
+exports.getMessageFile = async (req, res) => {
+    try {
+        const file = await inboxService.getMessageFile(req.params.messageID);
+        if (!file || !file.FileData) return res.status(404).json({ error: 'File not found' });
+        res.setHeader('Content-Type', file.FileType);
+        res.setHeader('Content-Disposition',
+            file.FileType.startsWith('image/')
+                ? `inline; filename="${file.FileName}"`
+                : `attachment; filename="${file.FileName}"`
+        );
+        res.send(file.FileData);
+    } catch (e) {
+        console.error('Error fetching file:', e);
+        res.status(500).json({ error: 'Failed to fetch file' });
     }
 };
 
