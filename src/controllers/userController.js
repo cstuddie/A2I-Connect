@@ -191,3 +191,20 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ error: 'Failed to update profile' });
   }
 };
+
+// Search functionality
+exports.searchUsers = async (req, res) => {
+  try {
+    const query = req.query.q;
+    
+    if (!query) {
+      return res.json([]);
+    }
+    
+    const users = await userService.searchUsers(query);
+    res.json(users);
+  } catch (err) {
+    console.error('Error searching users:', err);
+    res.status(500).json({ error: 'Failed to search users', details: err.message });
+  }
+};

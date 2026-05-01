@@ -8,6 +8,7 @@ router.get('/trueInterests/:userID', userController.getTrueInterests);
 router.get('/interests/:userID', userController.getInterestsByUser);
 router.get('/allInterests', userController.getAllInterests);
 router.get('/courses/:userID', userController.getCoursesByUser);
+router.get('/search', userController.searchUsers);
 router.get('/availability/:userID', userController.getAvailability);
 router.put('/availability/:userID', userController.setAvailability);
 router.put('/email/:id', userController.updateEmail);

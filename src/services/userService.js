@@ -80,3 +80,20 @@ exports.updateProfile = async (id, profileData) => {
       updated_at: db.fn.now()
     });
 };
+
+// Search functionality
+exports.searchUsers = async (query) => {
+  if (!query || query.trim() === '') {
+    return [];
+  }
+  
+  const searchTerm = `%${query}%`;
+  
+  return db('User')
+    .where('FirstName', 'like', searchTerm)
+    .orWhere('LastName', 'like', searchTerm)
+    .orWhere('Email', 'like', searchTerm)
+    .orWhere('Affiliation', 'like', searchTerm)
+    .select('ID', 'FirstName', 'LastName', 'Email', 'Bio', 'Affiliation', 'ExpertiseID', 'Role')
+    .limit(20);
+};

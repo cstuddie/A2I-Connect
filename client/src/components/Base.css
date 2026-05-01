@@ -341,3 +341,340 @@ p {
   }
   }
   
+/* ==================== INBOX STYLES ==================== */
+
+/* Inbox Container */
+.inbox-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* Left Side - Conversation List */
+.conversation-list {
+    width: 350px;
+    border-right: 1px solid #e5e5e5;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.list-header {
+    padding: 20px 16px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.list-header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+}
+
+.conversations {
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Conversation Card */
+.convo-card {
+    padding: 16px;
+    border-bottom: 1px solid #e5e5e5;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    background-color: white;
+}
+
+.convo-card:hover {
+    background-color: #f5f5f5;
+}
+
+.convo-card.active {
+    background-color: #e3f2fd;
+    border-left: 3px solid #2196F3;
+}
+
+.convo-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.convo-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.convo-card-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+}
+
+.convo-card-timestamp {
+    font-size: 12px;
+    color: #999;
+}
+
+.convo-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.convo-card-message {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.unread-badge {
+    background-color: #2196F3;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 0px 6px;
+    border-radius: 50%;
+    min-width: 20px;
+    text-align: center;
+    line-height: 1;
+}
+
+/* Right Side - Chat View */
+.chat-view {
+    flex: 1;
+    background-color: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.no-chat-selected {
+    color: #999;
+    font-size: 18px;
+}
+
+/* Loading and Error States */
+.inbox-loading,
+.inbox-error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 18px;
+    color: #666;
+}
+
+.inbox-error {
+    color: #d32f2f;
+}
+
+.no-conversations {
+    padding: 20px;
+    text-align: center;
+    color: #999;
+    font-size: 16px;
+}
+
+/* Update list-header to flex layout */
+.list-header {
+    padding: 20px 16px;
+    border-bottom: 1px solid #e5e5e5;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Back Button */
+.back-btn {
+    background-color: transparent;
+    color: #2196F3;
+    border: 1px solid #2196F3;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    width: auto;
+    align-self: flex-start;
+}
+
+.back-btn:hover {
+    background-color: #e3f2fd;
+    cursor: pointer;
+}
+
+.search-form {
+  min-width: 300px;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-input {
+  padding-left: 35px !important;
+  border-radius: 20px !important;
+  border: 1px solid #ccc !important;
+}
+
+.search-input:focus {
+  border-color: #2196F3 !important;
+  box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25) !important;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  pointer-events: none;
+}
+
+.search-results-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  margin-top: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.search-result-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-item:hover {
+  background-color: #f5f5f5;
+}
+
+.search-result-item.searching,
+.search-result-item.no-results {
+  text-align: center;
+  color: #999;
+  cursor: default;
+}
+
+.search-result-item.searching:hover,
+.search-result-item.no-results:hover {
+  background-color: white;
+}
+
+.search-result-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.search-result-details {
+  font-size: 14px;
+  color: #666;
+}
+
+.search-result-details .text-muted {
+  color: #999 !important;
+}
+
+/* ==================== USER PROFILE STYLES ==================== */
+
+.profile-card {
+    max-width: 900px;
+    margin: 0 auto;
+    border-radius: 12px;
+}
+
+.profile-card .card-body {
+    padding: 60px 80px !important;
+}
+
+.profile-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 60px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.profile-card h2 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.profile-card .text-muted {
+    font-size: 18px;
+}
+
+.profile-section {
+    margin-top: 40px;
+    padding-top: 40px;
+    border-top: 2px solid #e5e5e5;
+}
+
+.section-title {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.bio-text {
+    color: #666;
+    line-height: 1.8;
+    font-size: 18px;
+    text-align: left;
+}
+
+.send-message-btn {
+    background-color: #2196F3;
+    border: none;
+    padding: 12px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background-color 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    min-width: 175px;
+}
+
+.send-message-btn:hover:not(:disabled) {
+    background-color: #1976D2;
+}
+
+.send-message-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}

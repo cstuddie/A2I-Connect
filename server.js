@@ -15,6 +15,7 @@ app.use('/api/auth', require('./src/routes/authRoutes.js'));
 app.use('/admin',     require('./src/routes/adminRoutes.js'));
 app.use('/users',     require('./src/routes/userRoutes.js'));
 app.use('/events',    require('./src/routes/eventRoutes.js'));
+app.use('/inbox', require('./src/routes/inboxRoutes.js'));
 
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 
