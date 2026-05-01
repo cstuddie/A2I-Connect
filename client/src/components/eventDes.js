@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Table, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table, Badge, Button } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import { UserHeader } from './Dashboard';
 import "./Base.css";
@@ -68,6 +68,8 @@ const EventDescription = () => {
 
   const [profileInfo, setProfileInfo] = useState(null);
   const [event, setEvent] = useState(null);
+  const [accepting, setAccepting] = useState(false);
+  const [acceptError, setAcceptError] = useState(null);
 
   useEffect(() => {
     if (!userID) {
@@ -101,6 +103,25 @@ const EventDescription = () => {
 
     fetchEvent();
   }, [eventID]);
+
+  const handleAccept = async () => {
+    setAccepting(true);
+    setAcceptError(null);
+    try {
+      const res = await fetch(`http://localhost:3001/events/${eventID}/accept`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ speakerID: parseInt(userID) })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to accept');
+      navigate('/inbox');
+    } catch (err) {
+      setAcceptError(err.message);
+    } finally {
+      setAccepting(false);
+    }
+  };
 
   return (
     <div>
@@ -172,6 +193,15 @@ const EventDescription = () => {
                 />
               </Col>
             </Row>
+
+            {event && !event.InstructorID && event.EventStatus === 1 && parseInt(userID) !== event.RequesterID && (
+              <div className="mt-4 text-center">
+                {acceptError && <div className="alert alert-danger mb-3">{acceptError}</div>}
+                <Button variant="success" size="lg" onClick={handleAccept} disabled={accepting}>
+                  {accepting ? 'Accepting...' : 'Accept Speaking Request'}
+                </Button>
+              </div>
+            )}
           </Card.Body>
         </Card>
       </Container>

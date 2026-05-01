@@ -81,3 +81,24 @@ exports.getEventByID = async (req, res) => {
   }
 };
 
+exports.acceptEvent = async (req, res) => {
+  const { eventID } = req.params;
+  const { speakerID } = req.body;
+
+  if (!speakerID) return res.status(400).json({ error: 'speakerID is required' });
+
+  try {
+    const result = await eventService.acceptEvent({
+      eventID: parseInt(eventID),
+      speakerID: parseInt(speakerID)
+    });
+    res.json(result);
+  } catch (e) {
+    console.error('Accept event error:', e);
+    const status = e.message === 'Event not found' ? 404
+                 : e.message === 'Event already accepted' ? 409
+                 : 500;
+    res.status(status).json({ error: e.message });
+  }
+};
+
