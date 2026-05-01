@@ -60,7 +60,7 @@ exports.sendMessage = async ({ Content, SenderID, ConversationID }) => {
     .first();
 };
 
-exports.createConversation = async ({ initiatorID, receiverID }) => {
+exports.createConversation = async ({ initiatorID, receiverID, associatedEventID = null }) => {
   // Check if conversation already exists
   const existing = await db('Conversation')
     .where(function() {
@@ -70,16 +70,17 @@ exports.createConversation = async ({ initiatorID, receiverID }) => {
       this.where('InitiatorID', receiverID).andWhere('RecieverID', initiatorID);
     })
     .first();
-  
+
   if (existing) {
     return existing;
   }
-  
+
   // Create new conversation
   const [id] = await db('Conversation').insert({
     InitiatorID: initiatorID,
-    RecieverID: receiverID
+    RecieverID: receiverID,
+    AssociatedEventID: associatedEventID
   });
-  
+
   return db('Conversation').where('ID', id).first();
 };

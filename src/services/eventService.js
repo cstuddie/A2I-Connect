@@ -65,6 +65,33 @@ exports.requestSpeaker = async (payload) => {
   return eventID;
 };
 
+exports.acceptEvent = async ({ eventID, speakerID }) => {
+  const event = await db('Event').where('ID', eventID).first();
+  if (!event) throw new Error('Event not found');
+  if (event.InstructorID) throw new Error('Event already accepted');
+
+  await db('Event').where('ID', eventID).update({
+    InstructorID: speakerID,
+    EventStatus: 2,
+    updated_at: new Date()
+  });
+
+  const inboxService = require('./inboxService');
+  const conversation = await inboxService.createConversation({
+    initiatorID: speakerID,
+    receiverID: event.RequesterID,
+    associatedEventID: eventID
+  });
+
+  await inboxService.sendMessage({
+    Content: `I've accepted the speaking request for: ${event.Topic}.`,
+    SenderID: speakerID,
+    ConversationID: conversation.ID
+  });
+
+  return { eventID, conversationID: conversation.ID };
+};
+
 exports.recommendedEvents = async (userID) => {
   // mirrors the logic from server.js [L1–L37]
   const trueInterests = [];
