@@ -1,8 +1,65 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table, Badge } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import { UserHeader } from './Dashboard';
 import "./Base.css";
+
+const formatTime = (time) => {
+  if (!time) return '';
+  const [hours, minutes] = time.split(':');
+  const h = parseInt(hours, 10);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  const displayH = h % 12 || 12;
+  return `${displayH}:${minutes} ${ampm}`;
+};
+
+const AvailabilitySection = ({ label, userID }) => {
+  const [availability, setAvailability] = useState([]);
+
+  useEffect(() => {
+    if (!userID) return;
+    const fetchAvailability = async () => {
+      try {
+        const res = await fetch(`http://localhost:3001/users/availability/${userID}`);
+        const data = await res.json();
+        setAvailability(data || []);
+      } catch (err) {
+        console.error(`Error fetching availability for ${label}:`, err);
+      }
+    };
+    fetchAvailability();
+  }, [userID, label]);
+
+  if (!userID) return null;
+
+  return (
+    <div className="mt-3">
+      <h6><Badge bg="dark">{label} Availability</Badge></h6>
+      {availability.length > 0 ? (
+        <Table size="sm" bordered hover>
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Start</th>
+              <th>End</th>
+            </tr>
+          </thead>
+          <tbody>
+            {availability.map((slot, i) => (
+              <tr key={i}>
+                <td>{slot.DayOfWeek}</td>
+                <td>{formatTime(slot.StartTime)}</td>
+                <td>{formatTime(slot.EndTime)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      ) : (
+        <p className="text-muted fst-italic">No availability set.</p>
+      )}
+    </div>
+  );
+};
 
 const EventDescription = () => {
   const userID = localStorage.getItem('userID');
@@ -32,7 +89,6 @@ const EventDescription = () => {
   }, [userID, navigate]);
 
   useEffect(() => {
-    console.log('eventID from params:', eventID);
     const fetchEvent = async () => {
       try {
         const res = await fetch(`http://localhost:3001/events/${eventID}`);
@@ -97,6 +153,23 @@ const EventDescription = () => {
                 <strong>Description:</strong>
                 <br />
                 {event?.Description || 'N/A'}
+              </Col>
+            </Row>
+
+            <hr />
+
+            <Row>
+              <Col md={6}>
+                <AvailabilitySection
+                  label="Requester"
+                  userID={event?.RequesterID}
+                />
+              </Col>
+              <Col md={6}>
+                <AvailabilitySection
+                  label="Instructor"
+                  userID={event?.InstructorID}
+                />
               </Col>
             </Row>
           </Card.Body>

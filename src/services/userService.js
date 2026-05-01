@@ -41,6 +41,30 @@ exports.getCoursesByUser = async (userID) => {
   return result;
 };
 
+exports.getAvailability = (userID) =>
+  db('Availability').where('UserID', userID).orderByRaw("FIELD(DayOfWeek, 'Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday')");
+
+exports.setAvailability = async (userID, slots) => {
+  await db('Availability').where('UserID', userID).del();
+  if (slots && slots.length > 0) {
+    const rows = slots.map((slot) => ({
+      UserID: userID,
+      DayOfWeek: slot.DayOfWeek,
+      StartTime: slot.StartTime,
+      EndTime: slot.EndTime,
+    }));
+    await db('Availability').insert(rows);
+  }
+};
+
+exports.updateEmail = async (id, newEmail) => {
+  return db('User').where('ID', id).update({ Email: newEmail });
+};
+
+exports.updatePassword = async (id, hashedPassword) => {
+  return db('User').where('ID', id).update({ Password: hashedPassword });
+};
+
 exports.updateProfile = async (id, profileData) => {
   const { FirstName, LastName, Bio, Affiliation, ExpertiseID, Role } = profileData;
   
