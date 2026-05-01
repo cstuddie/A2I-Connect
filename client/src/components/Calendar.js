@@ -122,7 +122,7 @@ const Calendar = () => {
                         <div className="day-events-tooltip">
                             {dayEvents.map(event => (
                                 <div key={event.ID} className="event-tooltip-item">
-                                    <Link to={`/Event/${event.ID}`} style={{textDecoration: 'none'}}><h4><b>{event.Topic}</b></h4></Link>
+                                    <Link to={`/events/${event.ID}`} style={{textDecoration: 'none'}}><h4><b>{event.Topic}</b></h4></Link>
                                     <p>With: {event.InstructorID ? profileNames[event.InstructorID] || 'TBD' : 'TBD'}</p>
                                 </div>
                             ))}
@@ -173,7 +173,7 @@ const Calendar = () => {
                         {currentMonthEvents.length > 0 ? (
                             currentMonthEvents.map(event => (
                                 <div key={event.ID} className="event-item">
-                                    <Link to={`/Event/${event.ID}`} style={{textDecoration: 'none'}}><strong>{event.Topic}</strong></Link>
+                                    <Link to={`/events/${event.ID}`} style={{textDecoration: 'none'}}><strong>{event.Topic}</strong></Link>
                                     <p>
                                         {formatLocalDate(event.Date)} • {expertiseMap[event.ExpertiseID]} •
                                         {event.InstructorID ? ` With: ${profileNames[event.InstructorID] || 'TBD'}` : ' (Instructor TBD)'}
