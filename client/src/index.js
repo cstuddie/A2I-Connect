@@ -17,6 +17,7 @@ import AdminUsers from "./components/Admin/AdminUsers";
 import AdminEvents from "./components/Admin/AdminEvents";
 import UserProfile from "./components/UserProfile";
 import Inbox from "./components/Inbox"
+import NotificationsPage from "./components/NotificationsPage";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './components/Base.css';
 
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
   {
     path:'/Calendar',
     element: <Calendar />
+  },
+  {
+    path:'/Notifications',
+    element: <NotificationsPage />
   },
   // Admin routes
   {
