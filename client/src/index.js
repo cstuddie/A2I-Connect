@@ -15,6 +15,8 @@ import AdminLogin from "./components/Admin/AdminLogin";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import AdminUsers from "./components/Admin/AdminUsers";
 import AdminEvents from "./components/Admin/AdminEvents";
+import UserProfile from "./components/UserProfile";
+import Inbox from "./components/Inbox"
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './components/Base.css';
 
@@ -46,6 +48,10 @@ const router = createBrowserRouter([
   {
     path:'/inbox',
     element: <Inbox/>
+  },
+  {
+    path:'/profile/:userId',  // ADD THIS
+    element: <UserProfile/>
   },
   {
     path:'/RequestSpeaker',

@@ -14,9 +14,9 @@ exports.getAllConversations = async (userID) => {
           .orWhere('c.RecieverID', userID);
     })
 
-    .join(latestMessageSubquery, 'c.ID', 'lm.ConversationID')
+    .leftJoin(latestMessageSubquery, 'c.ID', 'lm.ConversationID')  // MUST be leftJoin
 
-    .join('Message as m', function () {
+    .leftJoin('Message as m', function () {  // MUST be leftJoin
       this.on('m.ConversationID', '=', 'c.ID')
           .andOn('m.TimeStamp', '=', 'lm.LatestTimeStamp');
     })
@@ -58,4 +58,28 @@ exports.sendMessage = async ({ Content, SenderID, ConversationID }) => {
   return db("Message")
     .where({ ID: id })
     .first();
+};
+
+exports.createConversation = async ({ initiatorID, receiverID }) => {
+  // Check if conversation already exists
+  const existing = await db('Conversation')
+    .where(function() {
+      this.where('InitiatorID', initiatorID).andWhere('RecieverID', receiverID);
+    })
+    .orWhere(function() {
+      this.where('InitiatorID', receiverID).andWhere('RecieverID', initiatorID);
+    })
+    .first();
+  
+  if (existing) {
+    return existing;
+  }
+  
+  // Create new conversation
+  const [id] = await db('Conversation').insert({
+    InitiatorID: initiatorID,
+    RecieverID: receiverID
+  });
+  
+  return db('Conversation').where('ID', id).first();
 };

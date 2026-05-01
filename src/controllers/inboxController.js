@@ -42,3 +42,26 @@ exports.sendMessage = async (req, res) => {
         });
     }
 };
+
+exports.createConversation = async (req, res) => {
+    try {
+        const { initiatorID, receiverID } = req.body;
+        
+        console.log('Creating conversation between:', initiatorID, 'and', receiverID);
+        
+        const conversation = await inboxService.createConversation({
+            initiatorID,
+            receiverID
+        });
+        
+        console.log('Conversation created:', conversation);
+        
+        res.status(201).json(conversation);
+    } catch (e) {
+        console.error('Error creating conversation:', e);
+        res.status(500).json({
+            error: 'An error occurred creating conversation',
+            details: e.message
+        });
+    }
+};

@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const inboxController = require('../controllers/inboxController');
 
+router.post('/create', inboxController.createConversation);
+router.get('/conversation/:conversationID', inboxController.loadMessagesForConversation);
 router.post('/:conversationID', inboxController.sendMessage);
-router.get('/:conversationID', inboxController.loadMessagesForConversation);
-router.get('/:userID', inboxController.loadConversations);
+router.get('/user/:userID', inboxController.loadConversations); 
 
 module.exports = router;
