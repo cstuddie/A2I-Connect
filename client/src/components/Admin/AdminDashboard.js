@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, NavLink } from 'react-router-dom';
+import { parseUTCDateTime, formatLocalDate, formatUTCDate } from '../../utils/dateUtils';
 import '../Base.css';
 
 // Admin Header Component
@@ -109,14 +110,14 @@ const AdminDashboard = () => {
 
         // Get 5 most recent users
         const sortedUsers = [...usersData].sort((a, b) =>
-          new Date(b.created_at) - new Date(a.created_at)
+          parseUTCDateTime(b.created_at) - parseUTCDateTime(a.created_at)
         ).slice(0, 5);
 
         setRecentUsers(sortedUsers);
 
         // Get 5 most recent events with names
         const sortedEvents = [...eventsData].sort((a, b) =>
-          new Date(b.created_at) - new Date(a.created_at)
+          parseUTCDateTime(b.created_at) - parseUTCDateTime(a.created_at)
         ).slice(0, 5);
 
         const enhancedEvents = sortedEvents.map(event => ({
@@ -246,7 +247,7 @@ const AdminDashboard = () => {
                   <td style={{ padding: '12px' }}>{event.Topic}</td>
                   <td style={{ padding: '12px' }}>{event.requesterName}</td>
                   <td style={{ padding: '12px' }}>{event.instructorName}</td>
-                  <td style={{ padding: '12px' }}>{event.Date ? new Date(event.Date).toLocaleDateString() : 'No Date'}</td>
+                  <td style={{ padding: '12px' }}>{formatLocalDate(event.Date)}</td>
                   <td style={{ padding: '12px' }}>
                     <span style={{
                       padding: '5px 8px',

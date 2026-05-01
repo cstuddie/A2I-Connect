@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button, Card, Badge, Navbar, Nav, NavDropdown, Form, FormControl } from 'react-bootstrap';
 import { FaUserCircle, FaSearch, FaEnvelope } from 'react-icons/fa';
+import { formatLocalDate } from '../utils/dateUtils';
 import "./Base.css";
 
 export function UserHeader() {
@@ -152,7 +153,7 @@ export function EventCard({ eventID, topic, instructor, requester, date, course 
 
         <Card.Text>
           <Badge bg="dark" className="me-2">Date</Badge>
-          {new Date(date).toLocaleString()}
+          {formatLocalDate(date)}
         </Card.Text>
       </Card.Body>
     </Card>

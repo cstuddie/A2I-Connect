@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { formatLocalDate } from '../../utils/dateUtils';
 import '../Base.css';
 
 // Reusing AdminHeader component
@@ -383,7 +384,7 @@ const AdminEvents = () => {
                   <td style={{ padding: '12px' }}>{event.Topic}</td>
                   <td style={{ padding: '12px' }}>{event.requesterName}</td>
                   <td style={{ padding: '12px' }}>{event.instructorName}</td>
-                  <td style={{ padding: '12px' }}>{event.Date ? new Date(event.Date).toLocaleDateString() : 'No Date'}</td>
+                  <td style={{ padding: '12px' }}>{formatLocalDate(event.Date)}</td>
                   <td style={{ padding: '12px' }}>{event.DeliveryMethod || 'N/A'}</td>
                   <td style={{ padding: '12px' }}>
                     <span style={{

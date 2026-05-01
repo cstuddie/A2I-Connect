@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { UserHeader } from './Dashboard';
 import { Button } from 'react-bootstrap';
+import { parseLocalDate, formatLocalDate } from '../utils/dateUtils';
 import './Base.css';
 
 const Calendar = () => {
@@ -137,8 +138,8 @@ const Calendar = () => {
     const monthYearString = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
 
     const currentMonthEvents = events.filter(event => {
-        const eventDate = new Date(event.Date);
-        return eventDate.getMonth() === currentDate.getMonth() && 
+        const eventDate = parseLocalDate(event.Date);
+        return eventDate && eventDate.getMonth() === currentDate.getMonth() &&
                eventDate.getFullYear() === currentDate.getFullYear();
     });
 
@@ -174,7 +175,7 @@ const Calendar = () => {
                                 <div key={event.ID} className="event-item">
                                     <Link to={`/Event/${event.ID}`} style={{textDecoration: 'none'}}><strong>{event.Topic}</strong></Link>
                                     <p>
-                                        {new Date(event.Date).toLocaleDateString()} • {expertiseMap[event.ExpertiseID]} • 
+                                        {formatLocalDate(event.Date)} • {expertiseMap[event.ExpertiseID]} •
                                         {event.InstructorID ? ` With: ${profileNames[event.InstructorID] || 'TBD'}` : ' (Instructor TBD)'}
                                     </p>
                                     <p>Status: {event.EventStatus} • Method: {event.DeliveryMethod}</p>
