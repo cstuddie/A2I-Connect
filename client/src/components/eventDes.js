@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Badge, Button } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import { UserHeader } from './Dashboard';
+import { formatLocalDate } from '../utils/dateUtils';
 import "./Base.css";
 
 const formatTime = (time) => {
@@ -155,9 +156,7 @@ const EventDescription = () => {
 
               <Col md={6} className="mb-3">
                 <strong>Date:</strong>{' '}
-                {event?.Date
-                  ? new Date(event.Date).toLocaleDateString()
-                  : 'N/A'}
+                {formatLocalDate(event?.Date)}
               </Col>
 
               <Col md={6} className="mb-3">

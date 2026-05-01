@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { formatUTCDate } from '../../utils/dateUtils';
 import '../Base.css';
 
 // Reusing AdminHeader component
@@ -507,7 +508,7 @@ const AdminUsers = () => {
                   <td style={{ padding: '12px' }}>{user.Email}</td>
                   <td style={{ padding: '12px' }}>{user.Role === 2 ? 'Expert' : 'User'}</td>
                   <td style={{ padding: '12px' }}>{user.Affiliation || 'Not specified'}</td>
-                  <td style={{ padding: '12px' }}>{new Date(user.created_at).toLocaleDateString()}</td>
+                  <td style={{ padding: '12px' }}>{formatUTCDate(user.created_at)}</td>
                   <td style={{ padding: '12px' }}>
                     <button
                       className="cta-button"

@@ -4,6 +4,7 @@ import "./Base.css";
 import { UserHeader, EventCard } from './Dashboard';
 import { Row, Col, Form, Button, ListGroup, Container } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
+import { formatLocalDate } from '../utils/dateUtils';
 
 const Search = () => {
   const userID = localStorage.getItem('userID') || 2;
@@ -292,7 +293,7 @@ const fetchProfileNames = async (events, setRequesterNames, setInstructorNames) 
                 {filteredResults.map((event) => (
                   <ListGroup.Item key={event.eventID}>
                     <Link to={`/events/${event.eventID}`} className="text-decoration-none" style={{color: 'black'}}><strong>{event.topic}</strong></ Link><br />
-                    <strong>Date:</strong> {new Date(event.date).toLocaleString()}<br />
+                    <strong>Date:</strong> {formatLocalDate(event.date)}<br />
                     <strong>Requester:</strong> {requesterNameMap[event.requesterID] || 'Unknown Requester'}<br />
                     <strong>Instructor:</strong> {instructorNameMap[event.instructorID] || 'Instructor Needed'}<br />
                     <strong style={{textDecoration: 'underline'}}>Event Description</strong><br />

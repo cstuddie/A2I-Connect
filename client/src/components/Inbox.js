@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { parseUTCDateTime } from '../utils/dateUtils';
 import './Base.css';
 
 const Inbox = () => {
@@ -118,7 +119,7 @@ const Inbox = () => {
 
     // Format timestamp
     const formatTimestamp = (timestamp) => {
-        const date = new Date(timestamp);
+        const date = parseUTCDateTime(timestamp);
         const now = new Date();
         const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
 
