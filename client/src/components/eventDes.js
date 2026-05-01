@@ -3,6 +3,7 @@ import { Container, Row, Col, Card, Table, Badge, Button } from 'react-bootstrap
 import { useParams, useNavigate } from 'react-router-dom';
 import { UserHeader } from './Dashboard';
 import { formatLocalDate } from '../utils/dateUtils';
+import JitsiMeeting from './JitsiMeeting';
 import "./Base.css";
 
 const formatTime = (time) => {
@@ -71,6 +72,9 @@ const EventDescription = () => {
   const [event, setEvent] = useState(null);
   const [accepting, setAccepting] = useState(false);
   const [acceptError, setAcceptError] = useState(null);
+  const [callActive, setCallActive] = useState(false);
+  const [conversationID, setConversationID] = useState(null);
+  const [callError, setCallError] = useState(null);
 
   useEffect(() => {
     if (!userID) {
@@ -123,6 +127,24 @@ const EventDescription = () => {
       setAccepting(false);
     }
   };
+
+  const handleJoinCall = async () => {
+    setCallError(null);
+    try {
+      const res = await fetch(`http://localhost:3001/inbox/conversation-by-event/${eventID}`);
+      if (!res.ok) throw new Error('No conversation found for this event');
+      const data = await res.json();
+      setConversationID(data.conversationID);
+      setCallActive(true);
+    } catch (err) {
+      setCallError(err.message);
+    }
+  };
+
+  const isParticipant = event && (
+    parseInt(userID) === event.RequesterID ||
+    parseInt(userID) === event.InstructorID
+  );
 
   return (
     <div>
@@ -200,6 +222,23 @@ const EventDescription = () => {
                   {accepting ? 'Accepting...' : 'Accept Speaking Request'}
                 </Button>
               </div>
+            )}
+
+            {event && event.EventStatus === 2 && isParticipant && !callActive && (
+              <div className="mt-4 text-center">
+                {callError && <div className="alert alert-danger mb-3">{callError}</div>}
+                <Button variant="primary" size="lg" onClick={handleJoinCall}>
+                  📹 Join Video Call
+                </Button>
+              </div>
+            )}
+
+            {callActive && conversationID && (
+              <JitsiMeeting
+                roomName={`a2iconnect-conv-${conversationID}`}
+                displayName="User"
+                onClose={() => setCallActive(false)}
+              />
             )}
           </Card.Body>
         </Card>

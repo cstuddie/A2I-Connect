@@ -17,6 +17,7 @@ const upload = multer({
 });
 
 router.post('/create', inboxController.createConversation);
+router.get('/conversation-by-event/:eventID', inboxController.getConversationByEvent);
 router.get('/conversation/:conversationID', inboxController.loadMessagesForConversation);
 router.get('/message/:messageID/file', inboxController.getMessageFile);
 router.post('/:conversationID', upload.single('file'), inboxController.sendMessage);

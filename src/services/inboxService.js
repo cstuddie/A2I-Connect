@@ -71,6 +71,9 @@ exports.sendMessage = async ({ Content, SenderID, ConversationID, FileName = nul
 exports.getMessageFile = async (messageID) =>
   db('Message').select('FileData', 'FileType', 'FileName').where('ID', messageID).first();
 
+exports.getConversationByEventID = async (eventID) =>
+  db('Conversation').where('AssociatedEventID', eventID).first();
+
 exports.createConversation = async ({ initiatorID, receiverID, associatedEventID = null }) => {
   // Check if conversation already exists
   const existing = await db('Conversation')
