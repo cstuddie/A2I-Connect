@@ -62,6 +62,17 @@ exports.getMessageFile = async (req, res) => {
     }
 };
 
+exports.getConversationByEvent = async (req, res) => {
+    try {
+        const conversation = await inboxService.getConversationByEventID(req.params.eventID);
+        if (!conversation) return res.status(404).json({ error: 'No conversation found for this event' });
+        res.json({ conversationID: conversation.ID });
+    } catch (e) {
+        console.error('Error fetching conversation by event:', e);
+        res.status(500).json({ error: 'An error occurred', details: e.message });
+    }
+};
+
 exports.createConversation = async (req, res) => {
     try {
         const { initiatorID, receiverID } = req.body;

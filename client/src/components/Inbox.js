@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { parseUTCDateTime } from '../utils/dateUtils';
+import JitsiMeeting from './JitsiMeeting';
 import './Base.css';
 
 const Inbox = () => {
@@ -15,6 +16,7 @@ const Inbox = () => {
     const [attachedFile, setAttachedFile] = useState(null);
     const [attachedPreview, setAttachedPreview] = useState(null);
     const [lightboxSrc, setLightboxSrc] = useState(null);
+    const [callActive, setCallActive] = useState(false);
     const messagesEndRef = useRef(null);
     const pollIntervalRef = useRef(null);
     const fileInputRef = useRef(null);
@@ -46,6 +48,11 @@ const Inbox = () => {
 
         fetchConversations();
     }, [userID]);
+
+    // Reset call state when switching conversations
+    useEffect(() => {
+        setCallActive(false);
+    }, [activeConversation]);
 
     // Fetch messages + start polling when active conversation changes
     useEffect(() => {
@@ -88,6 +95,25 @@ const Inbox = () => {
         if (attachedPreview) URL.revokeObjectURL(attachedPreview);
         setAttachedFile(null);
         setAttachedPreview(null);
+    };
+
+    const handleStartCall = async () => {
+        const roomName = `a2iconnect-conv-${activeConversation}`;
+        const joinURL = `https://meet.jit.si/${roomName}`;
+        try {
+            const formData = new FormData();
+            formData.append('Content', `📹 Video call started — Join: ${joinURL}`);
+            formData.append('SenderID', userID);
+            await fetch(`http://localhost:3001/inbox/${activeConversation}`, {
+                method: 'POST',
+                body: formData
+            });
+            const res = await fetch(`http://localhost:3001/inbox/conversation/${activeConversation}`);
+            if (res.ok) setMessages(await res.json());
+        } catch (err) {
+            console.error('Error posting call message:', err);
+        }
+        setCallActive(true);
     };
 
     const handleSendMessage = async (e) => {
@@ -199,6 +225,11 @@ const Inbox = () => {
                                     ? `${activeConvoData.FirstName} ${activeConvoData.LastName}`
                                     : ''}
                             </h3>
+                            {!callActive && (
+                                <button className="start-call-btn" onClick={handleStartCall}>
+                                    📹 Video Call
+                                </button>
+                            )}
                         </div>
 
                         <div className="chat-messages">
@@ -287,6 +318,14 @@ const Inbox = () => {
                                 </button>
                             </form>
                         </div>
+
+                        {callActive && (
+                            <JitsiMeeting
+                                roomName={`a2iconnect-conv-${activeConversation}`}
+                                displayName={localStorage.getItem('userName') || 'User'}
+                                onClose={() => setCallActive(false)}
+                            />
+                        )}
 
                         {lightboxSrc && (
                             <div className="lightbox-overlay" onClick={() => setLightboxSrc(null)}>
