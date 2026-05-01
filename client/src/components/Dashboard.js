@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button, Card, Badge, Navbar, Nav, NavDropdown, Form, FormControl } from 'react-bootstrap';
-import { FaUserCircle, FaSearch } from 'react-icons/fa';
+import { FaUserCircle, FaSearch, FaEnvelope } from 'react-icons/fa';
 import "./Base.css";
 
 export function UserHeader() {
@@ -114,7 +114,7 @@ export function UserHeader() {
 
         <Nav className="ms-auto">
           <Nav.Link as={Link} to="/Inbox">
-            Email
+            <FaEnvelope size={24} />
           </Nav.Link>
           <NavDropdown title={<FaUserCircle size={40} />} id="basic-nav-dropdown">
             <NavDropdown.Item href="/EditProfile" className='custom-dropdown-link'>Account</NavDropdown.Item>

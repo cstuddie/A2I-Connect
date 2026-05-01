@@ -11,8 +11,12 @@ const Inbox = () => {
     const [newMessage, setNewMessage] = useState('');
     const [sendingMsg, setSendingMsg] = useState(false);
     const [messagesLoading, setMessagesLoading] = useState(false);
+    const [attachedFile, setAttachedFile] = useState(null);
+    const [attachedPreview, setAttachedPreview] = useState(null);
+    const [lightboxSrc, setLightboxSrc] = useState(null);
     const messagesEndRef = useRef(null);
     const pollIntervalRef = useRef(null);
+    const fileInputRef = useRef(null);
     const navigate = useNavigate();
     const userID = localStorage.getItem('userID');
 
@@ -71,19 +75,38 @@ const Inbox = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
+    const handleFileSelect = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setAttachedFile(file);
+        setAttachedPreview(file.type.startsWith('image/') ? URL.createObjectURL(file) : null);
+        e.target.value = '';
+    };
+
+    const handleRemoveFile = () => {
+        if (attachedPreview) URL.revokeObjectURL(attachedPreview);
+        setAttachedFile(null);
+        setAttachedPreview(null);
+    };
+
     const handleSendMessage = async (e) => {
         e.preventDefault();
         const trimmed = newMessage.trim();
-        if (!trimmed || sendingMsg) return;
+        if ((!trimmed && !attachedFile) || sendingMsg) return;
 
         setSendingMsg(true);
         try {
+            const formData = new FormData();
+            formData.append('Content', trimmed);
+            formData.append('SenderID', userID);
+            if (attachedFile) formData.append('file', attachedFile);
+
             await fetch(`http://localhost:3001/inbox/${activeConversation}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ Content: trimmed, SenderID: parseInt(userID) })
+                body: formData
             });
             setNewMessage('');
+            handleRemoveFile();
             const res = await fetch(`http://localhost:3001/inbox/conversation/${activeConversation}`);
             if (res.ok) setMessages(await res.json());
         } catch (err) {
@@ -190,7 +213,27 @@ const Inbox = () => {
                                             key={msg.ID}
                                             className={`message-bubble ${isMine ? 'mine' : 'theirs'}`}
                                         >
-                                            <div className="message-text">{msg.Content}</div>
+                                            {msg.Content && (
+                                                <div className="message-text">{msg.Content}</div>
+                                            )}
+                                            {msg.FileName && (
+                                                msg.FileType?.startsWith('image/') ? (
+                                                    <img
+                                                        className="message-image"
+                                                        src={`http://localhost:3001/inbox/message/${msg.ID}/file`}
+                                                        alt={msg.FileName}
+                                                        onClick={() => setLightboxSrc(`http://localhost:3001/inbox/message/${msg.ID}/file`)}
+                                                    />
+                                                ) : (
+                                                    <a
+                                                        className="message-file-link"
+                                                        href={`http://localhost:3001/inbox/message/${msg.ID}/file`}
+                                                        download={msg.FileName}
+                                                    >
+                                                        📄 {msg.FileName}
+                                                    </a>
+                                                )
+                                            )}
                                             <div className="message-time">
                                                 {formatTimestamp(msg.TimeStamp)}
                                             </div>
@@ -201,23 +244,59 @@ const Inbox = () => {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        <form className="chat-input-area" onSubmit={handleSendMessage}>
-                            <input
-                                className="chat-input"
-                                type="text"
-                                placeholder="Type a message..."
-                                value={newMessage}
-                                onChange={e => setNewMessage(e.target.value)}
-                                disabled={sendingMsg}
-                            />
-                            <button
-                                className="chat-send-btn"
-                                type="submit"
-                                disabled={sendingMsg || !newMessage.trim()}
-                            >
-                                {sendingMsg ? '...' : 'Send'}
-                            </button>
-                        </form>
+                        <div className="chat-input-wrapper">
+                            {attachedFile && (
+                                <div className="file-preview-bar">
+                                    {attachedPreview
+                                        ? <img className="file-preview-thumb" src={attachedPreview} alt={attachedFile.name} />
+                                        : <span className="file-preview-name">📄 {attachedFile.name}</span>
+                                    }
+                                    <button type="button" className="file-remove-btn" onClick={handleRemoveFile}>×</button>
+                                </div>
+                            )}
+                            <form className="chat-input-area" onSubmit={handleSendMessage}>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    style={{ display: 'none' }}
+                                    onChange={handleFileSelect}
+                                    accept=".jpg,.jpeg,.png,.gif,.pdf,.docx"
+                                />
+                                <button
+                                    type="button"
+                                    className="file-attach-btn"
+                                    onClick={() => fileInputRef.current?.click()}
+                                >
+                                    📎
+                                </button>
+                                <input
+                                    className="chat-input"
+                                    type="text"
+                                    placeholder="Type a message..."
+                                    value={newMessage}
+                                    onChange={e => setNewMessage(e.target.value)}
+                                    disabled={sendingMsg}
+                                />
+                                <button
+                                    className="chat-send-btn"
+                                    type="submit"
+                                    disabled={sendingMsg || (!newMessage.trim() && !attachedFile)}
+                                >
+                                    {sendingMsg ? '...' : 'Send'}
+                                </button>
+                            </form>
+                        </div>
+
+                        {lightboxSrc && (
+                            <div className="lightbox-overlay" onClick={() => setLightboxSrc(null)}>
+                                <img
+                                    className="lightbox-img"
+                                    src={lightboxSrc}
+                                    alt="Full size"
+                                    onClick={e => e.stopPropagation()}
+                                />
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <div className="no-chat-selected">

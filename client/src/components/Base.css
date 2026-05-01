@@ -806,3 +806,138 @@ p {
     background-color: #90CAF9;
     cursor: not-allowed;
 }
+
+/* ==================== FILE ATTACHMENT STYLES ==================== */
+
+.chat-input-wrapper {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid #e5e5e5;
+    background-color: white;
+}
+
+.chat-input-wrapper .chat-input-area {
+    border-top: none;
+}
+
+.file-preview-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.file-preview-thumb {
+    height: 50px;
+    width: 50px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+.file-preview-name {
+    font-size: 14px;
+    color: #333;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.file-remove-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: #999;
+    cursor: pointer;
+    width: auto;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+.file-remove-btn:hover {
+    color: #d32f2f;
+}
+
+.file-attach-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0 6px;
+    width: auto;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.file-attach-btn:hover {
+    color: #2196F3;
+}
+
+.message-image {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    cursor: pointer;
+    display: block;
+    margin-top: 4px;
+}
+
+.message-image:hover {
+    opacity: 0.9;
+}
+
+.message-file-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    background-color: white;
+    color: #1565C0;
+    border: 1px solid #90CAF9;
+}
+
+.message-bubble.mine .message-file-link {
+    background-color: white;
+    color: #1565C0;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.message-bubble.theirs .message-file-link {
+    background-color: white;
+    color: #1565C0;
+    border: 1px solid #90CAF9;
+}
+
+.message-file-link:hover {
+    background-color: #E3F2FD;
+    text-decoration: none;
+}
+
+.lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    cursor: pointer;
+}
+
+.lightbox-img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+    cursor: default;
+}
