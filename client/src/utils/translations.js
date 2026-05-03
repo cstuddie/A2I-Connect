@@ -85,6 +85,8 @@ const translations = {
     // User Profile
     userProfile: 'Profile', sendMessage: 'Send Message', expertise: 'Expertise',
     viewEvents: 'View Events',
+    // Language
+    changeLanguage: 'Change Language', selectLanguageLbl: 'Language:', languageSaved: 'Language saved.',
   },
 
   es: {
@@ -149,6 +151,7 @@ const translations = {
     eventDetail: 'Detalles del Evento', back: 'Volver', status: 'Estado',
     requesterAvailability: 'Disponibilidad del Solicitante', instructorAvailability: 'Disponibilidad del Instructor',
     noAvailability: 'No hay disponibilidad configurada.', userProfile: 'Perfil', sendMessage: 'Enviar Mensaje', viewEvents: 'Ver Eventos',
+    changeLanguage: 'Cambiar Idioma', selectLanguageLbl: 'Idioma:', languageSaved: 'Idioma guardado.',
   },
 
   fr: {
@@ -213,6 +216,7 @@ const translations = {
     eventDetail: 'Détails de l\'Événement', back: 'Retour', status: 'Statut',
     requesterAvailability: 'Disponibilité du Demandeur', instructorAvailability: 'Disponibilité de l\'Instructeur',
     noAvailability: 'Aucune disponibilité définie.', userProfile: 'Profil', sendMessage: 'Envoyer un Message', viewEvents: 'Voir les Événements',
+    changeLanguage: 'Changer de langue', selectLanguageLbl: 'Langue :', languageSaved: 'Langue enregistrée.',
   },
 
   de: {
@@ -277,6 +281,7 @@ const translations = {
     eventDetail: 'Veranstaltungsdetails', back: 'Zurück', status: 'Status',
     requesterAvailability: 'Verfügbarkeit des Anfragenden', instructorAvailability: 'Verfügbarkeit des Dozenten',
     noAvailability: 'Keine Verfügbarkeit festgelegt.', userProfile: 'Profil', sendMessage: 'Nachricht senden', viewEvents: 'Veranstaltungen anzeigen',
+    changeLanguage: 'Sprache ändern', selectLanguageLbl: 'Sprache:', languageSaved: 'Sprache gespeichert.',
   },
 
   zh: {
@@ -341,6 +346,7 @@ const translations = {
     eventDetail: '活动详情', back: '返回', status: '状态',
     requesterAvailability: '申请人可用时间', instructorAvailability: '讲师可用时间',
     noAvailability: '未设置可用时间。', userProfile: '个人资料', sendMessage: '发送消息', viewEvents: '查看活动',
+    changeLanguage: '更改语言', selectLanguageLbl: '语言：', languageSaved: '语言已保存。',
   },
 
   ar: {
@@ -405,6 +411,7 @@ const translations = {
     eventDetail: 'تفاصيل الفعالية', back: 'رجوع', status: 'الحالة',
     requesterAvailability: 'توفر الطالب', instructorAvailability: 'توفر المدرب',
     noAvailability: 'لم يتم تحديد توفر.', userProfile: 'الملف الشخصي', sendMessage: 'إرسال رسالة', viewEvents: 'عرض الفعاليات',
+    changeLanguage: 'تغيير اللغة', selectLanguageLbl: 'اللغة:', languageSaved: 'تم حفظ اللغة.',
   },
 
   pt: {
@@ -469,6 +476,7 @@ const translations = {
     eventDetail: 'Detalhes do Evento', back: 'Voltar', status: 'Status',
     requesterAvailability: 'Disponibilidade do Solicitante', instructorAvailability: 'Disponibilidade do Instrutor',
     noAvailability: 'Nenhuma disponibilidade definida.', userProfile: 'Perfil', sendMessage: 'Enviar Mensagem', viewEvents: 'Ver Eventos',
+    changeLanguage: 'Alterar Idioma', selectLanguageLbl: 'Idioma:', languageSaved: 'Idioma salvo.',
   },
 
   ru: {
@@ -533,6 +541,7 @@ const translations = {
     eventDetail: 'Детали мероприятия', back: 'Назад', status: 'Статус',
     requesterAvailability: 'Доступность запрашивающего', instructorAvailability: 'Доступность инструктора',
     noAvailability: 'Доступность не установлена.', userProfile: 'Профиль', sendMessage: 'Отправить сообщение', viewEvents: 'Просмотр мероприятий',
+    changeLanguage: 'Изменить язык', selectLanguageLbl: 'Язык:', languageSaved: 'Язык сохранён.',
   },
 
   ja: {
@@ -597,6 +606,7 @@ const translations = {
     eventDetail: 'イベント詳細', back: '戻る', status: 'ステータス',
     requesterAvailability: '依頼者の空き時間', instructorAvailability: '講師の空き時間',
     noAvailability: '空き時間が設定されていません。', userProfile: 'プロフィール', sendMessage: 'メッセージを送る', viewEvents: 'イベントを見る',
+    changeLanguage: '言語を変更', selectLanguageLbl: '言語：', languageSaved: '言語が保存されました。',
   },
 
   ko: {
@@ -661,6 +671,7 @@ const translations = {
     eventDetail: '이벤트 상세', back: '뒤로', status: '상태',
     requesterAvailability: '요청자 가능 시간', instructorAvailability: '강사 가능 시간',
     noAvailability: '가능 시간이 설정되지 않았습니다.', userProfile: '프로필', sendMessage: '메시지 보내기', viewEvents: '이벤트 보기',
+    changeLanguage: '언어 변경', selectLanguageLbl: '언어:', languageSaved: '언어가 저장되었습니다.',
   },
 
   hi: {
@@ -725,6 +736,7 @@ const translations = {
     eventDetail: 'कार्यक्रम विवरण', back: 'वापस', status: 'स्थिति',
     requesterAvailability: 'अनुरोधकर्ता की उपलब्धता', instructorAvailability: 'प्रशिक्षक की उपलब्धता',
     noAvailability: 'कोई उपलब्धता सेट नहीं।', userProfile: 'प्रोफ़ाइल', sendMessage: 'संदेश भेजें', viewEvents: 'कार्यक्रम देखें',
+    changeLanguage: 'भाषा बदलें', selectLanguageLbl: 'भाषा:', languageSaved: 'भाषा सहेजी गई।',
   },
 };
 

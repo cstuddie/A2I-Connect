@@ -4,6 +4,7 @@ import { Container, Row, Col, Button, Card, Badge, Navbar, Nav, NavDropdown, For
 import { FaUserCircle, FaSearch, FaEnvelope } from 'react-icons/fa';
 import { formatLocalDate } from '../utils/dateUtils';
 import useTranslation from '../utils/useTranslation';
+import NotificationWidget from './NotificationWidget';
 import "./Base.css";
 
 export function UserHeader() {
@@ -120,6 +121,7 @@ export function UserHeader() {
           <Nav.Link as={Link} to="/Inbox">
             <FaEnvelope size={24} />
           </Nav.Link>
+          <NotificationWidget />
           <NavDropdown title={<FaUserCircle size={40} />} id="basic-nav-dropdown">
             <NavDropdown.Item href="/EditProfile" className='custom-dropdown-link'>{t.account}</NavDropdown.Item>
             <NavDropdown.Divider />

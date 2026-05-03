@@ -35,6 +35,31 @@ const EditProfile = () => {
   const [accountError, setAccountError] = useState('');
   const [accountSuccess, setAccountSuccess] = useState('');
 
+  // Language state
+  const [selectedLang, setSelectedLang] = useState(localStorage.getItem('preferredLanguage') || 'en');
+  const [langSaved, setLangSaved] = useState(false);
+
+  const LANGUAGES = [
+    { code: 'en', label: 'English' },
+    { code: 'es', label: 'Español' },
+    { code: 'fr', label: 'Français' },
+    { code: 'de', label: 'Deutsch' },
+    { code: 'zh', label: '中文' },
+    { code: 'ar', label: 'العربية' },
+    { code: 'pt', label: 'Português' },
+    { code: 'ru', label: 'Русский' },
+    { code: 'ja', label: '日本語' },
+    { code: 'ko', label: '한국어' },
+    { code: 'hi', label: 'हिंदी' },
+  ];
+
+  const handleSaveLanguage = () => {
+    localStorage.setItem('preferredLanguage', selectedLang);
+    setLangSaved(true);
+    setTimeout(() => setLangSaved(false), 3000);
+    window.location.reload();
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -475,6 +500,30 @@ const EditProfile = () => {
                   {accountSuccess && (
                     <div className="alert alert-success">{accountSuccess}</div>
                   )}
+
+                  <div className="form-container mb-4">
+                    <h5>{t.changeLanguage}</h5>
+                    <Form.Group as={Row} className="mb-3">
+                      <Form.Label column sm="3">{t.selectLanguageLbl}</Form.Label>
+                      <Col sm="9">
+                        <Form.Control
+                          as="select"
+                          value={selectedLang}
+                          onChange={(e) => { setSelectedLang(e.target.value); setLangSaved(false); }}
+                        >
+                          {LANGUAGES.map((l) => (
+                            <option key={l.code} value={l.code}>{l.label}</option>
+                          ))}
+                        </Form.Control>
+                      </Col>
+                    </Form.Group>
+                    {langSaved && <div className="alert alert-success py-1">{t.languageSaved}</div>}
+                    <div className="text-center">
+                      <Button variant="dark" onClick={handleSaveLanguage}>
+                        {t.saveChanges}
+                      </Button>
+                    </div>
+                  </div>
 
                   <div className="form-container mb-4">
                     <h5>{t.changeEmail}</h5>
