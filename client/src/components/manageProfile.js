@@ -4,12 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { UserHeader } from './Dashboard';
 import { Form, Button, Container, Row, Col, Tab, Tabs, Nav, Table } from 'react-bootstrap';
 import axios from 'axios';
+import useTranslation from '../utils/useTranslation';
 
 const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const EditProfile = () => {
-
-  // Changes the current user (keeping main's comment but using auth logic)
+  const t = useTranslation();
   const userID = localStorage.getItem('userID') || 2;
 
   const [profileInfo, setProfileInfo] = useState({
@@ -34,6 +34,31 @@ const EditProfile = () => {
   const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [accountError, setAccountError] = useState('');
   const [accountSuccess, setAccountSuccess] = useState('');
+
+  // Language state
+  const [selectedLang, setSelectedLang] = useState(localStorage.getItem('preferredLanguage') || 'en');
+  const [langSaved, setLangSaved] = useState(false);
+
+  const LANGUAGES = [
+    { code: 'en', label: 'English' },
+    { code: 'es', label: 'Español' },
+    { code: 'fr', label: 'Français' },
+    { code: 'de', label: 'Deutsch' },
+    { code: 'zh', label: '中文' },
+    { code: 'ar', label: 'العربية' },
+    { code: 'pt', label: 'Português' },
+    { code: 'ru', label: 'Русский' },
+    { code: 'ja', label: '日本語' },
+    { code: 'ko', label: '한국어' },
+    { code: 'hi', label: 'हिंदी' },
+  ];
+
+  const handleSaveLanguage = () => {
+    localStorage.setItem('preferredLanguage', selectedLang);
+    setLangSaved(true);
+    setTimeout(() => setLangSaved(false), 3000);
+    window.location.reload();
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -269,26 +294,26 @@ const EditProfile = () => {
               <h1>Settings</h1>
               <Nav variant="pills" className="flex-column custom-pills">
                 <Nav.Item>
-                  <Nav.Link eventKey="first">Profile</Nav.Link>
+                  <Nav.Link eventKey="first">{t.profileTab}</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                  <Nav.Link eventKey="second">Availability</Nav.Link>
+                  <Nav.Link eventKey="second">{t.availabilityTab}</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                  <Nav.Link eventKey="third">Account</Nav.Link>
+                  <Nav.Link eventKey="third">{t.accountTab}</Nav.Link>
                 </Nav.Item>
               </Nav>
             </Col>
             <Col sm={9}>
               <Tab.Content>
                 <Tab.Pane eventKey="first">
-                  <h1 className="text-center mt-4">Edit Profile Information</h1>
-                  <p className="text-center mb-4 text-muted">View and make changes to your profile.</p>
+                  <h1 className="text-center mt-4">{t.manageProfileTitle}</h1>
+                  <p className="text-center mb-4 text-muted">{t.manageProfileSubtitle}</p>
                   <div className='form-container'>
                     <Form onSubmit={handleSubmitProfile} className="mt-3">
                       <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="2">
-                          First Name:
+                          {t.firstName}:
                         </Form.Label>
                         <Col sm="10">
                           <Form.Control
@@ -306,7 +331,7 @@ const EditProfile = () => {
 
                       <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="2">
-                          Last Name:
+                          {t.lastName}:
                         </Form.Label>
                         <Col sm="10">
                           <Form.Control
@@ -324,7 +349,7 @@ const EditProfile = () => {
 
                       <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="2">
-                          Affiliation:
+                          {t.affiliation}:
                         </Form.Label>
                         <Col sm="10">
                           <Form.Control
@@ -342,7 +367,7 @@ const EditProfile = () => {
 
                       <Form.Group as={Row} className="mb-3">
                         <Form.Label column sm="2">
-                          Bio:
+                          {t.bio}:
                         </Form.Label>
                         <Col sm="10">
                           <Form.Control
@@ -362,7 +387,7 @@ const EditProfile = () => {
 
                       <div className="text-center">
                         <Button variant="dark" type="submit">
-                          Update Profile Information
+                          {t.saveChanges}
                         </Button>
                       </div>
                     </Form>
@@ -370,8 +395,8 @@ const EditProfile = () => {
                 </Tab.Pane>
 
                 <Tab.Pane eventKey="second">
-                  <h1 className="text-center mt-4">Manage Availability</h1>
-                  <p className="text-center mb-4 text-muted">Set your available time slots so others can see when you're free.</p>
+                  <h1 className="text-center mt-4">{t.manageAvailabilityTitle}</h1>
+                  <p className="text-center mb-4 text-muted">{t.availabilitySubtitle}</p>
 
                   {availabilityError && (
                     <div className="alert alert-danger">{availabilityError}</div>
@@ -379,9 +404,9 @@ const EditProfile = () => {
 
                   {/* Add new slot */}
                   <div className="form-container">
-                    <h5>Add a Time Slot</h5>
+                    <h5>{t.addTimeSlot}</h5>
                     <Form.Group as={Row} className="mb-3">
-                      <Form.Label column sm="2">Day:</Form.Label>
+                      <Form.Label column sm="2">{t.day}</Form.Label>
                       <Col sm="10">
                         <Form.Control
                           as="select"
@@ -396,7 +421,7 @@ const EditProfile = () => {
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-3">
-                      <Form.Label column sm="2">Start Time:</Form.Label>
+                      <Form.Label column sm="2">{t.startTime}</Form.Label>
                       <Col sm="10">
                         <Form.Control
                           type="time"
@@ -407,7 +432,7 @@ const EditProfile = () => {
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-3">
-                      <Form.Label column sm="2">End Time:</Form.Label>
+                      <Form.Label column sm="2">{t.endTime}</Form.Label>
                       <Col sm="10">
                         <Form.Control
                           type="time"
@@ -419,7 +444,7 @@ const EditProfile = () => {
 
                     <div className="text-center mb-4">
                       <Button variant="outline-dark" onClick={handleAddSlot}>
-                        Add Slot
+                        {t.addSlot}
                       </Button>
                     </div>
                   </div>
@@ -455,19 +480,19 @@ const EditProfile = () => {
                       </tbody>
                     </Table>
                   ) : (
-                    <p className="text-muted text-center mt-3">No availability slots set yet.</p>
+                    <p className="text-muted text-center mt-3">{t.noSlots}</p>
                   )}
 
                   <div className="text-center mt-3 mb-4">
                     <Button variant="dark" onClick={handleSaveAvailability}>
-                      Save Availability
+                      {t.saveAvailability}
                     </Button>
                   </div>
                 </Tab.Pane>
 
                 <Tab.Pane eventKey="third">
-                  <h1 className="text-center mt-4">Account Settings</h1>
-                  <p className="text-center mb-4 text-muted">Change your email or password.</p>
+                  <h1 className="text-center mt-4">{t.accountSettingsTitle}</h1>
+                  <p className="text-center mb-4 text-muted">{t.accountSubtitle}</p>
 
                   {accountError && (
                     <div className="alert alert-danger">{accountError}</div>
@@ -477,11 +502,35 @@ const EditProfile = () => {
                   )}
 
                   <div className="form-container mb-4">
-                    <h5>Change Email</h5>
-                    <p className="text-muted">Current email: {profileInfo.Email}</p>
+                    <h5>{t.changeLanguage}</h5>
+                    <Form.Group as={Row} className="mb-3">
+                      <Form.Label column sm="3">{t.selectLanguageLbl}</Form.Label>
+                      <Col sm="9">
+                        <Form.Control
+                          as="select"
+                          value={selectedLang}
+                          onChange={(e) => { setSelectedLang(e.target.value); setLangSaved(false); }}
+                        >
+                          {LANGUAGES.map((l) => (
+                            <option key={l.code} value={l.code}>{l.label}</option>
+                          ))}
+                        </Form.Control>
+                      </Col>
+                    </Form.Group>
+                    {langSaved && <div className="alert alert-success py-1">{t.languageSaved}</div>}
+                    <div className="text-center">
+                      <Button variant="dark" onClick={handleSaveLanguage}>
+                        {t.saveChanges}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="form-container mb-4">
+                    <h5>{t.changeEmail}</h5>
+                    <p className="text-muted">{t.currentEmail} {profileInfo.Email}</p>
                     <Form onSubmit={handleUpdateEmail}>
                       <Form.Group as={Row} className="mb-3">
-                        <Form.Label column sm="3">New Email:</Form.Label>
+                        <Form.Label column sm="3">{t.newEmail}</Form.Label>
                         <Col sm="9">
                           <Form.Control
                             type="email"
@@ -492,7 +541,7 @@ const EditProfile = () => {
                         </Col>
                       </Form.Group>
                       <Form.Group as={Row} className="mb-3">
-                        <Form.Label column sm="3">Password:</Form.Label>
+                        <Form.Label column sm="3">{t.confirmPasswordLbl}</Form.Label>
                         <Col sm="9">
                           <Form.Control
                             type="password"
@@ -504,17 +553,17 @@ const EditProfile = () => {
                       </Form.Group>
                       <div className="text-center">
                         <Button variant="dark" type="submit">
-                          Update Email
+                          {t.updateEmail}
                         </Button>
                       </div>
                     </Form>
                   </div>
 
                   <div className="form-container mb-4">
-                    <h5>Change Password</h5>
+                    <h5>{t.changePassword}</h5>
                     <Form onSubmit={handleUpdatePassword}>
                       <Form.Group as={Row} className="mb-3">
-                        <Form.Label column sm="3">Current Password:</Form.Label>
+                        <Form.Label column sm="3">{t.currentPassword}</Form.Label>
                         <Col sm="9">
                           <Form.Control
                             type="password"
@@ -525,7 +574,7 @@ const EditProfile = () => {
                         </Col>
                       </Form.Group>
                       <Form.Group as={Row} className="mb-3">
-                        <Form.Label column sm="3">New Password:</Form.Label>
+                        <Form.Label column sm="3">{t.newPassword}</Form.Label>
                         <Col sm="9">
                           <Form.Control
                             type="password"
@@ -536,7 +585,7 @@ const EditProfile = () => {
                         </Col>
                       </Form.Group>
                       <Form.Group as={Row} className="mb-3">
-                        <Form.Label column sm="3">Confirm Password:</Form.Label>
+                        <Form.Label column sm="3">{t.confirmNewPassword}</Form.Label>
                         <Col sm="9">
                           <Form.Control
                             type="password"
@@ -548,7 +597,7 @@ const EditProfile = () => {
                       </Form.Group>
                       <div className="text-center">
                         <Button variant="dark" type="submit">
-                          Update Password
+                          {t.updatePassword}
                         </Button>
                       </div>
                     </Form>

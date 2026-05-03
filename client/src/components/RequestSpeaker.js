@@ -3,10 +3,12 @@ import { Form, Button, Container, Row, Col, Tabs, Tab } from 'react-bootstrap';
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { UserHeader } from './Dashboard';
 import './Base.css';
+import useTranslation from '../utils/useTranslation';
 
 const RequestSpeaker = () => {
     // Changes the current user (keeping main's comment but using auth logic)
     const userID = localStorage.getItem('userID') || 2;
+    const t = useTranslation();
 
     // State for profile info
     const [profileInfo, setProfileInfo] = useState({
@@ -80,7 +82,7 @@ const RequestSpeaker = () => {
 
             const result = await response.json();
             if (response.ok) {
-                alert('Event request submitted successfully!');
+                alert(t.successRequest);
                 navigate('/dashboard');
             } else {
                 alert(result.error || 'Failed to submit request');
@@ -117,17 +119,17 @@ const RequestSpeaker = () => {
             <UserHeader name={`${profileInfo.FirstName} ${profileInfo.LastName}`} />
             <Container>
                 <div className="mt-4">
-                    <h1 className="text-center">Request a Speaker</h1>
-                    <p className="text-center text-muted">Invite an industry professional to give a talk.</p>
+                    <h1 className="text-center">{t.requestTitle}</h1>
+                    <p className="text-center text-muted">{t.requestSubtitle}</p>
 
                     <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} style={{ display: 'none' }}>
                         <Tab eventKey="first" title="Part 1">
                             <Form className="mt-4">
                                 <Row>
                                     <Col md={6}>
-                                        <p className='text-muted'>1/3 Request Speaker</p>
-                                        <p><strong>Enter event information:</strong></p>
-                                        <p>Please provide the topic of discussion and a brief description of the event.</p>
+                                        <p className='text-muted'>{t.step1of3}</p>
+                                        <p><strong>{t.step1desc}</strong></p>
+                                        <p>{t.step1subdesc}</p>
                                     </Col>
                                     <Col md={6}>
 
@@ -143,22 +145,22 @@ const RequestSpeaker = () => {
                                         </Form.Group> */}
 
                                         <Form.Group className="mb-3">
-                                            <Form.Label style={{ color: 'black' }}>Topic</Form.Label>
+                                            <Form.Label style={{ color: 'black' }}>{t.topic}</Form.Label>
                                             <Form.Control
                                                 type="text"
                                                 name="Topic"
-                                                placeholder="Topic of Discussion"
+                                                placeholder={t.topicPlaceholder}
                                                 required
                                                 onChange={handleChange}
                                             />
                                         </Form.Group>
 
                                         <Form.Group className="mb-3">
-                                            <Form.Label style={{ color: 'black' }}>Description</Form.Label>
+                                            <Form.Label style={{ color: 'black' }}>{t.description}</Form.Label>
                                             <Form.Control
                                                 as="textarea"
                                                 name="Description"
-                                                placeholder="Describe what you'd like the talk to cover"
+                                                placeholder={t.descriptionPlaceholder}
                                                 required
                                                 onChange={handleChange}
                                             />
@@ -167,7 +169,7 @@ const RequestSpeaker = () => {
                                 </Row>
                                 <div className="d-flex justify-content-end mt-3">
                                     <Button variant="dark" onClick={handleNext}>
-                                        Next
+                                        {t.next}
                                     </Button>
                                 </div>
                             </Form>
@@ -177,13 +179,13 @@ const RequestSpeaker = () => {
                             <Form className="mt-4">
                                 <Row>
                                     <Col md={6}>
-                                        <p className='text-muted'>2/3 Request Speaker</p>
-                                        <p><strong>Choose the area of expertise:</strong></p>
-                                        <p>Select the expertise area that best matches your event.</p>
+                                        <p className='text-muted'>{t.step2of3}</p>
+                                        <p><strong>{t.step2desc}</strong></p>
+                                        <p>{t.step2subdesc}</p>
                                     </Col>
                                     <Col md={6}>
                                         <Form.Group className="mb-3">
-                                            <Form.Label style={{ color: 'black' }}>Area of Expertise</Form.Label>
+                                            <Form.Label style={{ color: 'black' }}>{t.areaOfExpertise}</Form.Label>
                                             <Form.Control
                                                 as="select"
                                                 name="ExpertiseID"
@@ -191,7 +193,7 @@ const RequestSpeaker = () => {
                                                 onChange={handleChange}
                                                 value={formData.ExpertiseID}
                                             >
-                                                <option value="">Select expertise area...</option>
+                                                <option value="">{t.selectExpertise}</option>
                                                 <option value={1}>Web Development</option>
                                                 <option value={2}>Data Science</option>
                                                 <option value={3}>AI & Machine Learning</option>
@@ -202,10 +204,10 @@ const RequestSpeaker = () => {
                                 </Row>
                                 <div className="d-flex justify-content-between mt-3">
                                     <Button variant="secondary" onClick={handlePrevious}>
-                                        Previous
+                                        {t.previous}
                                     </Button>
                                     <Button variant="dark" onClick={handleNext}>
-                                        Next
+                                        {t.next}
                                     </Button>
                                 </div>
                             </Form>
@@ -215,32 +217,32 @@ const RequestSpeaker = () => {
                             <Form onSubmit={handleSubmit} className="mt-4">
                                 <Row>
                                     <Col md={6}>
-                                        <p className='text-muted'>3/3 Request Speaker</p>
-                                        <p><strong>Date and delivery:</strong></p>
-                                        <p>Choose the preferred date, and delivery method.</p>
+                                        <p className='text-muted'>{t.step3of3}</p>
+                                        <p><strong>{t.step3desc}</strong></p>
+                                        <p>{t.step3subdesc}</p>
                                     </Col>
                                     <Col md={6}>
                                         <Form.Group className="mb-3">
-                                            <Form.Label style={{ color: 'black' }}>Preferred Date</Form.Label>
+                                            <Form.Label style={{ color: 'black' }}>{t.preferredDate}</Form.Label>
                                             <Form.Control type="date" name="Date" required onChange={handleChange} />
                                         </Form.Group>
 
                                         <Form.Group className="mb-3">
-                                            <Form.Label style={{ color: 'black' }}>Delivery Method</Form.Label>
+                                            <Form.Label style={{ color: 'black' }}>{t.deliveryMethod}</Form.Label>
                                             <Form.Control as="select" name="DeliveryMethod" required onChange={handleChange}>
                                                 <option value="">-</option>
-                                                <option value="Online">Online</option>
-                                                <option value="Hybrid">Hybrid</option>
+                                                <option value="Online">{t.online}</option>
+                                                <option value="Hybrid">{t.hybrid}</option>
                                             </Form.Control>
                                         </Form.Group>
                                     </Col>
                                 </Row>
                                 <div className="d-flex justify-content-between mt-3">
                                     <Button variant="secondary" onClick={handlePrevious}>
-                                        Previous
+                                        {t.previous}
                                     </Button>
                                     <Button variant="success" type="submit">
-                                        Submit Request
+                                        {t.submit}
                                     </Button>
                                 </div>
                             </Form>

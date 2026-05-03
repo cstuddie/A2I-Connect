@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { relativeTime, getTypeIcon } from '../utils/notificationHelpers';
 import { UserHeader } from './Dashboard';
 import './Notifications.css';
+import useTranslation from '../utils/useTranslation';
 
 const LEAD_HOUR_OPTIONS = [
   { value: 1,  label: '1 hour before' },
@@ -18,6 +19,7 @@ export default function NotificationsPage() {
   const userID   = localStorage.getItem('userID');
   const token    = localStorage.getItem('token');
   const navigate = useNavigate();
+  const t        = useTranslation();
 
   const [notifications, setNotifications] = useState([]);
   const [activeTab,     setActiveTab]     = useState('all');
@@ -123,19 +125,19 @@ export default function NotificationsPage() {
         <Row>
           <Col sm={12} md={3} className="mb-4 mb-md-0">
             <div className="notifications-sidebar">
-              <h5>Notification Settings</h5>
+              <h5>{t.notificationSettings}</h5>
 
               {prefs ? (
                 <Form onSubmit={savePreferences}>
                   <Form.Group className="mb-3">
                     <Form.Label className="fw-semibold" style={{ fontSize: '0.85rem' }}>
-                      Notify me about
+                      {t.notifyMeAbout}
                     </Form.Label>
                     {[
-                      { key: 'NotifyMessageRequest',  label: 'Message requests' },
-                      { key: 'NotifyIncomingMessage',  label: 'New messages' },
-                      { key: 'NotifyEventUpdate',      label: 'Session updates' },
-                      { key: 'NotifySessionReminder',  label: 'Session reminders' },
+                      { key: 'NotifyMessageRequest',  label: t.messageRequests },
+                      { key: 'NotifyIncomingMessage',  label: t.newMessages },
+                      { key: 'NotifyEventUpdate',      label: t.sessionUpdates },
+                      { key: 'NotifySessionReminder',  label: t.sessionReminders },
                     ].map(({ key, label }) => (
                       <Form.Check
                         key={key}
@@ -152,7 +154,7 @@ export default function NotificationsPage() {
 
                   <Form.Group className="mb-3">
                     <Form.Label className="fw-semibold" style={{ fontSize: '0.85rem' }}>
-                      Session reminder timing
+                      {t.reminderTiming}
                     </Form.Label>
                     <Form.Select
                       size="sm"
@@ -176,7 +178,7 @@ export default function NotificationsPage() {
                     style={{ backgroundColor: '#0B3444', borderColor: '#0B3444' }}
                     disabled={prefSaving}
                   >
-                    {prefSaving ? 'Saving…' : 'Save'}
+                    {prefSaving ? t.saving : t.save}
                   </Button>
 
                   {prefSavedMsg && (
@@ -184,7 +186,7 @@ export default function NotificationsPage() {
                   )}
                 </Form>
               ) : (
-                <p style={{ fontSize: '0.85rem', color: '#888' }}>Loading settings…</p>
+                <p style={{ fontSize: '0.85rem', color: '#888' }}>{t.loadingSettings}</p>
               )}
             </div>
           </Col>
@@ -193,7 +195,7 @@ export default function NotificationsPage() {
             <div className="notifications-list-panel">
               <div className="notifications-list-header">
                 <h5>
-                  Notifications
+                  {t.notificationsTitle}
                   {unreadCount > 0 && (
                     <span
                       style={{
@@ -205,7 +207,7 @@ export default function NotificationsPage() {
                         padding: '2px 8px',
                       }}
                     >
-                      {unreadCount} unread
+                      {unreadCount} {t.unread}
                     </span>
                   )}
                 </h5>
@@ -216,13 +218,13 @@ export default function NotificationsPage() {
                       className={activeTab === 'all' ? 'active' : ''}
                       onClick={() => setActiveTab('all')}
                     >
-                      All
+                      {t.tabAll}
                     </button>
                     <button
                       className={activeTab === 'unread' ? 'active' : ''}
                       onClick={() => setActiveTab('unread')}
                     >
-                      Unread
+                      {t.tabUnread}
                     </button>
                   </div>
 
@@ -239,19 +241,19 @@ export default function NotificationsPage() {
                         padding: 0,
                       }}
                     >
-                      Mark all read
+                      {t.markAllRead}
                     </button>
                   )}
                 </div>
               </div>
 
               {loading && (
-                <div className="notifications-empty">Loading notifications…</div>
+                <div className="notifications-empty">{t.loadingNotifications}</div>
               )}
 
               {!loading && displayed.length === 0 && (
                 <div className="notifications-empty">
-                  {activeTab === 'unread' ? 'No unread notifications.' : 'No notifications yet.'}
+                  {activeTab === 'unread' ? t.noUnread : t.noNotifications}
                 </div>
               )}
 
@@ -279,7 +281,7 @@ export default function NotificationsPage() {
                           style={{ fontSize: '0.75rem' }}
                           onClick={() => navigate(`/events/${n.RelatedEventID}`)}
                         >
-                          View
+                          {t.view}
                         </Button>
                       )}
                       {!n.IsRead && (
@@ -293,7 +295,7 @@ export default function NotificationsPage() {
                           }}
                           onClick={() => markRead(n.ID)}
                         >
-                          Mark read
+                          {t.markRead}
                         </Button>
                       )}
                     </div>

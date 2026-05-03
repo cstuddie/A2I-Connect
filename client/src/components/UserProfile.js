@@ -3,11 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Card, Button, Spinner } from 'react-bootstrap';
 import { UserHeader } from './Dashboard';
 import './Base.css';
+import useTranslation from '../utils/useTranslation';
 
 const UserProfile = () => {
     const { userId } = useParams();
     const navigate = useNavigate();
     const currentUserId = localStorage.getItem('userID');
+    const t = useTranslation();
     
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -153,10 +155,10 @@ const UserProfile = () => {
                                             aria-hidden="true"
                                             className="me-2"
                                         />
-                                        Starting conversation...
+                                        {t.sendMessage}...
                                     </>
                                 ) : (
-                                    'Send Message'
+                                    t.sendMessage
                                 )}
                             </Button>
                             {parseInt(currentUserId) === parseInt(userId) && (

@@ -4,10 +4,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaBell } from 'react-icons/fa';
 import { relativeTime, getTypeIcon } from '../utils/notificationHelpers';
 import './Notifications.css';
+import useTranslation from '../utils/useTranslation';
 
 export default function NotificationWidget() {
   const userID = localStorage.getItem('userID');
   const token  = localStorage.getItem('token');
+  const t      = useTranslation();
 
   const [unreadCount,   setUnreadCount]   = useState(0);
   const [notifications, setNotifications] = useState([]);
@@ -117,18 +119,18 @@ export default function NotificationWidget() {
       {dropdownOpen && (
         <div className="notification-dropdown">
           <div className="notification-dropdown-header">
-            <span>Notifications</span>
+            <span>{t.notifications}</span>
             {unreadCount > 0 && (
-              <button onClick={markAllRead}>Mark all read</button>
+              <button onClick={markAllRead}>{t.markAllRead}</button>
             )}
           </div>
 
           <div className="notification-dropdown-body">
             {loading && (
-              <div className="notification-dropdown-empty">Loading…</div>
+              <div className="notification-dropdown-empty">{t.loading}</div>
             )}
             {!loading && notifications.length === 0 && (
-              <div className="notification-dropdown-empty">No notifications yet</div>
+              <div className="notification-dropdown-empty">{t.noNotificationsYet}</div>
             )}
             {!loading &&
               notifications.map((n) => (
@@ -154,7 +156,7 @@ export default function NotificationWidget() {
 
           <div className="notification-dropdown-footer">
             <Link to="/Notifications" onClick={() => setDropdownOpen(false)}>
-              See all notifications
+              {t.seeAllNotifications}
             </Link>
           </div>
         </div>

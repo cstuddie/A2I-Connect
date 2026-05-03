@@ -15,7 +15,8 @@ router.post('/register', async (req, res) => {
       role,
       expertiseID,
       bio,
-      affiliation
+      affiliation,
+      preferredLanguage
     } = req.body;
 
     if (!firstName || !lastName || !email || !password || !role) {
@@ -43,7 +44,8 @@ router.post('/register', async (req, res) => {
       ExpertiseID: expertiseID || null,
       Bio: bio || null,
       Status: 1,
-      Affiliation: affiliation || null
+      Affiliation: affiliation || null,
+      PreferredLanguage: preferredLanguage || 'en'
     });
 
     const token = jwt.sign(
@@ -90,7 +92,8 @@ router.post('/login', async (req, res) => {
         id: user.ID,
         email: user.Email,
         firstName: user.FirstName,
-        lastName: user.LastName
+        lastName: user.LastName,
+        preferredLanguage: user.PreferredLanguage || 'en'
       }
     });
   } catch (err) {

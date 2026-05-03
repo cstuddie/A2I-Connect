@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col, Tabs, Tab, Nav, Navbar } from 'react-bootstrap';
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import './Base.css'; // Importing styles
+import t from '../utils/registerTranslations';
+import './Base.css';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -10,22 +11,24 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 1, // Default to regular user (1 = user, 2 = instructor/expert)
-    expertiseID: '', // will be a dropdown selection
+    role: 1,
+    expertiseID: '',
     bio: '',
     affiliation: 'Independent Professional',
+    preferredLanguage: 'en',
   });
 
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('first');
 
-  // Handle input changes
+  const lang = t[formData.preferredLanguage] || t.en;
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError('');
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -42,7 +45,8 @@ const Register = () => {
       role: Number(formData.role),
       expertiseID: formData.expertiseID ? Number(formData.expertiseID) : null,
       bio: formData.bio || null,
-      affiliation: formData.affiliation || null
+      affiliation: formData.affiliation || null,
+      preferredLanguage: formData.preferredLanguage || 'en',
     };
 
     try {
@@ -66,13 +70,8 @@ const Register = () => {
     }
   };
 
-  //handle tabs
-  const [activeTab, setActiveTab] = useState('first');
-
   const handleNext = () => {
     if (activeTab === 'first') {
-
-      // Whitespace validation
       if (!formData.firstName.trim() || !formData.lastName.trim() ||
         !formData.email.trim() || !formData.password.trim() ||
         !formData.confirmPassword.trim()) {
@@ -80,7 +79,6 @@ const Register = () => {
         return;
       }
 
-      // Name validation - no numbers allowed
       const nameRegex = /^[a-zA-Z\s'-]+$/;
       if (!nameRegex.test(formData.firstName.trim())) {
         setError('First name cannot contain numbers or special characters');
@@ -91,7 +89,6 @@ const Register = () => {
         return;
       }
 
-      // Password match validation 
       if (formData.password !== formData.confirmPassword) {
         setError('Passwords do not match');
         return;
@@ -105,27 +102,20 @@ const Register = () => {
 
       setError('');
       setActiveTab('second');
-    }
-    else if (activeTab === 'second') {
-
+    } else if (activeTab === 'second') {
       if (!formData.affiliation.trim() || !formData.expertiseID) {
-        setError('Please fill out all required fields (Role, Expertise, and Affiliation)')
+        setError('Please fill out all required fields (Role, Expertise, and Affiliation)');
         return;
       }
-
-      setError('')
+      setError('');
       setActiveTab('third');
     }
   };
 
   const handlePrevious = () => {
     setError('');
-    if (activeTab === 'second') {
-      setActiveTab('first');
-    }
-    else if (activeTab === 'third') {
-      setActiveTab('second');
-    }
+    if (activeTab === 'second') setActiveTab('first');
+    else if (activeTab === 'third') setActiveTab('second');
   };
 
   return (
@@ -136,14 +126,14 @@ const Register = () => {
         </Navbar.Brand>
         <Nav className="ms-auto">
           <NavLink to="/Login" className="nav-link me-3">
-            Already have an account?
+            {lang.alreadyHaveAccount}
           </NavLink>
         </Nav>
       </Navbar>
 
       <Container>
-        <h1 style={{ textAlign: 'center' }}>AI Connect: Account Registration</h1>
-        <p style={{ textAlign: 'center' }}>Join AI Connect to hear from industry professionals.</p>
+        <h1 style={{ textAlign: 'center' }}>{lang.pageTitle}</h1>
+        <p style={{ textAlign: 'center' }}>{lang.pageSubtitle}</p>
 
         {error && (
           <div style={{
@@ -159,20 +149,18 @@ const Register = () => {
         )}
 
         <div className="form-container">
-
           <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} style={{ display: 'none' }}>
             <Tab eventKey="first" title="Part 1">
               <Form onSubmit={(e) => { e.preventDefault(); handleNext(); }} className="mt-4">
                 <Row>
                   <Col md={4}>
-                    <p className='text-muted'>1/2 Register</p>
-                    <p><strong>Enter your basic information:</strong></p>
-                    <p>Please provide your name, email, and password.</p>
+                    <p className='text-muted'>{lang.step1of2}</p>
+                    <p><strong>{lang.step1desc}</strong></p>
+                    <p>{lang.step1subdesc}</p>
                   </Col>
                   <Col md={8}>
-
                     <Form.Group className="mb-3">
-                      <Form.Label style={{ color: 'black' }}>First Name</Form.Label>
+                      <Form.Label style={{ color: 'black' }}>{lang.firstName}</Form.Label>
                       <Form.Control
                         type="text"
                         name="firstName"
@@ -184,7 +172,7 @@ const Register = () => {
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                      <Form.Label style={{ color: 'black' }}>Last Name</Form.Label>
+                      <Form.Label style={{ color: 'black' }}>{lang.lastName}</Form.Label>
                       <Form.Control
                         type="text"
                         name="lastName"
@@ -196,7 +184,7 @@ const Register = () => {
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                      <Form.Label style={{ color: 'black' }}>Email</Form.Label>
+                      <Form.Label style={{ color: 'black' }}>{lang.email}</Form.Label>
                       <Form.Control
                         type="email"
                         name="email"
@@ -208,7 +196,7 @@ const Register = () => {
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                      <Form.Label style={{ color: 'black' }}>Password</Form.Label>
+                      <Form.Label style={{ color: 'black' }}>{lang.password}</Form.Label>
                       <Form.Control
                         type="password"
                         name="password"
@@ -221,7 +209,7 @@ const Register = () => {
                     </Form.Group>
 
                     <Form.Group className="mb-3">
-                      <Form.Label style={{ color: 'black' }}>Confirm Password</Form.Label>
+                      <Form.Label style={{ color: 'black' }}>{lang.confirmPassword}</Form.Label>
                       <Form.Control
                         type="password"
                         name="confirmPassword"
@@ -231,11 +219,49 @@ const Register = () => {
                         onChange={handleChange}
                       />
                     </Form.Group>
+
+                    <Form.Group className="mb-3">
+                      <Form.Label style={{ color: 'black' }}>{lang.preferredLanguage}</Form.Label>
+                      <Form.Select
+                        name="preferredLanguage"
+                        value={formData.preferredLanguage}
+                        onChange={handleChange}
+                      >
+                        <option value="en">English</option>
+                        <option value="es">Español (Spanish)</option>
+                        <option value="fr">Français (French)</option>
+                        <option value="de">Deutsch (German)</option>
+                        <option value="it">Italiano (Italian)</option>
+                        <option value="nl">Nederlands (Dutch)</option>
+                        <option value="pl">Polski (Polish)</option>
+                        <option value="ro">Română (Romanian)</option>
+                        <option value="sv">Svenska (Swedish)</option>
+                        <option value="uk">Українська (Ukrainian)</option>
+                        <option value="ru">Русский (Russian)</option>
+                        <option value="ar">العربية (Arabic)</option>
+                        <option value="fa">فارسی (Persian)</option>
+                        <option value="ur">اردو (Urdu)</option>
+                        <option value="hi">हिन्दी (Hindi)</option>
+                        <option value="bn">বাংলা (Bengali)</option>
+                        <option value="zh">中文简体 (Chinese Simplified)</option>
+                        <option value="zh-TW">中文繁體 (Chinese Traditional)</option>
+                        <option value="ja">日本語 (Japanese)</option>
+                        <option value="ko">한국어 (Korean)</option>
+                        <option value="th">ภาษาไทย (Thai)</option>
+                        <option value="vi">Tiếng Việt (Vietnamese)</option>
+                        <option value="id">Bahasa Indonesia (Indonesian)</option>
+                        <option value="ms">Bahasa Melayu (Malay)</option>
+                        <option value="tl">Filipino (Tagalog)</option>
+                        <option value="sw">Kiswahili (Swahili)</option>
+                        <option value="pt">Português (Portuguese)</option>
+                        <option value="tr">Türkçe (Turkish)</option>
+                      </Form.Select>
+                    </Form.Group>
                   </Col>
                 </Row>
                 <div className="d-flex justify-content-end mt-3">
                   <Button variant="dark" type="submit">
-                    Next
+                    {lang.next}
                   </Button>
                 </div>
               </Form>
@@ -245,16 +271,13 @@ const Register = () => {
               <Form onSubmit={handleSubmit} className="mt-3">
                 <Row>
                   <Col md={4}>
-                    <p className='text-muted'>2/2 Register</p>
-                    <p><strong>Enter your account information:</strong></p>
-                    <p>Please provide your interests, your professional affiliation, expertise, and some history about yourself.</p>
+                    <p className='text-muted'>{lang.step2of2}</p>
+                    <p><strong>{lang.step2desc}</strong></p>
+                    <p>{lang.step2subdesc}</p>
                   </Col>
                   <Col md={8}>
-
                     <Form.Group as={Row} className="mb-3">
-                      <Form.Label column sm="2">
-                        Role:
-                      </Form.Label>
+                      <Form.Label column sm="2">{lang.role}</Form.Label>
                       <Col sm="10">
                         <Form.Select
                           name="role"
@@ -262,16 +285,14 @@ const Register = () => {
                           onChange={handleChange}
                           required
                         >
-                          <option value={1}>User (seeking expertise)</option>
-                          <option value={2}>Expert (offering expertise)</option>
+                          <option value={1}>{lang.roleUser}</option>
+                          <option value={2}>{lang.roleExpert}</option>
                         </Form.Select>
                       </Col>
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-3">
-                      <Form.Label column sm="2">
-                        Expertise:
-                      </Form.Label>
+                      <Form.Label column sm="2">{lang.expertise}</Form.Label>
                       <Col sm="10">
                         <Form.Select
                           name="expertiseID"
@@ -279,7 +300,7 @@ const Register = () => {
                           onChange={handleChange}
                           required
                         >
-                          <option value="">Select your expertise...</option>
+                          <option value="">{lang.selectExpertise}</option>
                           <option value={1}>Web Development</option>
                           <option value={2}>Data Science</option>
                           <option value={3}>AI & Machine Learning</option>
@@ -289,15 +310,13 @@ const Register = () => {
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-3">
-                      <Form.Label column sm="2">
-                        Affiliation:
-                      </Form.Label>
+                      <Form.Label column sm="2">{lang.affiliation}</Form.Label>
                       <Col sm="10">
                         <Form.Control
                           type="text"
                           name="affiliation"
                           value={formData.affiliation}
-                          placeholder="Independent Professional, Mississippi State, Google, etc."
+                          placeholder={lang.affiliationPlaceholder}
                           onChange={handleChange}
                           required
                         />
@@ -305,16 +324,14 @@ const Register = () => {
                     </Form.Group>
 
                     <Form.Group as={Row} className="mb-3">
-                      <Form.Label column sm="2">
-                        Bio:
-                      </Form.Label>
+                      <Form.Label column sm="2">{lang.bio}</Form.Label>
                       <Col sm="10">
                         <Form.Control
                           as="textarea"
                           name="bio"
                           value={formData.bio}
                           style={{ height: '100px', resize: 'none' }}
-                          placeholder="Tell us about yourself and your professional background..."
+                          placeholder={lang.bioPlaceholder}
                           onChange={handleChange}
                           required
                         />
@@ -325,10 +342,10 @@ const Register = () => {
 
                 <div className="d-flex justify-content-between mt-3">
                   <Button variant="secondary" onClick={handlePrevious}>
-                    Previous
+                    {lang.previous}
                   </Button>
                   <Button variant="success" type="submit">
-                    Submit Request
+                    {lang.submit}
                   </Button>
                 </div>
               </Form>

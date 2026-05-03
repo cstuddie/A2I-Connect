@@ -5,9 +5,11 @@ import { UserHeader, EventCard } from './Dashboard';
 import { Row, Col, Form, Button, ListGroup, Container } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { formatLocalDate } from '../utils/dateUtils';
+import useTranslation from '../utils/useTranslation';
 
 const Search = () => {
   const userID = localStorage.getItem('userID') || 2;
+  const t = useTranslation();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -196,10 +198,10 @@ const fetchProfileNames = async (events, setRequesterNames, setInstructorNames) 
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search events"
+          placeholder={t.searchPlaceholder}
         />
         <Button onClick={handleSearch} variant="dark">
-          Search
+          {t.search}
         </Button>
       </div>
 
@@ -207,7 +209,7 @@ const fetchProfileNames = async (events, setRequesterNames, setInstructorNames) 
           <Col md={3} className="filter-container">
             <Form>
               <Form.Group>
-                <Form.Label>Field:</Form.Label>
+                <Form.Label>{t.field}</Form.Label>
                 <Form.Control
                   as="select"
                   onChange={(e) => setFilters({ ...filters, field: e.target.value })}
@@ -229,7 +231,7 @@ const fetchProfileNames = async (events, setRequesterNames, setInstructorNames) 
               </Form.Group>
 
               <Form.Group>
-                <Form.Label>Course:</Form.Label>
+                <Form.Label>{t.courseLbl}</Form.Label>
                 <Form.Control
                   as="select"
                   onChange={(e) => setFilters({ ...filters, course: e.target.value })}
@@ -242,7 +244,7 @@ const fetchProfileNames = async (events, setRequesterNames, setInstructorNames) 
               </Form.Group>
 
               <Form.Group>
-                <Form.Label>From:</Form.Label>
+                <Form.Label>{t.from}</Form.Label>
                 <Form.Control
                   type="date"
                   value={filters.startDate}
@@ -251,7 +253,7 @@ const fetchProfileNames = async (events, setRequesterNames, setInstructorNames) 
               </Form.Group>
 
               <Form.Group>
-                <Form.Label>To:</Form.Label>
+                <Form.Label>{t.to}</Form.Label>
                 <Form.Control
                   type="date"
                   value={filters.endDate}
@@ -260,27 +262,27 @@ const fetchProfileNames = async (events, setRequesterNames, setInstructorNames) 
               </Form.Group>
 
               <Form.Group>
-                <Form.Label>Delivery Method:</Form.Label>
+                <Form.Label>{t.deliveryMethodLbl}</Form.Label>
                 <Form.Control
                   as="select"
                   onChange={(e) => setFilters({ ...filters, deliveryMethod: e.target.value })}
                 >
-                  <option value="">All</option>
-                  <option value="Online">Online</option>
-                  <option value="In-Person">In-Person</option>
+                  <option value="">{t.all}</option>
+                  <option value="Online">{t.online}</option>
+                  <option value="In-Person">{t.inPerson}</option>
                 </Form.Control>
               </Form.Group>
 
               <Form.Group>
-                <Form.Label>Status:</Form.Label>
+                <Form.Label>{t.statusLbl}</Form.Label>
                 <Form.Control
                   as="select"
                   onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                 >
-                  <option value="">All</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Scheduled">Scheduled</option>
-                  <option value="Completed">Completed</option>
+                  <option value="">{t.all}</option>
+                  <option value="Pending">{t.pending}</option>
+                  <option value="Scheduled">{t.scheduled}</option>
+                  <option value="Completed">{t.completed}</option>
                 </Form.Control>
               </Form.Group>
             </Form>
@@ -293,17 +295,17 @@ const fetchProfileNames = async (events, setRequesterNames, setInstructorNames) 
                 {filteredResults.map((event) => (
                   <ListGroup.Item key={event.eventID}>
                     <Link to={`/events/${event.eventID}`} className="text-decoration-none" style={{color: 'black'}}><strong>{event.topic}</strong></ Link><br />
-                    <strong>Date:</strong> {formatLocalDate(event.date)}<br />
-                    <strong>Requester:</strong> {requesterNameMap[event.requesterID] || 'Unknown Requester'}<br />
-                    <strong>Instructor:</strong> {instructorNameMap[event.instructorID] || 'Instructor Needed'}<br />
-                    <strong style={{textDecoration: 'underline'}}>Event Description</strong><br />
+                    <strong>{t.dateLabel}</strong> {formatLocalDate(event.date)}<br />
+                    <strong>{t.requesterLabel}</strong> {requesterNameMap[event.requesterID] || 'Unknown Requester'}<br />
+                    <strong>{t.instructorLabel}</strong> {instructorNameMap[event.instructorID] || 'Instructor Needed'}<br />
+                    <strong style={{textDecoration: 'underline'}}>{t.eventDescription}</strong><br />
                     {event.description}
                   </ListGroup.Item>
                 ))}
               </ListGroup>
             ) : (
               <p style={{ textAlign: 'center', fontSize: '20px', fontWeight: 'bold', marginTop: '20px' }}>
-                No results found
+                {t.noResults}
               </p>
             )}
         </Col>

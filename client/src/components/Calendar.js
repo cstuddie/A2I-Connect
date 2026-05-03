@@ -4,8 +4,10 @@ import { UserHeader } from './Dashboard';
 import { Button } from 'react-bootstrap';
 import { parseLocalDate, formatLocalDate } from '../utils/dateUtils';
 import './Base.css';
+import useTranslation from '../utils/useTranslation';
 
 const Calendar = () => {
+    const t = useTranslation();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [events, setEvents] = useState([]);
     const [profileNames, setProfileNames] = useState({});
@@ -149,19 +151,19 @@ const Calendar = () => {
             <div className="container">
                 <main className="calendar-main">
                     <div className="month-navigation">
-                        <Button variant='secondary' onClick={prevMonth}>&lt; Previous</Button>
+                        <Button variant='secondary' onClick={prevMonth}>{t.previousMonth}</Button>
                         <h2 className="month-title">{monthYearString}</h2>
-                        <Button variant ='secondary' onClick={nextMonth}>Next &gt;</Button>
+                        <Button variant ='secondary' onClick={nextMonth}>{t.nextMonth}</Button>
                     </div>
 
                     <div className="weekdays">
-                        <div>Sun</div>
-                        <div>Mon</div>
-                        <div>Tue</div>
-                        <div>Wed</div>
-                        <div>Thu</div>
-                        <div>Fri</div>
-                        <div>Sat</div>
+                        <div>{t.sun}</div>
+                        <div>{t.mon}</div>
+                        <div>{t.tue}</div>
+                        <div>{t.wed}</div>
+                        <div>{t.thu}</div>
+                        <div>{t.fri}</div>
+                        <div>{t.sat}</div>
                     </div>
 
                     <div className="calendar-grid">
@@ -169,20 +171,20 @@ const Calendar = () => {
                     </div>
 
                     <div className="events-list">
-                        <h3>Your Events This Month</h3>
+                        <h3>{t.eventsThisMonth}</h3>
                         {currentMonthEvents.length > 0 ? (
                             currentMonthEvents.map(event => (
                                 <div key={event.ID} className="event-item">
                                     <Link to={`/events/${event.ID}`} style={{textDecoration: 'none'}}><strong>{event.Topic}</strong></Link>
                                     <p>
                                         {formatLocalDate(event.Date)} • {expertiseMap[event.ExpertiseID]} •
-                                        {event.InstructorID ? ` With: ${profileNames[event.InstructorID] || 'TBD'}` : ' (Instructor TBD)'}
+                                        {event.InstructorID ? ` ${t.with} ${profileNames[event.InstructorID] || 'TBD'}` : ` (${t.instructorTBD})`}
                                     </p>
                                     <p>Status: {event.EventStatus} • Method: {event.DeliveryMethod}</p>
                                 </div>
                             ))
                         ) : (
-                            <p>No events scheduled for this month</p>
+                            <p>{t.noEventsMonth}</p>
                         )}
                     </div>
                 </main>
