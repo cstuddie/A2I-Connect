@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Navbar, Nav, Button} from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { NavLink, Link } from 'react-router-dom';
+import useTranslation from '../utils/useTranslation';
 
 
 function Auth() {
   const navigate = useNavigate();
+  const t = useTranslation();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -54,6 +56,7 @@ function Auth() {
       if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('userID', data.user.id);
+        localStorage.setItem('preferredLanguage', data.user.preferredLanguage || 'en');
         setTimeout(() => {
           setLoading(false)
           navigate('/dashboard');
@@ -80,17 +83,17 @@ function Auth() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
               <NavLink to="/login" className="nav-link me-3">
-                Login
+                {t.login}
               </NavLink>
               <Button as={NavLink} variant="dark" to="/Register">
-                Sign Up
+                {t.signUp}
               </Button>
             </Nav>
           </Navbar.Collapse>
         </Navbar>
 
       <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
-        <h1>Login</h1>
+        <h1>{t.loginTitle}</h1>
         {error && (
           <div style={{
             color: 'red',
@@ -107,7 +110,7 @@ function Auth() {
         
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px' }}>Email:</label>
+            <label style={{ display: 'block', marginBottom: '5px' }}>{t.email}:</label>
             <input
               type="email"
               name="email"
@@ -118,7 +121,7 @@ function Auth() {
             />
           </div>
           <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', marginBottom: '5px' }}>Password:</label>
+            <label style={{ display: 'block', marginBottom: '5px' }}>{t.password}:</label>
             <input
               type="password"
               name="password"
@@ -140,13 +143,13 @@ function Auth() {
               cursor: 'pointer'
             }}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? t.loggingIn : t.login}
           </Button>
         </form>
         <div style={{textAlign:'center', marginTop:'15px', color:'#666'}}>
-            Don't have an account?{' '}
+            {t.noAccount}{' '}
             <Link to="/Register" style={{color:'#0B3444', textDecoration:'none'}}>
-              Sign up here
+              {t.signUpHere}
             </Link>
         </div>
       </div>

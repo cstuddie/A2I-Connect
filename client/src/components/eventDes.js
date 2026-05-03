@@ -5,6 +5,7 @@ import { UserHeader } from './Dashboard';
 import { formatLocalDate } from '../utils/dateUtils';
 import JitsiMeeting from './JitsiMeeting';
 import "./Base.css";
+import useTranslation from '../utils/useTranslation';
 
 const formatTime = (time) => {
   if (!time) return '';
@@ -15,7 +16,7 @@ const formatTime = (time) => {
   return `${displayH}:${minutes} ${ampm}`;
 };
 
-const AvailabilitySection = ({ label, userID }) => {
+const AvailabilitySection = ({ label, availabilityLabel, noAvailabilityText, userID }) => {
   const [availability, setAvailability] = useState([]);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ const AvailabilitySection = ({ label, userID }) => {
 
   return (
     <div className="mt-3">
-      <h6><Badge bg="dark">{label} Availability</Badge></h6>
+      <h6><Badge bg="dark">{availabilityLabel || `${label} Availability`}</Badge></h6>
       {availability.length > 0 ? (
         <Table size="sm" bordered hover>
           <thead>
@@ -57,7 +58,7 @@ const AvailabilitySection = ({ label, userID }) => {
           </tbody>
         </Table>
       ) : (
-        <p className="text-muted fst-italic">No availability set.</p>
+        <p className="text-muted fst-italic">{noAvailabilityText || 'No availability set.'}</p>
       )}
     </div>
   );
@@ -66,6 +67,7 @@ const AvailabilitySection = ({ label, userID }) => {
 const EventDescription = () => {
   const userID = localStorage.getItem('userID');
   const navigate = useNavigate();
+  const t = useTranslation();
   const { eventID } = useParams();
 
   const [profileInfo, setProfileInfo] = useState(null);
@@ -157,7 +159,7 @@ const EventDescription = () => {
       />
 
       <Container className="my-4">
-        <h1 className="text-center mb-4">Event Description</h1>
+        <h1 className="text-center mb-4">{t.eventDetail}</h1>
 
         <Card>
           <Card.Body>
@@ -167,32 +169,32 @@ const EventDescription = () => {
 
             <Row>
               <Col md={6} className="mb-3">
-                <strong>Instructor:</strong>{' '}
+                <strong>{t.instructor}:</strong>{' '}
                 {event?.InstructorName || 'Unassigned'}
               </Col>
 
               <Col md={6} className="mb-3">
-                <strong>Requester:</strong>{' '}
+                <strong>{t.requester}:</strong>{' '}
                 {event?.RequesterName || 'N/A'}
               </Col>
 
               <Col md={6} className="mb-3">
-                <strong>Date:</strong>{' '}
+                <strong>{t.date}:</strong>{' '}
                 {formatLocalDate(event?.Date)}
               </Col>
 
               <Col md={6} className="mb-3">
-                <strong>Delivery Method:</strong>{' '}
+                <strong>{t.deliveryMethod}:</strong>{' '}
                 {event?.DeliveryMethod || 'N/A'}
               </Col>
 
               <Col md={6} className="mb-3">
-                <strong>Status:</strong>{' '}
+                <strong>{t.status}:</strong>{' '}
                 {event?.EventStatus ?? 'N/A'}
               </Col>
 
               <Col md={12} className="mb-3">
-                <strong>Description:</strong>
+                <strong>{t.description}:</strong>
                 <br />
                 {event?.Description || 'N/A'}
               </Col>
@@ -203,13 +205,17 @@ const EventDescription = () => {
             <Row>
               <Col md={6}>
                 <AvailabilitySection
-                  label="Requester"
+                  label={t.requester}
+                  availabilityLabel={t.requesterAvailability}
+                  noAvailabilityText={t.noAvailability}
                   userID={event?.RequesterID}
                 />
               </Col>
               <Col md={6}>
                 <AvailabilitySection
-                  label="Instructor"
+                  label={t.instructor}
+                  availabilityLabel={t.instructorAvailability}
+                  noAvailabilityText={t.noAvailability}
                   userID={event?.InstructorID}
                 />
               </Col>

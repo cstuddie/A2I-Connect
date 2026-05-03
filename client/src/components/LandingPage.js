@@ -3,7 +3,8 @@ import { Container, Row, Col, Button, Navbar, Nav } from 'react-bootstrap';
 import { NavLink, Link } from "react-router-dom";
 import { EventCard } from './Dashboard';
 import { FaUserCircle } from 'react-icons/fa';
-import "./Base.css"; 
+import "./Base.css";
+import useTranslation from '../utils/useTranslation';
 
 const Card = ({ name, role }) => (
   <div className="card">
@@ -18,6 +19,7 @@ const Card = ({ name, role }) => (
 );
 
 const LandingPage = () => {
+  const t = useTranslation();
   const [professionals, setProfessionals] = useState([]);
   const [events, setEvents] = useState([]);
   const [usersMap, setUsersMap] = useState({});
@@ -84,10 +86,10 @@ const LandingPage = () => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
             <NavLink to="/login" className="nav-link me-3">
-              Login
+              {t.login}
             </NavLink>
               <Button as={NavLink} variant="dark" to="/Register">
-              Sign Up
+              {t.signUp}
             </Button>
           </Nav>
         </Navbar.Collapse>
@@ -96,18 +98,18 @@ const LandingPage = () => {
       <Container>
         <Row className="mb-5">
           <div className="d-flex flex-column align-items-center" style={{paddingTop: '40px'}}>
-              <h1 style={{color: 'black'}}>Find and connect with academic and industry professionals.</h1>
+              <h1 style={{color: 'black'}}>{t.landingHeadline}</h1>
             <p style={{textAlign: 'center'}}>
-              Whether looking to academic professionals for instruction or for industry professionals to give seminars, A2I Connect will connect you with professionals tailored to your needs.
+              {t.landingSubtitle}
             </p>
               <Button as={NavLink} to="/Register" variant="dark" className="mt-3" style={{width: '400px'}}>
-                Get Started
+                {t.getStarted}
               </Button>
           </div>
         </Row>
         <Row className="mb-5">
           <Col>
-              <h1 style={{textAlign: 'left', color: 'black'}}>Attend Events.</h1>
+              <h1 style={{textAlign: 'left', color: 'black'}}>{t.attendEvents}</h1>
             <div className="card-container">
               {events.slice(0, 10).map(event => (
                 <EventCard
@@ -126,7 +128,7 @@ const LandingPage = () => {
   
         <Row className="mb-5">
           <Col>
-              <h1 style={{textAlign: 'left', color: 'black'}}>Find Professionals.</h1>
+              <h1 style={{textAlign: 'left', color: 'black'}}>{t.findProfessionals}</h1>
             <div className="card-container">
               {professionals.slice(0, 10).map(pro => (
                 <Card
@@ -141,10 +143,10 @@ const LandingPage = () => {
   
         <Row className="text-center mt-5">
           <Col>
-              <h1 style={{textAlign: 'left'}}>Start connecting with professionals today.</h1>
+              <h1 style={{textAlign: 'left'}}>{t.startConnecting}</h1>
               <div className="mt-4">
                 <Button as={NavLink} to="/Register" variant="dark">
-                Get Started
+                {t.getStarted}
               </Button>
             </div>
           </Col>

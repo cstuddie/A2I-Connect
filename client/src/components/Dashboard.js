@@ -3,9 +3,11 @@ import { NavLink, Link, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button, Card, Badge, Navbar, Nav, NavDropdown, Form, FormControl } from 'react-bootstrap';
 import { FaUserCircle, FaSearch, FaEnvelope } from 'react-icons/fa';
 import { formatLocalDate } from '../utils/dateUtils';
+import useTranslation from '../utils/useTranslation';
 import "./Base.css";
 
 export function UserHeader() {
+  const t = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
@@ -15,6 +17,7 @@ export function UserHeader() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userID');
+    localStorage.removeItem('preferredLanguage');
     window.location.href = '/login';
   }
 
@@ -56,16 +59,16 @@ export function UserHeader() {
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="me-auto">
           <Nav.Link as={Link} to="/Dashboard">
-            Home
+            {t.home}
           </Nav.Link>
           <Nav.Link as={Link} to="/Calendar">
-            Calendar
+            {t.calendar}
           </Nav.Link>
           <Nav.Link as={Link} to="/RequestSpeaker">
-            Request Speaker
+            {t.requestSpeaker}
           </Nav.Link>
           <Nav.Link as={Link} to="/Search">
-            Browse Events
+            {t.browseEvents}
           </Nav.Link>
         </Nav>
 
@@ -74,7 +77,7 @@ export function UserHeader() {
           <div className="search-wrapper">
             <FormControl
               type="search"
-              placeholder="Search users..."
+              placeholder={t.searchUsers}
               className="search-input"
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
@@ -118,9 +121,9 @@ export function UserHeader() {
             <FaEnvelope size={24} />
           </Nav.Link>
           <NavDropdown title={<FaUserCircle size={40} />} id="basic-nav-dropdown">
-            <NavDropdown.Item href="/EditProfile" className='custom-dropdown-link'>Account</NavDropdown.Item>
+            <NavDropdown.Item href="/EditProfile" className='custom-dropdown-link'>{t.account}</NavDropdown.Item>
             <NavDropdown.Divider />
-            <NavDropdown.Item onClick={handleLogout} className='custom-dropdown-link'>Logout</NavDropdown.Item>
+            <NavDropdown.Item onClick={handleLogout} className='custom-dropdown-link'>{t.logout}</NavDropdown.Item>
           </NavDropdown>
         </Nav>
       </Navbar.Collapse>
@@ -129,6 +132,7 @@ export function UserHeader() {
 };
 
 export function EventCard({ eventID, topic, instructor, requester, date, course }) {
+  const t = useTranslation();
   return (
     <Card className="h-100 shadow-sm">
       <Card.Body>
@@ -137,22 +141,22 @@ export function EventCard({ eventID, topic, instructor, requester, date, course 
         </Card.Title>
 
         <Card.Text className="mb-2">
-          <Badge bg="dark" className="me-2">Instructor</Badge>
+          <Badge bg="dark" className="me-2">{t.instructor}</Badge>
           {instructor}
         </Card.Text>
 
         <Card.Text className="mb-2">
-          <Badge bg="dark" className="me-2">Requester</Badge>
+          <Badge bg="dark" className="me-2">{t.requester}</Badge>
           {requester}
         </Card.Text>
 
         <Card.Text className="mb-2">
-          <Badge bg="dark" className="me-2">Course</Badge>
+          <Badge bg="dark" className="me-2">{t.course}</Badge>
           {course}
         </Card.Text>
 
         <Card.Text>
-          <Badge bg="dark" className="me-2">Date</Badge>
+          <Badge bg="dark" className="me-2">{t.date}</Badge>
           {formatLocalDate(date)}
         </Card.Text>
       </Card.Body>
@@ -169,7 +173,7 @@ const InterestCard = ({ title }) => {
 };
 
 const Dashboard = () => {
-  // Changes the current user (keeping main's comment but using auth logic)
+  const t = useTranslation();
   const userID = localStorage.getItem('userID') || 2;
 
   const [profileInfo, setProfileInfo] = useState({
@@ -280,8 +284,8 @@ const Dashboard = () => {
 
         {/* Recommended Events */}
         <section className="mb-5">
-          <h2 className="mb-4" style={{ textAlign: 'left' }}>Opportunities for You!</h2>
-          <p className="text-muted">Find events based on topics and courses you're interested in.</p>
+          <h2 className="mb-4" style={{ textAlign: 'left' }}>{t.opportunitiesTitle}</h2>
+          <p className="text-muted">{t.opportunitiesSubtitle}</p>
           {recommendedEvents.length > 0 ? (
             <Row className="g-4">
               <div className='card-container'>
@@ -300,14 +304,14 @@ const Dashboard = () => {
               </div>
             </Row>
           ) : (
-            <p className="text-muted fst-italic">No recommended events.</p>
+            <p className="text-muted fst-italic">{t.noRecommended}</p>
           )}
         </section>
 
         {/* Upcoming Events */}
         <section className="mb-5">
-          <h2 className="mb-4" style={{ textAlign: 'left' }}>Your Upcoming Events.</h2>
-          <p className="text-muted">Events that you are participating in.</p>
+          <h2 className="mb-4" style={{ textAlign: 'left' }}>{t.upcomingTitle}</h2>
+          <p className="text-muted">{t.upcomingSubtitle}</p>
           <Row className="g-4">
             <div className='card-container'>
               {upcomingEvents.map((event) => (
@@ -328,8 +332,8 @@ const Dashboard = () => {
 
         {/* Interests */}
         <section>
-          <h2 className="mb-4" style={{ textAlign: 'left' }}>Your Topics.</h2>
-          <p className="text-muted">Topics that you are interested in.</p>
+          <h2 className="mb-4" style={{ textAlign: 'left' }}>{t.topicsTitle}</h2>
+          <p className="text-muted">{t.topicsSubtitle}</p>
           <div className="d-flex flex-wrap gap-3">
             {trueInterests.map((interest, key) => (
               <InterestCard key={key} title={interest} />
