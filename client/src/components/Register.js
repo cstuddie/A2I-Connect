@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Form, Button, Container, Row, Col, Tabs, Tab, Nav, Navbar } from 'react-bootstrap';
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import t from '../utils/registerTranslations';
-import './Base.css';
+import './LandingPage.css'
+import './Register.css'
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -118,241 +119,233 @@ const Register = () => {
     else if (activeTab === 'third') setActiveTab('second');
   };
 
+  const steps = ['first', 'second'];
+  const currentStep = steps.indexOf(activeTab) + 1;
+
   return (
-    <div>
-      <Navbar bg="white" variant="light" expand="lg" sticky="top" className='border-bottom'>
-        <Navbar.Brand as={Link} to="/">
-          <h1>A2I Connect</h1>
-        </Navbar.Brand>
-        <Nav className="ms-auto">
-          <NavLink to="/Login" className="nav-link me-3">
-            {lang.alreadyHaveAccount}
-          </NavLink>
-        </Nav>
-      </Navbar>
+    <div className='auth-root'>
 
-      <Container>
-        <h1 style={{ textAlign: 'center' }}>{lang.pageTitle}</h1>
-        <p style={{ textAlign: 'center' }}>{lang.pageSubtitle}</p>
+      {/* Navbar */}
 
-        {error && (
-          <div style={{
-            color: 'red',
-            backgroundColor: '#ffe6e6',
-            padding: '10px',
-            marginBottom: '15px',
-            borderRadius: '5px',
-            textAlign: 'center'
-          }}>
-            {error}
-          </div>
-        )}
-
-        <div className="form-container">
-          <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} style={{ display: 'none' }}>
-            <Tab eventKey="first" title="Part 1">
-              <Form onSubmit={(e) => { e.preventDefault(); handleNext(); }} className="mt-4">
-                <Row>
-                  <Col md={4}>
-                    <p className='text-muted'>{lang.step1of2}</p>
-                    <p><strong>{lang.step1desc}</strong></p>
-                    <p>{lang.step1subdesc}</p>
-                  </Col>
-                  <Col md={8}>
-                    <Form.Group className="mb-3">
-                      <Form.Label style={{ color: 'black' }}>{lang.firstName}</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="firstName"
-                        value={formData.firstName}
-                        placeholder="John"
-                        required
-                        onChange={handleChange}
-                      />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                      <Form.Label style={{ color: 'black' }}>{lang.lastName}</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="lastName"
-                        value={formData.lastName}
-                        placeholder="Doe"
-                        required
-                        onChange={handleChange}
-                      />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                      <Form.Label style={{ color: 'black' }}>{lang.email}</Form.Label>
-                      <Form.Control
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        placeholder="example@domain.com"
-                        required
-                        onChange={handleChange}
-                      />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                      <Form.Label style={{ color: 'black' }}>{lang.password}</Form.Label>
-                      <Form.Control
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        placeholder="Enter a password"
-                        required
-                        minLength={8}
-                        onChange={handleChange}
-                      />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                      <Form.Label style={{ color: 'black' }}>{lang.confirmPassword}</Form.Label>
-                      <Form.Control
-                        type="password"
-                        name="confirmPassword"
-                        value={formData.confirmPassword}
-                        placeholder="Confirm your password"
-                        required
-                        onChange={handleChange}
-                      />
-                    </Form.Group>
-
-                    <Form.Group className="mb-3">
-                      <Form.Label style={{ color: 'black' }}>{lang.preferredLanguage}</Form.Label>
-                      <Form.Select
-                        name="preferredLanguage"
-                        value={formData.preferredLanguage}
-                        onChange={handleChange}
-                      >
-                        <option value="en">English</option>
-                        <option value="es">Español (Spanish)</option>
-                        <option value="fr">Français (French)</option>
-                        <option value="de">Deutsch (German)</option>
-                        <option value="it">Italiano (Italian)</option>
-                        <option value="nl">Nederlands (Dutch)</option>
-                        <option value="pl">Polski (Polish)</option>
-                        <option value="ro">Română (Romanian)</option>
-                        <option value="sv">Svenska (Swedish)</option>
-                        <option value="uk">Українська (Ukrainian)</option>
-                        <option value="ru">Русский (Russian)</option>
-                        <option value="ar">العربية (Arabic)</option>
-                        <option value="fa">فارسی (Persian)</option>
-                        <option value="ur">اردو (Urdu)</option>
-                        <option value="hi">हिन्दी (Hindi)</option>
-                        <option value="bn">বাংলা (Bengali)</option>
-                        <option value="zh">中文简体 (Chinese Simplified)</option>
-                        <option value="zh-TW">中文繁體 (Chinese Traditional)</option>
-                        <option value="ja">日本語 (Japanese)</option>
-                        <option value="ko">한국어 (Korean)</option>
-                        <option value="th">ภาษาไทย (Thai)</option>
-                        <option value="vi">Tiếng Việt (Vietnamese)</option>
-                        <option value="id">Bahasa Indonesia (Indonesian)</option>
-                        <option value="ms">Bahasa Melayu (Malay)</option>
-                        <option value="tl">Filipino (Tagalog)</option>
-                        <option value="sw">Kiswahili (Swahili)</option>
-                        <option value="pt">Português (Portuguese)</option>
-                        <option value="tr">Türkçe (Turkish)</option>
-                      </Form.Select>
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <div className="d-flex justify-content-end mt-3">
-                  <Button variant="dark" type="submit">
-                    {lang.next}
-                  </Button>
-                </div>
-              </Form>
-            </Tab>
-
-            <Tab eventKey="second" title="Part 2">
-              <Form onSubmit={handleSubmit} className="mt-3">
-                <Row>
-                  <Col md={4}>
-                    <p className='text-muted'>{lang.step2of2}</p>
-                    <p><strong>{lang.step2desc}</strong></p>
-                    <p>{lang.step2subdesc}</p>
-                  </Col>
-                  <Col md={8}>
-                    <Form.Group as={Row} className="mb-3">
-                      <Form.Label column sm="2">{lang.role}</Form.Label>
-                      <Col sm="10">
-                        <Form.Select
-                          name="role"
-                          value={formData.role}
-                          onChange={handleChange}
-                          required
-                        >
-                          <option value={1}>{lang.roleUser}</option>
-                          <option value={2}>{lang.roleExpert}</option>
-                        </Form.Select>
-                      </Col>
-                    </Form.Group>
-
-                    <Form.Group as={Row} className="mb-3">
-                      <Form.Label column sm="2">{lang.expertise}</Form.Label>
-                      <Col sm="10">
-                        <Form.Select
-                          name="expertiseID"
-                          value={formData.expertiseID}
-                          onChange={handleChange}
-                          required
-                        >
-                          <option value="">{lang.selectExpertise}</option>
-                          <option value={1}>Web Development</option>
-                          <option value={2}>Data Science</option>
-                          <option value={3}>AI & Machine Learning</option>
-                          <option value={4}>Cybersecurity</option>
-                        </Form.Select>
-                      </Col>
-                    </Form.Group>
-
-                    <Form.Group as={Row} className="mb-3">
-                      <Form.Label column sm="2">{lang.affiliation}</Form.Label>
-                      <Col sm="10">
-                        <Form.Control
-                          type="text"
-                          name="affiliation"
-                          value={formData.affiliation}
-                          placeholder={lang.affiliationPlaceholder}
-                          onChange={handleChange}
-                          required
-                        />
-                      </Col>
-                    </Form.Group>
-
-                    <Form.Group as={Row} className="mb-3">
-                      <Form.Label column sm="2">{lang.bio}</Form.Label>
-                      <Col sm="10">
-                        <Form.Control
-                          as="textarea"
-                          name="bio"
-                          value={formData.bio}
-                          style={{ height: '100px', resize: 'none' }}
-                          placeholder={lang.bioPlaceholder}
-                          onChange={handleChange}
-                          required
-                        />
-                      </Col>
-                    </Form.Group>
-                  </Col>
-                </Row>
-
-                <div className="d-flex justify-content-between mt-3">
-                  <Button variant="secondary" onClick={handlePrevious}>
-                    {lang.previous}
-                  </Button>
-                  <Button variant="success" type="submit">
-                    {lang.submit}
-                  </Button>
-                </div>
-              </Form>
-            </Tab>
-          </Tabs>
+      <nav className='landing-nav'>
+        <Link to="/" className='nav-logo'>A2I Connect</Link>
+        <div className='nav-links'>
+          <NavLink to="/login" className="nav-link-text">{lang.alreadyHaveAccount}</NavLink>
         </div>
-      </Container>
+      </nav>
+
+      <div className='auth-wrapper reg-wrapper'>
+        <div className='auth-card reg-card'>
+
+          {/* Header */}
+          <div className='auth-header'>
+            <h1 className='auth-title'>{lang.pageTitle}</h1>
+            <p className='auth-sub'>{lang.pageSubtitle}</p>
+          </div>
+
+          {/* Step Indicator */}
+          <div className="reg-steps">
+            <div className={`reg-step ${activeTab === 'first' ? 'active' : currentStep > 1 ? 'done' : ''}`}>
+              <div className="reg-step-dot">{currentStep > 1 ? '✓' : '1'}</div>
+              <span>Account</span>
+            </div>
+            <div className="reg-step-line" />
+            <div className={`reg-step ${activeTab === 'second' ? 'active' : ''}`}>
+              <div className="reg-step-dot">2</div>
+              <span>Profile</span>
+            </div>
+          </div>
+
+          {/* Error */}
+          {error && <div className='auth-error'>{error}</div>}
+
+          {/* Step 1 */}
+          {activeTab === 'first' && (
+            <form onSubmit={(e) => { e.preventDefault(); handleNext(); }} className="auth-form">
+ 
+              <div className="reg-row">
+                <div className="auth-field">
+                  <label className="auth-label">{lang.firstName}</label>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    className="auth-input"
+                    placeholder="John"
+                    required
+                  />
+                </div>
+                <div className="auth-field">
+                  <label className="auth-label">{lang.lastName}</label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="auth-input"
+                    placeholder="Doe"
+                    required
+                  />
+                </div>
+              </div>
+ 
+              <div className="auth-field">
+                <label className="auth-label">{lang.email}</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="auth-input"
+                  placeholder="example@domain.com"
+                  required
+                />
+              </div>
+ 
+              <div className="auth-field">
+                <label className="auth-label">{lang.password}</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="auth-input"
+                  placeholder="Min. 8 characters"
+                  minLength={8}
+                  required
+                />
+              </div>
+ 
+              <div className="auth-field">
+                <label className="auth-label">{lang.confirmPassword}</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="auth-input"
+                  placeholder="Confirm your password"
+                  required
+                />
+              </div>
+ 
+              <div className="auth-field">
+                <label className="auth-label">{lang.preferredLanguage}</label>
+                <select
+                  name="preferredLanguage"
+                  value={formData.preferredLanguage}
+                  onChange={handleChange}
+                  className="auth-input auth-select"
+                >
+                  <option value="en">English</option>
+                  <option value="es">Español (Spanish)</option>
+                  <option value="fr">Français (French)</option>
+                  <option value="de">Deutsch (German)</option>
+                  <option value="it">Italiano (Italian)</option>
+                  <option value="nl">Nederlands (Dutch)</option>
+                  <option value="pl">Polski (Polish)</option>
+                  <option value="ro">Română (Romanian)</option>
+                  <option value="sv">Svenska (Swedish)</option>
+                  <option value="uk">Українська (Ukrainian)</option>
+                  <option value="ru">Русский (Russian)</option>
+                  <option value="ar">العربية (Arabic)</option>
+                  <option value="fa">فارسی (Persian)</option>
+                  <option value="ur">اردو (Urdu)</option>
+                  <option value="hi">हिन्दी (Hindi)</option>
+                  <option value="bn">বাংলা (Bengali)</option>
+                  <option value="zh">中文简体 (Chinese Simplified)</option>
+                  <option value="zh-TW">中文繁體 (Chinese Traditional)</option>
+                  <option value="ja">日本語 (Japanese)</option>
+                  <option value="ko">한국어 (Korean)</option>
+                  <option value="th">ภาษาไทย (Thai)</option>
+                  <option value="vi">Tiếng Việt (Vietnamese)</option>
+                  <option value="id">Bahasa Indonesia (Indonesian)</option>
+                  <option value="ms">Bahasa Melayu (Malay)</option>
+                  <option value="tl">Filipino (Tagalog)</option>
+                  <option value="sw">Kiswahili (Swahili)</option>
+                  <option value="pt">Português (Portuguese)</option>
+                  <option value="tr">Türkçe (Turkish)</option>
+                </select>
+              </div>
+ 
+              <button type="submit" className="auth-submit-btn">{lang.next}</button>
+            </form>
+          )}
+
+          {/* Step 2 */}
+          {activeTab === 'second' && (
+            <form onSubmit={handleSubmit} className="auth-form">
+ 
+              <div className="auth-field">
+                <label className="auth-label">{lang.role}</label>
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="auth-input auth-select"
+                  required
+                >
+                  <option value={1}>{lang.roleUser}</option>
+                  <option value={2}>{lang.roleExpert}</option>
+                </select>
+              </div>
+ 
+              <div className="auth-field">
+                <label className="auth-label">{lang.expertise}</label>
+                <select
+                  name="expertiseID"
+                  value={formData.expertiseID}
+                  onChange={handleChange}
+                  className="auth-input auth-select"
+                  required
+                >
+                  <option value="">{lang.selectExpertise}</option>
+                  <option value={1}>Web Development</option>
+                  <option value={2}>Data Science</option>
+                  <option value={3}>AI & Machine Learning</option>
+                  <option value={4}>Cybersecurity</option>
+                </select>
+              </div>
+ 
+              <div className="auth-field">
+                <label className="auth-label">{lang.affiliation}</label>
+                <input
+                  type="text"
+                  name="affiliation"
+                  value={formData.affiliation}
+                  onChange={handleChange}
+                  className="auth-input"
+                  placeholder={lang.affiliationPlaceholder}
+                  required
+                />
+              </div>
+ 
+              <div className="auth-field">
+                <label className="auth-label">{lang.bio}</label>
+                <textarea
+                  name="bio"
+                  value={formData.bio}
+                  onChange={handleChange}
+                  className="auth-input auth-textarea"
+                  placeholder={lang.bioPlaceholder}
+                  required
+                />
+              </div>
+ 
+              <div className="reg-btn-row">
+                <button type="button" className="auth-back-btn" onClick={handlePrevious}>
+                  ← {lang.previous}
+                </button>
+                <button type="submit" className="auth-submit-btn reg-submit">
+                  {lang.submit}
+                </button>
+              </div>
+            </form>
+          )}
+
+        </div>
+      </div>
     </div>
   );
 };

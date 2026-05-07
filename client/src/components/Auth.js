@@ -81,8 +81,7 @@ function Auth() {
       <nav className="landing-nav">
         <Link to="/" className="nav-logo">A2I Connect</Link>
         <div className="nav-links">
-          <NavLink to="/login" className="nav-link-text">Log in</NavLink>
-          <NavLink to="/Register" className="nav-btn-outline">Sign up</NavLink>
+          <NavLink to="/Register" className="nav-link-text">Don't have an account?</NavLink>
         </div>
       </nav>
 

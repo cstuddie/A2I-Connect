@@ -1,0 +1,135 @@
+/* =====================
+   Register.css
+   ===================== */
+
+.reg-wrapper {
+  align-items: flex-start;
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+
+.reg-card {
+  max-width: 560px;
+}
+
+/* ---- Step Indicator ---- */
+.reg-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 28px;
+}
+
+.reg-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.reg-step.active {
+  color: var(--dark);
+}
+
+.reg-step.done {
+  color: var(--green-dark);
+}
+
+.reg-step-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--white);
+  color: var(--muted);
+  transition: all 0.2s;
+}
+
+.reg-step.active .reg-step-dot {
+  border-color: var(--green-dark);
+  background: var(--green-dark);
+  color: white;
+}
+
+.reg-step.done .reg-step-dot {
+  border-color: var(--green-dark);
+  background: var(--green-light);
+  color: var(--green-dark);
+}
+
+.reg-step-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  margin: 0 12px;
+}
+
+/* ---- Two-column row for first/last name ---- */
+.reg-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ---- Select styling ---- */
+.auth-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a9585' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  cursor: pointer;
+}
+
+/* ---- Textarea ---- */
+.auth-textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+}
+
+/* ---- Button row for step 2 ---- */
+.reg-btn-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.auth-back-btn {
+  padding: 13px 20px;
+  background: transparent;
+  color: var(--dark);
+  font-size: 0.95rem;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.auth-back-btn:hover {
+  border-color: var(--dark);
+  background: var(--surface);
+}
+
+.reg-submit {
+  flex: 1;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 480px) {
+  .reg-row {
+    grid-template-columns: 1fr;
+  }
+  .reg-card {
+    padding: 28px 20px;
+  }
+}
