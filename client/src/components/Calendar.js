@@ -21,7 +21,7 @@ const Calendar = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const eventsResponse = await fetch(`http://localhost:3001/events/${userID}`);
+                const eventsResponse = await fetch(`http://localhost:3001/events/user/${userID}`);
                 const eventsData = await eventsResponse.json();
                 setEvents(Array.isArray(eventsData) ? eventsData : []);
 
