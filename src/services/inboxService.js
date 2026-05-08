@@ -5,6 +5,7 @@ exports.getAllConversations = async (userID) => {
   const latestMessageSubquery = db('Message as m1')
     .select('m1.ConversationID')
     .max('m1.TimeStamp as LatestTimeStamp')
+    .max('m1.ID as LatestMessageID')
     .groupBy('m1.ConversationID')
     .as('lm');
 
@@ -14,11 +15,10 @@ exports.getAllConversations = async (userID) => {
           .orWhere('c.RecieverID', userID);
     })
 
-    .leftJoin(latestMessageSubquery, 'c.ID', 'lm.ConversationID')  // MUST be leftJoin
+    .leftJoin(latestMessageSubquery, 'c.ID', 'lm.ConversationID')
 
-    .leftJoin('Message as m', function () {  // MUST be leftJoin
-      this.on('m.ConversationID', '=', 'c.ID')
-          .andOn('m.TimeStamp', '=', 'lm.LatestTimeStamp');
+    .leftJoin('Message as m', function () {
+      this.on('m.ID', '=', 'lm.LatestMessageID');
     })
 
     .join('User as u', function () {
