@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { Container, Row, Col, Button, Card, Badge, Navbar, Nav, NavDropdown, Form, FormControl } from 'react-bootstrap';
-import { FaUserCircle, FaSearch, FaEnvelope } from 'react-icons/fa';
+import { FaUserCircle, FaSearch, FaEnvelope, FaChevronDown, FaSignOutAlt, FaUserEdit } from 'react-icons/fa';
 import { formatLocalDate } from '../utils/dateUtils';
 import useTranslation from '../utils/useTranslation';
 import NotificationWidget from './NotificationWidget';
-import "./Base.css";
+import "./LandingPage.css";
+import "./Dashboard.css";
 
 export function UserHeader() {
   const t = useTranslation();
@@ -13,6 +13,8 @@ export function UserHeader() {
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -20,18 +22,15 @@ export function UserHeader() {
     localStorage.removeItem('userID');
     localStorage.removeItem('preferredLanguage');
     window.location.href = '/login';
-  }
+  };
 
-  // Search for users
   const handleSearch = async (query) => {
     setSearchQuery(query);
-
     if (!query.trim()) {
       setSearchResults([]);
       setShowResults(false);
       return;
     }
-
     try {
       setSearching(true);
       const response = await fetch(`http://localhost:3001/users/search?q=${query}`);
@@ -48,151 +47,132 @@ export function UserHeader() {
   const handleResultClick = (userId) => {
     setShowResults(false);
     setSearchQuery('');
-    navigate(`/profile/${userId}`);  // Navigate to profile page
+    navigate(`/profile/${userId}`);
   };
 
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
   return (
-    <Navbar bg="white" variant="light" expand="lg" sticky="top" className='border-bottom'>
-      <Navbar.Brand as={Link} to="/Dashboard">
-        <h1>A2I Connect</h1>
-      </Navbar.Brand>
-      <Navbar.Toggle aria-controls="basic-navbar-nav" />
-      <Navbar.Collapse id="basic-navbar-nav">
-        <Nav className="me-auto">
-          <Nav.Link as={Link} to="/Dashboard">
-            {t.home}
-          </Nav.Link>
-          <Nav.Link as={Link} to="/Calendar">
-            {t.calendar}
-          </Nav.Link>
-          <Nav.Link as={Link} to="/RequestSpeaker">
-            {t.requestSpeaker}
-          </Nav.Link>
-          <Nav.Link as={Link} to="/Search">
-            {t.browseEvents}
-          </Nav.Link>
-        </Nav>
+    <nav className="dash-nav">
+      {/* Left: Logo + Nav Links */}
+      <div className="dash-nav-left">
+        <Link to="/Dashboard" className="nav-logo">A2I Connect</Link>
+        <div className="dash-nav-links">
+          <Link to="/Dashboard" className="dash-nav-link">{t.home}</Link>
+          <Link to="/Calendar" className="dash-nav-link">{t.calendar}</Link>
+          <Link to="/RequestSpeaker" className="dash-nav-link">{t.requestSpeaker}</Link>
+          <Link to="/Search" className="dash-nav-link">{t.browseEvents}</Link>
+        </div>
+      </div>
 
-        {/* Search Bar */}
-        <Form className="d-flex mx-3 position-relative search-form">
-          <div className="search-wrapper">
-            <FormControl
-              type="search"
-              placeholder={t.searchUsers}
-              className="search-input"
-              value={searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              onBlur={() => setTimeout(() => setShowResults(false), 200)}
-            />
-            <FaSearch className="search-icon" />
-
-            {/* Search Results Dropdown */}
-            {showResults && (
-              <div className="search-results-dropdown">
-                {searching && (
-                  <div className="search-result-item searching">Searching...</div>
-                )}
-
-                {!searching && searchResults.length === 0 && (
-                  <div className="search-result-item no-results">No users found</div>
-                )}
-
-                {!searching && searchResults.map(user => (
-                  <div
-                    key={user.ID}
-                    className="search-result-item"
-                    onClick={() => handleResultClick(user.ID)}
-                  >
-                    <div className="search-result-name">
-                      {user.FirstName} {user.LastName}
-                    </div>
-                    <div className="search-result-details">
-                      {user.Affiliation && <span>{user.Affiliation}</span>}
-                      {user.Email && <span className="text-muted"> • {user.Email}</span>}
-                    </div>
-                  </div>
-                ))}
-              </div>
+      {/* Center: Search */}
+      <div className="dash-search-wrapper">
+        <FaSearch className="dash-search-icon" />
+        <input
+          type="search"
+          placeholder={t.searchUsers}
+          className="dash-search-input"
+          value={searchQuery}
+          onChange={(e) => handleSearch(e.target.value)}
+          onBlur={() => setTimeout(() => setShowResults(false), 200)}
+        />
+        {showResults && (
+          <div className="dash-search-results">
+            {searching && <div className="dash-search-item muted">Searching...</div>}
+            {!searching && searchResults.length === 0 && (
+              <div className="dash-search-item muted">No users found</div>
             )}
+            {!searching && searchResults.map(user => (
+              <div key={user.ID} className="dash-search-item" onClick={() => handleResultClick(user.ID)}>
+                <div className="dash-search-name">{user.FirstName} {user.LastName}</div>
+                {user.Affiliation && (
+                  <div className="dash-search-sub">{user.Affiliation}{user.Email ? ` • ${user.Email}` : ''}</div>
+                )}
+              </div>
+            ))}
           </div>
-        </Form>
+        )}
+      </div>
 
-        <Nav className="ms-auto">
-          <Nav.Link as={Link} to="/Inbox">
-            <FaEnvelope size={24} />
-          </Nav.Link>
-          <NotificationWidget />
-          <NavDropdown title={<FaUserCircle size={40} />} id="basic-nav-dropdown">
-            <NavDropdown.Item href="/EditProfile" className='custom-dropdown-link'>{t.account}</NavDropdown.Item>
-            <NavDropdown.Divider />
-            <NavDropdown.Item onClick={handleLogout} className='custom-dropdown-link'>{t.logout}</NavDropdown.Item>
-          </NavDropdown>
-        </Nav>
-      </Navbar.Collapse>
-    </Navbar>
+      {/* Right: Icons + Avatar */}
+      <div className="dash-nav-right">
+        <Link to="/Inbox" className="dash-icon-btn" title="Inbox">
+          <FaEnvelope size={18} />
+        </Link>
+        <NotificationWidget />
+        <div className="dash-avatar-wrapper" ref={dropdownRef}>
+          <button className="dash-avatar-btn" onClick={() => setDropdownOpen(o => !o)}>
+            <FaUserCircle size={30} />
+            <FaChevronDown size={11} />
+          </button>
+          {dropdownOpen && (
+            <div className="dash-dropdown">
+              <Link to="/EditProfile" className="dash-dropdown-item" onClick={() => setDropdownOpen(false)}>
+                <FaUserEdit size={14} />
+                {t.account}
+              </Link>
+              <div className="dash-dropdown-divider" />
+              <button className="dash-dropdown-item danger" onClick={handleLogout}>
+                <FaSignOutAlt size={14} />
+                {t.logout}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </nav>
   );
-};
+}
 
 export function EventCard({ eventID, topic, instructor, requester, date, course }) {
   const t = useTranslation();
   return (
-    <Card className="h-100 shadow-sm">
-      <Card.Body>
-        <Card.Title as={Link} to={`/events/${eventID}`} className="text-decoration-none">
-          <b>{topic}</b>
-        </Card.Title>
-
-        <Card.Text className="mb-2">
-          <Badge bg="dark" className="me-2">{t.instructor}</Badge>
-          {instructor}
-        </Card.Text>
-
-        <Card.Text className="mb-2">
-          <Badge bg="dark" className="me-2">{t.requester}</Badge>
-          {requester}
-        </Card.Text>
-
-        <Card.Text className="mb-2">
-          <Badge bg="dark" className="me-2">{t.course}</Badge>
-          {course}
-        </Card.Text>
-
-        <Card.Text>
-          <Badge bg="dark" className="me-2">{t.date}</Badge>
-          {formatLocalDate(date)}
-        </Card.Text>
-      </Card.Body>
-    </Card>
+    <Link to={`/events/${eventID}`} className="event-card">
+      <div className="event-card-topic">{topic}</div>
+      <div className="event-card-meta">
+        <span className="event-meta-label">{t.instructor}</span>
+        <span className="event-meta-value">{instructor}</span>
+      </div>
+      <div className="event-card-meta">
+        <span className="event-meta-label">{t.requester}</span>
+        <span className="event-meta-value">{requester}</span>
+      </div>
+      <div className="event-card-meta">
+        <span className="event-meta-label">{t.course}</span>
+        <span className="event-meta-value">{course}</span>
+      </div>
+      <div className="event-card-footer">
+        <span className="event-date">{formatLocalDate(date)}</span>
+      </div>
+    </Link>
   );
-};
+}
 
-const InterestCard = ({ title }) => {
-  return (
-    <Badge bg="light" text="dark" className="fs-6 px-3 py-2 shadow-sm">
-      {title}
-    </Badge>
-  );
-};
+const InterestTag = ({ title }) => (
+  <span className="interest-tag">{title}</span>
+);
 
 const Dashboard = () => {
   const t = useTranslation();
   const userID = localStorage.getItem('userID') || 2;
 
-  const [profileInfo, setProfileInfo] = useState({
-    name: 'Profile',
-    interests: '',
-    history: '',
-    expertise: '',
-    affiliation: '',
-  });
-
+  const [profileInfo, setProfileInfo] = useState({ name: 'Profile', interests: '', history: '', expertise: '', affiliation: '' });
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [requesterNameMap, setRequesterNameMap] = useState({});
   const [instructorNameMap, setInstructorNameMap] = useState({});
   const [recommendedEvents, setRecommendedEvents] = useState([]);
   const [recommendedRequesterNameMap, setRecommendedRequesterNameMap] = useState({});
   const [recommendedInstructorNameMap, setRecommendedInstructorNameMap] = useState({});
-  const [trueInterests, setTrueInterests] = useState([])
+  const [trueInterests, setTrueInterests] = useState([]);
   const [expertiseMap, setExpertiseMap] = useState({});
 
   useEffect(() => {
@@ -201,68 +181,44 @@ const Dashboard = () => {
         const res = await fetch('http://localhost:3001/users/expertise/');
         const data = await res.json();
         const map = {};
-        data.forEach(item => {
-          map[item.ID] = item.Title;
-        });
+        data.forEach(item => { map[item.ID] = item.Title; });
         setExpertiseMap(map);
-      } catch (e) {
-        console.error('Error fetching expertise:', e);
-      }
+      } catch (e) { console.error('Error fetching expertise:', e); }
     };
     fetchExpertise();
   }, []);
 
-  // Fetches info for the profile
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const response = await fetch(`http://localhost:3001/users/${userID}`);
         const data = await response.json();
-        if (data && data.length > 0) {
-          setProfileInfo(data[0]);
-        }
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-      }
+        if (data && data.length > 0) setProfileInfo(data[0]);
+      } catch (error) { console.error('Error fetching profile:', error); }
     };
     fetchProfile();
   }, [userID]);
 
   const fetchProfileNames = async (events, setRequesterNames, setInstructorNames) => {
-    const requesterIds = new Set(events.map(event => event.RequesterID).filter(id => id));
-    const instructorIds = new Set(events.map(event => event.InstructorID).filter(id => id));
-
-    const requesterNameMap = {};
-    const instructorNameMap = {};
-
-    for (const requesterId of requesterIds) {
+    const requesterIds = new Set(events.map(e => e.RequesterID).filter(Boolean));
+    const instructorIds = new Set(events.map(e => e.InstructorID).filter(Boolean));
+    const rMap = {}, iMap = {};
+    for (const id of requesterIds) {
       try {
-        const profileResponse = await fetch(`http://localhost:3001/users/${requesterId}`);
-        const profileData = await profileResponse.json();
-        requesterNameMap[requesterId] = profileData && profileData.FirstName
-          ? `${profileData.FirstName} ${profileData.LastName}`
-          : "Unknown Requester";
-      } catch (error) {
-        console.error(`Error fetching requester profile for ${requesterId}:`, error);
-        requesterNameMap[requesterId] = "Unknown Requester";
-      }
+        const res = await fetch(`http://localhost:3001/users/${id}`);
+        const d = await res.json();
+        rMap[id] = d?.FirstName ? `${d.FirstName} ${d.LastName}` : 'Unknown';
+      } catch { rMap[id] = 'Unknown'; }
     }
-
-    for (const instructorId of instructorIds) {
+    for (const id of instructorIds) {
       try {
-        const profileResponse = await fetch(`http://localhost:3001/users/${instructorId}`);
-        const profileData = await profileResponse.json();
-        instructorNameMap[instructorId] = profileData && profileData.FirstName
-          ? `${profileData.FirstName} ${profileData.LastName}`
-          : "Unknown Instructor";
-      } catch (error) {
-        console.error(`Error fetching instructor profile for ${instructorId}:`, error);
-        instructorNameMap[instructorId] = "Unknown Instructor";
-      }
+        const res = await fetch(`http://localhost:3001/users/${id}`);
+        const d = await res.json();
+        iMap[id] = d?.FirstName ? `${d.FirstName} ${d.LastName}` : 'Unknown';
+      } catch { iMap[id] = 'Unknown'; }
     }
-
-    setRequesterNames(requesterNameMap);
-    setInstructorNames(instructorNameMap);
+    setRequesterNames(rMap);
+    setInstructorNames(iMap);
   };
 
   useEffect(() => {
@@ -272,79 +228,103 @@ const Dashboard = () => {
         const data = await response.json();
         setUpcomingEvents(data);
         fetchProfileNames(data, setRequesterNameMap, setInstructorNameMap);
-      } catch (error) {
-        console.error('Error fetching upcoming events:', error);
-      }
+      } catch (error) { console.error('Error fetching upcoming events:', error); }
     };
     fetchUpcoming();
   }, [userID]);
 
+  const firstName = profileInfo.FirstName || 'there';
+
   return (
-    <div>
-      <UserHeader name={profileInfo.name} />
-      <Container className="py-4">
+    <div className="dash-root">
+      <UserHeader />
+
+      {/* Welcome Banner */}
+      <div className="dash-banner">
+        <div className="dash-banner-inner">
+          <h1 className="dash-banner-title">Welcome back, {firstName}</h1>
+          <p className="dash-banner-sub">Here's what's happening in your network.</p>
+        </div>
+      </div>
+
+      <div className="dash-body">
 
         {/* Recommended Events */}
-        <section className="mb-5">
-          <h2 className="mb-4" style={{ textAlign: 'left' }}>{t.opportunitiesTitle}</h2>
-          <p className="text-muted">{t.opportunitiesSubtitle}</p>
+        <section className="dash-section">
+          <div className="dash-section-header">
+            <div>
+              <h2 className="dash-section-title">{t.opportunitiesTitle}</h2>
+              <p className="dash-section-sub">{t.opportunitiesSubtitle}</p>
+            </div>
+            <Link to="/Search" className="dash-section-cta">Browse all →</Link>
+          </div>
           {recommendedEvents.length > 0 ? (
-            <Row className="g-4">
-              <div className='card-container'>
-                {recommendedEvents.map((event) => (
-                  <Col sm={6} lg={4} key={event.eventID}>
-                    <EventCard
-                      eventID={event.ID}
-                      topic={event.Topic}
-                      requester={requesterNameMap[event.RequesterID] || "TBD"}
-                      instructor={instructorNameMap[event.InstructorID] || "TBD"}
-                      course={expertiseMap[event.ExpertiseID] || "TBD"}
-                      date={event.Date}
-                    />
-                  </Col>
-                ))}
-              </div>
-            </Row>
+            <div className="dash-cards-grid">
+              {recommendedEvents.map(event => (
+                <EventCard
+                  key={event.ID}
+                  eventID={event.ID}
+                  topic={event.Topic}
+                  requester={recommendedRequesterNameMap[event.RequesterID] || 'TBD'}
+                  instructor={recommendedInstructorNameMap[event.InstructorID] || 'TBD'}
+                  course={expertiseMap[event.ExpertiseID] || 'TBD'}
+                  date={event.Date}
+                />
+              ))}
+            </div>
           ) : (
-            <p className="text-muted fst-italic">{t.noRecommended}</p>
+            <p className="dash-empty">{t.noRecommended}</p>
           )}
         </section>
 
         {/* Upcoming Events */}
-        <section className="mb-5">
-          <h2 className="mb-4" style={{ textAlign: 'left' }}>{t.upcomingTitle}</h2>
-          <p className="text-muted">{t.upcomingSubtitle}</p>
-          <Row className="g-4">
-            <div className='card-container'>
-              {upcomingEvents.map((event) => (
-                <Col sm={6} lg={4} key={event.eventID}>
-                  <EventCard
-                    eventID={event.ID}
-                    topic={event.Topic}
-                    requester={requesterNameMap[event.RequesterID] || "TBD"}
-                    instructor={instructorNameMap[event.InstructorID] || "TBD"}
-                    course={expertiseMap[event.ExpertiseID] || "TBD"}
-                    date={event.Date}
-                  />
-                </Col>
+        <section className="dash-section">
+          <div className="dash-section-header">
+            <div>
+              <h2 className="dash-section-title">{t.upcomingTitle}</h2>
+              <p className="dash-section-sub">{t.upcomingSubtitle}</p>
+            </div>
+            
+          </div>
+          {upcomingEvents.length > 0 ? (
+            <div className="dash-cards-grid">
+              {upcomingEvents.map(event => (
+                <EventCard
+                  key={event.ID}
+                  eventID={event.ID}
+                  topic={event.Topic}
+                  requester={requesterNameMap[event.RequesterID] || 'TBD'}
+                  instructor={instructorNameMap[event.InstructorID] || 'TBD'}
+                  course={expertiseMap[event.ExpertiseID] || 'TBD'}
+                  date={event.Date}
+                />
               ))}
             </div>
-          </Row>
+          ) : (
+            <p className="dash-empty">No upcoming events yet.</p>
+          )}
         </section>
 
         {/* Interests */}
-        <section>
-          <h2 className="mb-4" style={{ textAlign: 'left' }}>{t.topicsTitle}</h2>
-          <p className="text-muted">{t.topicsSubtitle}</p>
-          <div className="d-flex flex-wrap gap-3">
-            {trueInterests.map((interest, key) => (
-              <InterestCard key={key} title={interest} />
-            ))}
-          </div>
-        </section>
-      </Container>
+        {trueInterests.length > 0 && (
+          <section className="dash-section">
+            <div className="dash-section-header">
+              <div>
+                <h2 className="dash-section-title">{t.topicsTitle}</h2>
+                <p className="dash-section-sub">{t.topicsSubtitle}</p>
+              </div>
+            </div>
+            <div className="dash-interests">
+              {trueInterests.map((interest, i) => (
+                <InterestTag key={i} title={interest} />
+              ))}
+            </div>
+          </section>
+        )}
+
+      </div>
     </div>
   );
 };
 
-export default Dashboard; 
+export default Dashboard;
