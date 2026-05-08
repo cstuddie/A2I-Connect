@@ -1,0 +1,251 @@
+/* =====================
+   ManageProfile.css
+   ===================== */
+
+/* ---- Layout ---- */
+.mp-body {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 3%;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+/* ---- Sidebar ---- */
+.mp-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 80px;
+}
+
+.mp-tab-btn {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--mid);
+  background: none;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mp-tab-btn:hover {
+  background: var(--surface);
+  color: var(--dark);
+}
+.mp-tab-btn.active {
+  background: var(--green-light);
+  color: var(--green-dark);
+  font-weight: 600;
+}
+
+/* ---- Panel ---- */
+.mp-panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.mp-panel-header {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mp-panel-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.6rem;
+  letter-spacing: -0.02em;
+  color: var(--dark);
+  margin-bottom: 4px;
+}
+
+.mp-panel-sub {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+/* ---- Form Actions ---- */
+.mp-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+.mp-save-btn {
+  width: auto;
+  padding: 11px 28px;
+}
+
+/* ---- Field Error ---- */
+.input-error {
+  border-color: #e74c3c !important;
+}
+
+.field-error {
+  font-size: 0.8rem;
+  color: #e74c3c;
+  margin-top: 2px;
+}
+
+/* ---- Success Message ---- */
+.mp-success {
+  background: var(--green-light);
+  border: 1px solid #b5ddb0;
+  color: var(--green);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 0.875rem;
+}
+
+/* ---- Sub Sections (Account tab) ---- */
+.mp-sub-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mp-sub-title {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.1rem;
+  color: var(--dark);
+  letter-spacing: -0.01em;
+}
+
+.mp-sub-hint {
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.mp-divider {
+  height: 1px;
+  background: var(--border);
+}
+
+/* ---- Availability Slot Form ---- */
+.mp-slot-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mp-slot-form-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.mp-slot-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+}
+
+.mp-add-slot-btn {
+  align-self: flex-start;
+  padding: 9px 20px;
+  background: var(--white);
+  border: 1.5px solid var(--green-dark);
+  border-radius: var(--radius);
+  color: var(--green-dark);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mp-add-slot-btn:hover {
+  background: var(--green-light);
+}
+
+/* ---- Slot Table ---- */
+.mp-slot-table-wrapper {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.mp-slot-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.mp-slot-table thead {
+  background: var(--surface);
+}
+
+.mp-slot-table th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.mp-slot-table td {
+  padding: 12px 16px;
+  color: var(--dark);
+  border-bottom: 1px solid var(--border);
+}
+
+.mp-slot-table tr:last-child td {
+  border-bottom: none;
+}
+
+.mp-slot-table tr:hover td {
+  background: var(--surface);
+}
+
+.mp-remove-btn {
+  padding: 5px 12px;
+  background: none;
+  border: 1.5px solid #fccfcf;
+  border-radius: var(--radius);
+  color: #c0392b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap; /* add this */
+}
+.mp-remove-btn:hover {
+  background: #fff2f2;
+  border-color: #e74c3c;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .mp-body {
+    grid-template-columns: 1fr;
+  }
+  .mp-sidebar {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .mp-tab-btn {
+    width: auto;
+  }
+  .mp-slot-inputs {
+    grid-template-columns: 1fr;
+  }
+}
