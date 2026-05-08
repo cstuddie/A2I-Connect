@@ -233,8 +233,6 @@ const Dashboard = () => {
     fetchUpcoming();
   }, [userID]);
 
-  const firstName = profileInfo.FirstName || 'there';
-
   return (
     <div className="dash-root">
       <UserHeader />
@@ -242,7 +240,7 @@ const Dashboard = () => {
       {/* Welcome Banner */}
       <div className="dash-banner">
         <div className="dash-banner-inner">
-          <h1 className="dash-banner-title">Welcome back, {firstName}</h1>
+          <h1 className="dash-banner-title">Welcome back!</h1>
           <p className="dash-banner-sub">Here's what's happening in your network.</p>
         </div>
       </div>
