@@ -73,6 +73,7 @@
 .mp-panel-sub {
   font-size: 0.875rem;
   color: var(--muted);
+  text-align: center;
 }
 
 /* ---- Form Actions ---- */
@@ -210,6 +211,19 @@
   border-bottom: none;
 }
 
+.mp-slot-table td:last-child,
+.mp-slot-table th:last-child {
+  width: 110px;
+  text-align: right;
+  overflow: visible;
+}
+
+.mp-slot-table-wrapper {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: visible;
+}
+
 .mp-slot-table tr:hover td {
   background: var(--surface);
 }
@@ -225,8 +239,12 @@
   font-family: 'DM Sans', sans-serif;
   cursor: pointer;
   transition: all 0.15s;
-  white-space: nowrap; /* add this */
+  white-space: nowrap;
+  min-width: 80px;
+  min-height: 32px;
+  overflow: visible;
 }
+
 .mp-remove-btn:hover {
   background: #fff2f2;
   border-color: #e74c3c;

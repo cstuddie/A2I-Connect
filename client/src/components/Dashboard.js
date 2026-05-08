@@ -111,7 +111,7 @@ export function UserHeader() {
         <NotificationWidget />
         <div className="dash-avatar-wrapper" ref={dropdownRef}>
           <button className="dash-avatar-btn" onClick={() => setDropdownOpen(o => !o)}>
-            <FaUserCircle size={30} />
+            <FaUserCircle size={28} />
             <FaChevronDown size={11} />
           </button>
           {dropdownOpen && (
@@ -282,7 +282,7 @@ const Dashboard = () => {
               <h2 className="dash-section-title">{t.upcomingTitle}</h2>
               <p className="dash-section-sub">{t.upcomingSubtitle}</p>
             </div>
-            
+
           </div>
           {upcomingEvents.length > 0 ? (
             <div className="dash-cards-grid">

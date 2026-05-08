@@ -1,0 +1,203 @@
+/* =====================
+   EventDes.css
+   ===================== */
+
+/* ---- Layout ---- */
+.ed-body {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 3%;
+}
+
+.ed-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ---- Card ---- */
+.ed-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ---- Details Grid ---- */
+.ed-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.ed-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ed-detail-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.ed-detail-value {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--dark);
+}
+
+/* ---- Status Badge ---- */
+.ed-status-badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: 20px;
+  width: fit-content;
+  background: var(--surface);
+  color: var(--mid);
+  border: 1px solid var(--border);
+}
+.ed-status-badge.status-1 { background: #fff8e6; color: #b8860b; border-color: #f0d080; }
+.ed-status-badge.status-2 { background: var(--green-light); color: var(--green); border-color: #b5ddb0; }
+.ed-status-badge.status-3 { background: #f0f0f0; color: #666; border-color: #ddd; }
+
+/* ---- Description ---- */
+.ed-description {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+.ed-description-text {
+  font-size: 0.95rem;
+  color: var(--mid);
+  line-height: 1.65;
+}
+
+/* ---- Actions ---- */
+.ed-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+
+.ed-accept-btn {
+  padding: 12px 28px;
+  background: var(--green-dark);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ed-accept-btn:hover:not(:disabled) { background: var(--green); }
+.ed-accept-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.ed-call-btn {
+  padding: 12px 28px;
+  background: var(--dark);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.ed-call-btn:hover { background: #333; }
+
+/* ---- Availability ---- */
+.ed-avail-heading {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+  color: var(--dark);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+
+.ed-avail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.avail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.avail-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mid);
+}
+
+.avail-table-wrapper {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.avail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.avail-table thead {
+  background: var(--surface);
+}
+
+.avail-table th {
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.avail-table td {
+  padding: 9px 12px;
+  color: var(--dark);
+  border-bottom: 1px solid var(--border);
+}
+
+.avail-table tr:last-child td {
+  border-bottom: none;
+}
+
+.avail-table tr:hover td {
+  background: var(--surface);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 640px) {
+  .ed-details-grid { grid-template-columns: 1fr; }
+  .ed-avail-grid { grid-template-columns: 1fr; }
+  .ed-card { padding: 20px; }
+}
