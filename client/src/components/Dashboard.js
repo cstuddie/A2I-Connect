@@ -233,6 +233,18 @@ const Dashboard = () => {
     fetchUpcoming();
   }, [userID]);
 
+  useEffect(() => {
+    const fetchRecommended = async () => {
+      try {
+        const response = await fetch(`http://localhost:3001/events/recommended/${userID}`);
+        const data = await response.json();
+        setRecommendedEvents(data);
+        fetchProfileNames(data, setRecommendedRequesterNameMap, setRecommendedInstructorNameMap);
+      } catch (error) { console.error('Error fetching recommended events:', error); }
+    };
+    fetchRecommended();
+  }, [userID]);
+
   return (
     <div className="dash-root">
       <UserHeader />

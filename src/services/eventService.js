@@ -93,33 +93,18 @@ exports.acceptEvent = async ({ eventID, speakerID }) => {
 };
 
 exports.recommendedEvents = async (userID) => {
-  // mirrors the logic from server.js [L1–L37]
-  const trueInterests = [];
-  const trueCourses = [];
+  const interests = await db('UserInterests')
+    .where('UserID', userID)
+    .select('InterestID');
 
-  const interestsRow = await db('interests').where('userID', userID).first();
-  if (interestsRow) {
-    for (const key in interestsRow) {
-      if (Object.prototype.hasOwnProperty.call(interestsRow, key) && interestsRow[key] === 1 && key !== 'userID') {
-        trueInterests.push(key);
-      }
-    }
-  }
+  if (interests.length === 0) return [];
 
-  for (const interest of trueInterests) {
-    const adjusted = interest.toLowerCase().replace(/ /g, '_');
-    const courses = await db('courses_' + adjusted).where('userID', userID).first();
-    if (courses) {
-      for (const key in courses) {
-        if (Object.prototype.hasOwnProperty.call(courses, key) && courses[key] === 1 && key !== 'userID') {
-          trueCourses.push(key);
-        }
-      }
-    }
-  }
+  const interestIDs = interests.map(i => i.InterestID);
 
-  return db('events')
-    .whereIn('course', trueCourses)
-    .andWhere('status', 'Pending')
-    .andWhereNot('requesterID', userID);
+  return db('Event')
+    .whereIn('ExpertiseID', interestIDs)
+    .where('EventStatus', 1)
+    .whereNull('InstructorID')
+    .whereNot('RequesterID', userID)
+    .select('*');
 };
