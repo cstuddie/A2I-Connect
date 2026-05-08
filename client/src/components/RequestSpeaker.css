@@ -1,0 +1,14 @@
+/* =====================
+   RequestSpeaker.css
+   ===================== */
+
+.rs-card {
+  max-width: 560px;
+}
+
+.rs-step-hint {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+  margin-top: -8px;
+}
