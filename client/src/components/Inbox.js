@@ -119,7 +119,9 @@ const Inbox = () => {
         const date = parseUTCDateTime(timestamp);
         if (!date) return '';
         const now = new Date();
-        const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const dateStart = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const diffInDays = Math.round((todayStart - dateStart) / (1000 * 60 * 60 * 24));
         if (diffInDays === 0) return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
         if (diffInDays === 1) return 'Yesterday';
         if (diffInDays < 7) return date.toLocaleDateString('en-US', { weekday: 'short' });

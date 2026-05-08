@@ -1,4 +1,3 @@
-const { default: DateTime } = require('tedious/lib/data-types/datetime');
 const db = require('../../db/knex');
 
 exports.getAllConversations = async (userID) => {
@@ -49,7 +48,7 @@ exports.getMessagesForConversation = async (conversationID) =>
   db('Message')
     .where('ConversationID', conversationID)
     .select('ID', 'TimeStamp', 'Content', 'SenderID', 'ConversationID', 'Read', 'FileName', 'FileType')
-    .orderBy('TimeStamp', 'asc');
+    .orderBy([{ column: 'TimeStamp', order: 'asc' }, { column: 'ID', order: 'asc' }]);
 
 exports.sendMessage = async ({ Content, SenderID, ConversationID, FileName = null, FileType = null, FileData = null }) => {
   const [id] = await db('Message').insert({

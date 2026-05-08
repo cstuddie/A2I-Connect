@@ -16,6 +16,11 @@ module.exports = {
       password: process.env.DB_PASSWORD,
       timezone: '+00:00'
     },
+    pool: {
+      afterCreate: (conn, done) => {
+        conn.query('SET time_zone = "+00:00"', done);
+      }
+    },
     migrations: {
       directory: './db/migrations',
     },
