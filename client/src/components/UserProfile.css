@@ -1,0 +1,118 @@
+/* =====================
+   UserProfile.css
+   ===================== */
+
+.up-body {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 48px 3%;
+}
+
+/* ---- Card ---- */
+.up-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ---- Hero ---- */
+.up-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+
+.up-avatar {
+  color: var(--muted);
+  line-height: 1;
+}
+
+.up-name {
+  font-family: 'Instrument Serif', serif;
+  font-size: 1.9rem;
+  letter-spacing: -0.02em;
+  color: var(--dark);
+  margin: 0;
+}
+
+.up-affiliation {
+  font-size: 0.95rem;
+  color: var(--mid);
+  margin: 0;
+}
+
+.up-own-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: var(--green-light);
+  color: var(--green-dark);
+  border: 1px solid #b5ddb0;
+  margin-top: 4px;
+}
+
+/* ---- Bio Section ---- */
+.up-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.up-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.up-bio {
+  font-size: 0.95rem;
+  color: var(--mid);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ---- Actions ---- */
+.up-actions {
+  padding-top: 4px;
+}
+
+.up-message-btn {
+  width: 100%;
+  padding: 13px;
+  background: var(--green-dark);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.up-message-btn:hover:not(:disabled) { background: var(--green); }
+.up-message-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ---- Status ---- */
+.up-status {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+.up-status.error { color: #c0392b; }
+
+/* ---- Responsive ---- */
+@media (max-width: 480px) {
+  .up-card { padding: 24px 20px; }
+}

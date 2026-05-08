@@ -3,18 +3,26 @@ import { Container, Row, Col, Button, Navbar, Nav } from 'react-bootstrap';
 import { NavLink, Link } from "react-router-dom";
 import { EventCard } from './Dashboard';
 import { FaUserCircle } from 'react-icons/fa';
-import "./Base.css";
+import "./LandingPage.css";
 import useTranslation from '../utils/useTranslation';
 
-const Card = ({ name, role }) => (
-  <div className="card">
-    <div className="icon-container">
-      <FaUserCircle size={60} />
+const ProfessionalCard = ({ name, role }) => (
+  <div className="pro-card">
+    <div className="pro-avatar">
+      <FaUserCircle size={48} />
     </div>
-    <div>
-      <h4><b>{name}</b></h4>
-      <p>{role}</p>
+    <div className="pro-info">
+      <h4>{name}</h4>
+      <p>{role || 'N/A'}</p>
     </div>
+    <div className="pro-badge">Available</div>
+  </div>
+);
+
+const CategoryPill = ({ label, icon }) => (
+  <div className="category-pill">
+    <span className="pill-icon">{icon}</span>
+    <span>{label}</span>
   </div>
 );
 
@@ -24,36 +32,30 @@ const LandingPage = () => {
   const [events, setEvents] = useState([]);
   const [usersMap, setUsersMap] = useState({});
   const [expertiseMap, setExpertiseMap] = useState({});
-
+ 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const res = await fetch('http://localhost:3001/users/');
         const data = await res.json();
         setProfessionals(data);
-
         const map = {};
-        data.forEach(u => {
-          map[u.ID] = `${u.FirstName} ${u.LastName}`;
-        });
+        data.forEach(u => { map[u.ID] = `${u.FirstName} ${u.LastName}`; });
         setUsersMap(map);
-
       } catch (err) {
         console.error('Error fetching users:', err);
       }
     };
     fetchUsers();
   }, []);
-
+ 
   useEffect(() => {
     const fetchExpertise = async () => {
       try {
         const res = await fetch('http://localhost:3001/users/expertise');
         const data = await res.json();
         const map = {};
-        data.forEach(e => {
-          map[e.ID] = e.Title;
-        });
+        data.forEach(e => { map[e.ID] = e.Title; });
         setExpertiseMap(map);
       } catch (err) {
         console.error('Error fetching expertise:', err);
@@ -61,7 +63,7 @@ const LandingPage = () => {
     };
     fetchExpertise();
   }, []);
-
+ 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -75,85 +77,145 @@ const LandingPage = () => {
     };
     fetchEvents();
   }, []);
-
+ 
+  const categories = [
+    { label: 'Development & IT', icon: '💻' },
+    { label: 'Design & Creative', icon: '🎨' },
+    { label: 'Research', icon: '🔬' },
+    { label: 'Engineering', icon: '⚙️' },
+    { label: 'Mathematics', icon: '📐' },
+    { label: 'Writing', icon: '✍️' },
+  ];
+ 
   return (
-    <div>
-      <Navbar bg="white" variant="light" expand="lg" sticky="top" className='border-bottom'>
-        <Navbar.Brand as={Link} to="/">
-            <h1>A2I Connect</h1>
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto">
-            <NavLink to="/login" className="nav-link me-3">
-              {t.login}
-            </NavLink>
-              <Button as={NavLink} variant="dark" to="/Register">
-              {t.signUp}
-            </Button>
-          </Nav>
-        </Navbar.Collapse>
-      </Navbar>
-
-      <Container>
-        <Row className="mb-5">
-          <div className="d-flex flex-column align-items-center" style={{paddingTop: '40px'}}>
-              <h1 style={{color: 'black'}}>{t.landingHeadline}</h1>
-            <p style={{textAlign: 'center'}}>
-              {t.landingSubtitle}
-            </p>
-              <Button as={NavLink} to="/Register" variant="dark" className="mt-3" style={{width: '400px'}}>
-                {t.getStarted}
-              </Button>
+    <div className="landing-root">
+ 
+      {/* Navbar */}
+      <nav className="landing-nav">
+        <Link to="/" className="nav-logo">A2I Connect</Link>
+        <div className="nav-links">
+          <NavLink to="/login" className="nav-link-text">Log in</NavLink>
+          <NavLink to="/Register" className="nav-btn-outline">Sign up</NavLink>
+        </div>
+      </nav>
+ 
+      {/* Hero */}
+      <section className="hero-section">
+        <div className="hero-content">
+          <h1 className="hero-headline">
+            Learning<br />
+            <span className="hero-accent">made accessible.</span>
+          </h1>
+          <p className="hero-sub">
+            Connect with top academic professionals and attend events that accelerate your learning.
+          </p>
+        </div>
+        <div className="hero-stats">
+          <div className="stat-item">
+            <span className="stat-number">500+</span>
+            <span className="stat-label">Professionals</span>
           </div>
-        </Row>
-        <Row className="mb-5">
-          <Col>
-              <h1 style={{textAlign: 'left', color: 'black'}}>{t.attendEvents}</h1>
-            <div className="card-container">
-              {events.slice(0, 10).map(event => (
-                <EventCard
-                  key={event.ID}
-                  eventID={event.ID}
-                  topic={event.Topic}
-                  requester={usersMap[event.RequesterID] || 'Unknown'}
-                  instructor={usersMap[event.InstructorID] || 'Unknown'}
-                  course={event.Course}
-                  date={event.Date}
-                />
-              ))}
+          <div className="stat-divider" />
+          <div className="stat-item">
+            <span className="stat-number">200+</span>
+            <span className="stat-label">Events hosted</span>
+          </div>
+          <div className="stat-divider" />
+          <div className="stat-item">
+            <span className="stat-number">50+</span>
+            <span className="stat-label">Fields of study</span>
+          </div>
+        </div>
+      </section>
+ 
+      {/* Trust bar */}
+      <section className="trust-bar">
+        <p className="trust-label">Trusted by students and professionals across</p>
+        <div className="trust-items">
+          <span>Mississippi State University</span>
+          <span>University of Mississippi</span>
+          <span>Jackson State University</span>
+          <span>University of Southern Mississippi</span>
+        </div>
+      </section>
+ 
+      {/* Upcoming Events */}
+      <section className="section events-section">
+        <div className="section-inner">
+          <div className="section-header">
+            <div>
+              <h2 className="section-title">Upcoming events</h2>
+              <p className="section-sub">Join live sessions hosted by professionals</p>
             </div>
-          </Col>
-        </Row>
-  
-        <Row className="mb-5">
-          <Col>
-              <h1 style={{textAlign: 'left', color: 'black'}}>{t.findProfessionals}</h1>
-            <div className="card-container">
-              {professionals.slice(0, 10).map(pro => (
-                <Card
-                  key={pro.ID}
-                  name={`${pro.FirstName} ${pro.LastName}`}
-                  role={expertiseMap[pro.ExpertiseID] || 'N/A'}
-                />
-              ))}
+            <NavLink to="/Register" className="section-cta">Browse all →</NavLink>
+          </div>
+          <div className="events-grid">
+            {events.slice(0, 6).map(event => (
+              <EventCard
+                key={event.ID}
+                eventID={event.ID}
+                topic={event.Topic}
+                requester={usersMap[event.RequesterID] || 'Unknown'}
+                instructor={usersMap[event.InstructorID] || 'Unknown'}
+                course={event.Course}
+                date={event.Date}
+              />
+            ))}
+            {events.length === 0 && (
+              <p className="empty-state">No upcoming events yet. Check back soon!</p>
+            )}
+          </div>
+        </div>
+      </section>
+ 
+      {/* Professionals */}
+      <section className="section professionals-section">
+        <div className="section-inner">
+          <div className="section-header">
+            <div>
+              <h2 className="section-title">Top professionals</h2>
+              <p className="section-sub">Experts ready to connect with you</p>
             </div>
-          </Col>
-        </Row>
-  
-        <Row className="text-center mt-5">
-          <Col>
-              <h1 style={{textAlign: 'left'}}>{t.startConnecting}</h1>
-              <div className="mt-4">
-                <Button as={NavLink} to="/Register" variant="dark">
-                {t.getStarted}
-              </Button>
-            </div>
-          </Col>
-        </Row>
-      </Container>
+            <NavLink to="/Register" className="section-cta">View all →</NavLink>
+          </div>
+          <div className="pros-grid">
+            {professionals.slice(0, 8).map(pro => (
+              <ProfessionalCard
+                key={pro.ID}
+                name={`${pro.FirstName} ${pro.LastName}`}
+                role={expertiseMap[pro.ExpertiseID]}
+              />
+            ))}
+            {professionals.length === 0 && (
+              <p className="empty-state">No professionals listed yet.</p>
+            )}
+          </div>
+        </div>
+      </section>
+ 
+      {/* CTA Banner */}
+      <section className="cta-banner">
+        <div className="cta-inner">
+          <h2>Ready to get started?</h2>
+          <p>Join A2I Connect and start learning from the best.</p>
+          <NavLink to="/Register" className="cta-btn">Create a free account</NavLink>
+        </div>
+      </section>
+ 
+      {/* Footer */}
+      <footer className="landing-footer">
+        <div className="footer-inner">
+          <span className="footer-logo">A2I Connect</span>
+          <div className="footer-links">
+            <NavLink to="/login">Log in</NavLink>
+            <NavLink to="/Register">Sign up</NavLink>
+          </div>
+          <p className="footer-copy">© {new Date().getFullYear()} A2I Connect. All rights reserved.</p>
+        </div>
+      </footer>
+ 
     </div>
   );
 };
-
+ 
 export default LandingPage;

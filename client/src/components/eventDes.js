@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Table, Badge, Button } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import { UserHeader } from './Dashboard';
 import { formatLocalDate } from '../utils/dateUtils';
 import JitsiMeeting from './JitsiMeeting';
-import "./Base.css";
+import './LandingPage.css';
+import './EventDes.css';
 import useTranslation from '../utils/useTranslation';
+
+const statusLabels = { 1: 'Pending', 2: 'Confirmed', 3: 'Completed' };
 
 const formatTime = (time) => {
   if (!time) return '';
@@ -36,29 +38,31 @@ const AvailabilitySection = ({ label, availabilityLabel, noAvailabilityText, use
   if (!userID) return null;
 
   return (
-    <div className="mt-3">
-      <h6><Badge bg="dark">{availabilityLabel || `${label} Availability`}</Badge></h6>
+    <div className="avail-section">
+      <h4 className="avail-title">{availabilityLabel || `${label} Availability`}</h4>
       {availability.length > 0 ? (
-        <Table size="sm" bordered hover>
-          <thead>
-            <tr>
-              <th>Day</th>
-              <th>Start</th>
-              <th>End</th>
-            </tr>
-          </thead>
-          <tbody>
-            {availability.map((slot, i) => (
-              <tr key={i}>
-                <td>{slot.DayOfWeek}</td>
-                <td>{formatTime(slot.StartTime)}</td>
-                <td>{formatTime(slot.EndTime)}</td>
+        <div className="avail-table-wrapper">
+          <table className="avail-table">
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Start</th>
+                <th>End</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {availability.map((slot, i) => (
+                <tr key={i}>
+                  <td>{slot.DayOfWeek}</td>
+                  <td>{formatTime(slot.StartTime)}</td>
+                  <td>{formatTime(slot.EndTime)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
-        <p className="text-muted fst-italic">{noAvailabilityText || 'No availability set.'}</p>
+        <p className="dash-empty">{noAvailabilityText || 'No availability set.'}</p>
       )}
     </div>
   );
@@ -79,21 +83,14 @@ const EventDescription = () => {
   const [callError, setCallError] = useState(null);
 
   useEffect(() => {
-    if (!userID) {
-      navigate('/login');
-      return;
-    }
-
+    if (!userID) { navigate('/login'); return; }
     const fetchProfile = async () => {
       try {
         const res = await fetch(`http://localhost:3001/users/${userID}`);
         const data = await res.json();
         setProfileInfo(data);
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) { console.error(err); }
     };
-
     fetchProfile();
   }, [userID, navigate]);
 
@@ -103,11 +100,8 @@ const EventDescription = () => {
         const res = await fetch(`http://localhost:3001/events/${eventID}`);
         const data = await res.json();
         setEvent(data);
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) { console.error(err); }
     };
-
     fetchEvent();
   }, [eventID]);
 
@@ -149,93 +143,70 @@ const EventDescription = () => {
   );
 
   return (
-    <div>
-      <UserHeader
-        name={
-          profileInfo
-            ? `${profileInfo.FirstName} ${profileInfo.LastName}`
-            : ''
-        }
-      />
+    <div className="dash-root">
+      <UserHeader name={profileInfo ? `${profileInfo.FirstName} ${profileInfo.LastName}` : ''} />
 
-      <Container className="my-4">
-        <h1 className="text-center mb-4">{t.eventDetail}</h1>
+      <div className="dash-banner">
+        <div className="dash-banner-inner">
+          <h1 className="dash-banner-title">{event?.Topic || t.eventDetail}</h1>
+          <p className="dash-banner-sub">{t.eventDetail || 'Event Details'}</p>
+        </div>
+      </div>
 
-        <Card>
-          <Card.Body>
-            <Card.Title className="mb-3">
-              <strong>{event?.Topic || 'N/A'}</strong>
-            </Card.Title>
+      <div className="ed-body">
 
-            <Row>
-              <Col md={6} className="mb-3">
-                <strong>{t.instructor}:</strong>{' '}
-                {event?.InstructorName || 'Unassigned'}
-              </Col>
+        {/* Main Info Card */}
+        <div className="ed-main">
+          <div className="ed-card">
 
-              <Col md={6} className="mb-3">
-                <strong>{t.requester}:</strong>{' '}
-                {event?.RequesterName || 'N/A'}
-              </Col>
+            {/* Details Grid */}
+            <div className="ed-details-grid">
+              <div className="ed-detail-item">
+                <span className="ed-detail-label">{t.instructor}</span>
+                <span className="ed-detail-value">{event?.InstructorName || 'Unassigned'}</span>
+              </div>
+              <div className="ed-detail-item">
+                <span className="ed-detail-label">{t.requester}</span>
+                <span className="ed-detail-value">{event?.RequesterName || 'N/A'}</span>
+              </div>
+              <div className="ed-detail-item">
+                <span className="ed-detail-label">{t.date}</span>
+                <span className="ed-detail-value">{formatLocalDate(event?.Date)}</span>
+              </div>
+              <div className="ed-detail-item">
+                <span className="ed-detail-label">{t.deliveryMethod}</span>
+                <span className="ed-detail-value">{event?.DeliveryMethod || 'N/A'}</span>
+              </div>
+              <div className="ed-detail-item">
+                <span className="ed-detail-label">{t.status}</span>
+                <span className={`ed-status-badge status-${event?.EventStatus}`}>
+                  {statusLabels[event?.EventStatus] || 'N/A'}
+                </span>
+              </div>
+            </div>
 
-              <Col md={6} className="mb-3">
-                <strong>{t.date}:</strong>{' '}
-                {formatLocalDate(event?.Date)}
-              </Col>
+            {/* Description */}
+            <div className="ed-description">
+              <span className="ed-detail-label">{t.description}</span>
+              <p className="ed-description-text">{event?.Description || 'N/A'}</p>
+            </div>
 
-              <Col md={6} className="mb-3">
-                <strong>{t.deliveryMethod}:</strong>{' '}
-                {event?.DeliveryMethod || 'N/A'}
-              </Col>
-
-              <Col md={6} className="mb-3">
-                <strong>{t.status}:</strong>{' '}
-                {event?.EventStatus ?? 'N/A'}
-              </Col>
-
-              <Col md={12} className="mb-3">
-                <strong>{t.description}:</strong>
-                <br />
-                {event?.Description || 'N/A'}
-              </Col>
-            </Row>
-
-            <hr />
-
-            <Row>
-              <Col md={6}>
-                <AvailabilitySection
-                  label={t.requester}
-                  availabilityLabel={t.requesterAvailability}
-                  noAvailabilityText={t.noAvailability}
-                  userID={event?.RequesterID}
-                />
-              </Col>
-              <Col md={6}>
-                <AvailabilitySection
-                  label={t.instructor}
-                  availabilityLabel={t.instructorAvailability}
-                  noAvailabilityText={t.noAvailability}
-                  userID={event?.InstructorID}
-                />
-              </Col>
-            </Row>
-
+            {/* Actions */}
             {event && !event.InstructorID && event.EventStatus === 1 && parseInt(userID) !== event.RequesterID && (
-              <div className="mt-4 text-center">
-                {acceptError && <div className="alert alert-danger mb-3">{acceptError}</div>}
-                <Button variant="success" size="lg" onClick={handleAccept} disabled={accepting}>
+              <div className="ed-actions">
+                {acceptError && <div className="auth-error">{acceptError}</div>}
+                <button className="ed-accept-btn" onClick={handleAccept} disabled={accepting}>
                   {accepting ? 'Accepting...' : 'Accept Speaking Request'}
-                </Button>
+                </button>
               </div>
             )}
 
             {event && event.EventStatus === 2 && isParticipant && !callActive && (
-              <div className="mt-4 text-center">
-                {callError && <div className="alert alert-danger mb-3">{callError}</div>}
-                <Button variant="primary" size="lg" onClick={handleJoinCall}>
+              <div className="ed-actions">
+                {callError && <div className="auth-error">{callError}</div>}
+                <button className="ed-call-btn" onClick={handleJoinCall}>
                   📹 Join Video Call
-                </Button>
+                </button>
               </div>
             )}
 
@@ -246,9 +217,29 @@ const EventDescription = () => {
                 onClose={() => setCallActive(false)}
               />
             )}
-          </Card.Body>
-        </Card>
-      </Container>
+          </div>
+
+          {/* Availability */}
+          <div className="ed-card">
+            <h3 className="ed-avail-heading">Availability</h3>
+            <div className="ed-avail-grid">
+              <AvailabilitySection
+                label={t.requester}
+                availabilityLabel={t.requesterAvailability}
+                noAvailabilityText={t.noAvailability}
+                userID={event?.RequesterID}
+              />
+              <AvailabilitySection
+                label={t.instructor}
+                availabilityLabel={t.instructorAvailability}
+                noAvailabilityText={t.noAvailability}
+                userID={event?.InstructorID}
+              />
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 };
