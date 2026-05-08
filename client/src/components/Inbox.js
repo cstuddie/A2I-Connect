@@ -145,7 +145,12 @@ const Inbox = () => {
 
     // Format timestamp
     const formatTimestamp = (timestamp) => {
+
+        if (!timestamp) return '';
+
         const date = parseUTCDateTime(timestamp);
+        if (!date) return '';
+
         const now = new Date();
         const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
 

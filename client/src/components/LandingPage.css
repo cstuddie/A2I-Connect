@@ -344,6 +344,7 @@ body { font-family: 'DM Sans', sans-serif; color: var(--dark); }
   color: #a0a0a0;
   font-size: 1rem;
   margin-bottom: 2rem;
+  text-align: center;
 }
 
 .cta-btn {
